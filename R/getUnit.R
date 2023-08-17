@@ -1,7 +1,21 @@
+#' Get a unit with resources
+#'
+#' @param workspace [Workspace-class]. Workspace information necessary to retrieve unit information and resources from the API.
+#' @param id Character. Name of the unit to be retrieved.
+#'
+#' @description
+#' This function only returns the unit information and coding scheme for a single unit. To retrieve multiple units, use [getUnits()].
+#'
+#' @return A tibble.
+#'
+#' @examples
+#' @aliases
+#' getUnit,Workspace-method
 setGeneric("getUnit", function(workspace, id) {
   standardGeneric("getUnit")
 })
 
+#' @describeIn getUnit Get unit information and coding scheme in a defined workspace
 setMethod("getUnit",
           signature = signature(workspace = "Workspace"),
           function(workspace, id) {
@@ -17,7 +31,7 @@ setMethod("getUnit",
             request_xml <- httr::GET(url = glue::glue(
               "{domain}/workspace/{ws_id}/file/Unit/{id}.xml"
             ),
-            config = httr::add_headers(.headers=headers)
+            config = httr::add_headers(.headers = headers)
             )
 
             if (request_xml$status_code == 200) {

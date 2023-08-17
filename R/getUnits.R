@@ -1,31 +1,30 @@
+#' Get multiple units with resources
+#'
+#' @param workspace [Workspace-class]. Workspace information necessary to retrieve multiple unit information and resources (coding schemes) from the API.
+#' @param id Character vector (optional). Names of the units to be retrieved. If no id is set, all units files and their resources in the workspace are retrieved.
+#'
+#' @description
+#' This function returns the unit information for multiple units by repeatedly calling [getUnit()].
+#'
+#' @return A tibble.
+#' @export
+#'
+#' @examples
+#' @aliases
+#' getUnits,Workspace-method
 setGeneric("getUnits", function(workspace, ...) {
   standardGeneric("getUnits")
 })
 
+#' @describeIn getUnits Get multiple unit information and coding schemes in a defined workspace
 setMethod("getUnits",
           signature = signature(workspace = "Workspace"),
           function(workspace, id = NULL) {
-            ws_unit_ids_all <- listUnits(workspace)
-            if (is.null(id)) {
-              ws_unit_ids <- ws_unit_ids_all
-            } else {
-              ws_unit_ids <- intersect(id, ws_unit_ids_all)
-
-              ws_units_not <- setdiff(id, ws_unit_ids_all)
-              n_ws_units_not <- length(ws_units_not)
-              if (length(ws_units_not) >= 1) {
-                cli::cli_alert_danger("No unit information could be retrieved for {n_ws_units_not} unit{?s}: {ws_units_not}")
-              }
-            }
-
-            ws_units_tbl <-
-              tibble::enframe(ws_unit_ids, name = NULL, value = "id") %>%
-              dplyr::mutate(
-                resource = purrr::map(id,
-                                      .f = function(x) getUnit(workspace, x),
-                                      .progress = list(name = "Downloading unit information"))
-              ) %>%
-              tidyr::unnest(resource)
-
-            return(ws_units_tbl)
+            getFiles(
+              workspace = workspace,
+              id = id,
+              type = "unit",
+              listFun = listUnits,
+              getFun = getUnit
+            )
           })

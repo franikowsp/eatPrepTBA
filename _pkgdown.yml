@@ -1,4 +1,32 @@
 url: ~
 template:
   bootstrap: 5
-
+reference:
+- title: Connecting to the Testcenter
+  desc: >
+    Functions and classes for communicating with the IQB Testcenter API
+- subtitle: Functions for access
+  contents:
+  - createLogin
+  - accessWorkspace
+- subtitle: Functions to list resources
+  contents:
+  - listFiles
+  - listUnits
+  - listResources
+  - listBooklets
+  - listTesttakers
+- subtitle: Functions to retrieve (multiple) resources
+  contents:
+  - getUnits
+  - getBooklets
+  - getTesttakers
+- subtitle: Functions to retrieve (single) resources (not exported)
+  contents:
+  - getUnit
+  - getBooklet
+  - getTesttaker
+- subtitle: Classes
+  contents:
+  - Login-class
+  - Workspace-class
