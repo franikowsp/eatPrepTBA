@@ -21,6 +21,10 @@ reference:
   - getUnits
   - getBooklets
   - getTesttakers
+- subtitle: Functions to retrieve (multiple) responses
+  contents:
+  - getResults
+  - getResponses
 - subtitle: Functions to retrieve (single) resources (not exported)
   contents:
   - getUnit

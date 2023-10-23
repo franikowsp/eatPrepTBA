@@ -4,6 +4,7 @@
 #' Provides a routine to login to an instance of the IQB Testcenter.
 #'
 #' @param domain Character. Domain of the hosted instance of the IQB Testcenter. Default is the IQB Testcenter.
+#' @param dialog Logical. Should the password be entered using RStudio dialogs (`TRUE`) or using the console (`FALSE`). Defaults to `TRUE`.
 #'
 #' @return An object of the [Login-class] class.
 #' @export
@@ -28,23 +29,37 @@
 #' Note that the name and the password are only available to the function call
 #' and cannot be accessed later as they are not part of the [Login-class] object generated.
 #'
-createLogin <- function(domain = "https://iqb-testcenter.de/api") {
+createLogin <- function(domain = "https://iqb-testcenter.de/api", dialog = TRUE, ...) {
   cli_setting()
 
-  isRStudio <- Sys.getenv("RSTUDIO") == "1"
+  if (!getOption("eatPrepTBA.test_mode") | is.null(getOption("eatPrepTBA.test_mode"))) {
+    isRStudio <- Sys.getenv("RSTUDIO") == "1"
 
-  if (isRStudio) {
-    name <- rstudioapi::askForPassword("Enter your user name: ")
-    password <- rstudioapi::askForPassword("Enter your user password: ")
+    if (isRStudio & dialog) {
+      name <- rstudioapi::askForPassword("Enter your username: ")
+      password <- rstudioapi::askForPassword("Enter your password: ")
+    } else {
+      name <- readline(prompt = "Enter your username: ")
+      password <- readline(prompt = "Enter your password: ")
+    }
+
+    credentials <- list(
+      name = name,
+      password = password
+    )
   } else {
-    name <- readline(prompt = "Enter your user name: ")
-    password <- readline(prompt = "Enter your user password: ")
+    # Routine for testing purposes only
+    credentials <- list(...)
+
+    if (is.null(credentials) || is.null(credentials$name) || is.null(credentials$password)) {
+      credentials <- list(
+        name = "eatPrepTBA",
+        password = "eatPrepTBA"
+      )
+    }
+
   }
 
-  credentials <- list(
-    name = name,
-    password = password
-  )
 
   request <- httr::PUT(glue::glue("{domain}/session/admin"),
                        config = httr::content_type_json(),
@@ -68,10 +83,12 @@ createLogin <- function(domain = "https://iqb-testcenter.de/api") {
     cli::cli_alert_success("Login was successful.")
     cli::cli_text("A token was generated to access the following workspaces ({.ws-id id}: {.ws label}):")
     cli::cli_li(items = glue::glue("{{.ws-id {Login@workspace}}}: {{.ws {names(Login@workspace)}}}"))
+    cli::cli_alert_info("Please note that the login becomes invalid if you log in to the Testcenter manually.")
 
-    return(Login)
+
+    return(invisible(Login))
   } else {
-    cli::cli_alert_danger("Login was not successful. Please check if you have admin rights.")
+    cli::cli_alert_danger("Login was not successful. Please check if you have admin rights or are already logged in on a browser.")
 
     return(NULL)
   }

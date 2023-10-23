@@ -8,6 +8,7 @@
 #'
 #' @return A tibble.
 #'
+#'
 #' @examples
 #' @aliases
 #' getTesttaker,Workspace-method
@@ -47,8 +48,71 @@ setMethod("getTesttaker",
               response_xml <- tibble::tibble()
             }
 
+            # Transformations
             response_tbl <-
-              response_xml
+              response_xml %>%
+              dplyr::select(
+                Group
+              ) %>%
+              dplyr::mutate(
+                Group = .extractGroup(Group)
+              ) %>%
+              tidyr::unnest(
+                Group
+              )
 
             return(response_tbl)
           })
+
+# Helpers
+.extractGroup <- function(Group) {
+  login_information <-
+    Group %>%
+    purrr::map_depth(.depth = 3, .f = function(x) {
+      Booklet <- x[["Booklet"]][[1]]
+      attributes(Booklet) <- NULL
+      Booklet
+
+      attributes(x) %>%
+        tibble::as_tibble() %>%
+        dplyr::mutate(
+          booklet = Booklet
+        ) %>%
+        dplyr::distinct()
+    }) %>%
+    purrr::map_depth(.depth = 2, .f = function(x) dplyr::bind_rows(x)) %>%
+    purrr::map_depth(.depth = 1, .f = function(x) dplyr::bind_rows(x)) %>%
+    # Avoid naming conflicts
+    purrr::map(.f = function(x) {
+      x %>%
+        dplyr::select(
+          mode,
+          login_name = name,
+          booklet,
+        )
+    })
+
+  group_names <-
+    Group %>%
+    purrr::map_depth(.depth = 2, .f = function(x) attributes(x) %>% tibble::as_tibble()) %>%
+    purrr::map_depth(.depth = 1, .f = function(x) dplyr::bind_rows(x)) %>%
+    # Avoid naming conflicts
+    purrr::map(.f = function(x) {
+      x %>%
+        dplyr::select(
+          groupname = id,
+          group_label = label
+        )
+    })
+
+  group_names %>%
+    purrr::imap(
+      .f = function(x, index) {
+        dplyr::bind_cols(
+          x,
+          login_information[[index]],
+        )
+      }
+    )
+
+}

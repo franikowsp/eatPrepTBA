@@ -75,3 +75,23 @@ setMethod("getUnit",
 
             return(response_tbl)
           })
+
+# units <- getUnits(workspace)
+#
+# codes <- units$vocs[[2]]$value %>%
+#   tibble::enframe()
+#
+# ex <- codes$value[[1]] %>%
+#   tibble::enframe() %>%
+#   tidyr::pivot_wider() %>%
+#   tidyr::unnest(c(id, sourceType, status, deriveSourceType, manualInstruction, label))
+#
+# ex$codes[[1]] %>%
+#   purrr::map(tibble::enframe) %>%
+#   tibble::enframe(name = "code") %>%
+#   tidyr::unnest(value) %>%
+#   tidyr::pivot_wider() %>%
+#   tidyr::unnest(cols = c(code, id, label, score, manualInstruction))
+#
+# units$xml[[1]]$BaseVariables[[1]]$Variable$Values %>%
+#   purrr::map_depth(.depth = 1, function(x) tibble::tibble(value = x$value[[1]], label = x$label[[1]]))
