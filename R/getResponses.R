@@ -66,7 +66,10 @@ setMethod("getResponses",
                 tidyr::unnest(c(
                   responses,
                   laststate
-                ))
+                )) %>%
+                dplyr::rename(
+                  variable_id = id
+                )
             } else {
               response_json <- tibble::tibble()
             }

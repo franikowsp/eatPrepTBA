@@ -1,5 +1,5 @@
 # Prepare tests with global variable --------------------------------------
-originalTestMode <- getOption("eatPrepTBA.test_mode")
+# originalTestMode <- getOption("eatPrepTBA.test_mode")
 
 options("eatPrepTBA.test_mode" = TRUE)
 
@@ -14,5 +14,3 @@ cli::test_that_cli("login fails with wrong or omitted name and/or password", {
 })
 
 options("eatPrepTBA.test_mode" = originalTestMode)
-
-

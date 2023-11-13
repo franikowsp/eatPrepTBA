@@ -26,5 +26,6 @@ setMethod("getUnits",
               type = "unit",
               listFun = listUnits,
               getFun = getUnit
-            )
+            ) %>%
+              dplyr::rename(unitname = id)
           })

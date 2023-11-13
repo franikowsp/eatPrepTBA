@@ -4,10 +4,12 @@
 \alias{createLogin}
 \title{Generate a \linkS4class{Login} object}
 \usage{
-createLogin(domain = "https://iqb-testcenter.de/api")
+createLogin(domain = "https://iqb-testcenter.de/api", dialog = TRUE, ...)
 }
 \arguments{
 \item{domain}{Character. Domain of the hosted instance of the IQB Testcenter. Default is the IQB Testcenter.}
+
+\item{dialog}{Logical. Should the password be entered using RStudio dialogs (\code{TRUE}) or using the console (\code{FALSE}). Defaults to \code{TRUE}.}
 }
 \value{
 An object of the \linkS4class{Login} class.

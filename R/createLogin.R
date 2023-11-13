@@ -32,7 +32,9 @@
 createLogin <- function(domain = "https://iqb-testcenter.de/api", dialog = TRUE, ...) {
   cli_setting()
 
-  if (!getOption("eatPrepTBA.test_mode") | is.null(getOption("eatPrepTBA.test_mode"))) {
+  test_mode <- getOption("eatPrepTBA.test_mode")
+
+  if (is.null(test_mode) || ! test_mode) {
     isRStudio <- Sys.getenv("RSTUDIO") == "1"
 
     if (isRStudio & dialog) {

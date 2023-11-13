@@ -11,14 +11,14 @@
 #' @examples
 #' @aliases
 #' getUnit,Workspace-method
-setGeneric("getUnit", function(workspace, id) {
+setGeneric("getUnit", function(workspace, id, ...) {
   standardGeneric("getUnit")
 })
 
 #' @describeIn getUnit Get unit information and coding scheme in a defined workspace
 setMethod("getUnit",
           signature = signature(workspace = "Workspace"),
-          function(workspace, id) {
+          function(workspace, id, prepare = TRUE) {
             domain <- workspace@login@domain
             ws_id <- workspace@id
 
@@ -73,25 +73,13 @@ setMethod("getUnit",
                 vocs = list(response_vocs)
               )
 
-            return(response_tbl)
+            if (prepare) {
+              response_tbl %>%
+                dplyr::mutate(
+                  xml = purrr::map(xml, prepareUnitXml),
+                  vocs = purrr::map(vocs, prepareUnitVocs)
+                )
+            } else {
+              return(response_tbl)
+            }
           })
-
-# units <- getUnits(workspace)
-#
-# codes <- units$vocs[[2]]$value %>%
-#   tibble::enframe()
-#
-# ex <- codes$value[[1]] %>%
-#   tibble::enframe() %>%
-#   tidyr::pivot_wider() %>%
-#   tidyr::unnest(c(id, sourceType, status, deriveSourceType, manualInstruction, label))
-#
-# ex$codes[[1]] %>%
-#   purrr::map(tibble::enframe) %>%
-#   tibble::enframe(name = "code") %>%
-#   tidyr::unnest(value) %>%
-#   tidyr::pivot_wider() %>%
-#   tidyr::unnest(cols = c(code, id, label, score, manualInstruction))
-#
-# units$xml[[1]]$BaseVariables[[1]]$Variable$Values %>%
-#   purrr::map_depth(.depth = 1, function(x) tibble::tibble(value = x$value[[1]], label = x$label[[1]]))

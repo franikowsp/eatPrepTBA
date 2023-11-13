@@ -45,3 +45,9 @@ po/*~
 rsconnect/
 
 inst/
+inst/doc
+/doc/
+/Meta/
+
+# User-defined
+R/ZZZ_DEV.R
