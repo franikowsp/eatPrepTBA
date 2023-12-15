@@ -19,13 +19,13 @@ setGeneric("getUnits", function(workspace, ...) {
 #' @describeIn getUnits Get multiple unit information and coding schemes in a defined workspace
 setMethod("getUnits",
           signature = signature(workspace = "WorkspaceTestcenter"),
-          function(workspace, id = NULL) {
+          function(workspace, id = NULL, prepare = TRUE) {
             getFiles(
               workspace = workspace,
               id = id,
               type = "unit",
               listFun = listUnits,
-              getFun = getUnit
+              getFun = function(workspace, id) getUnit(workspace = workspace, id = id, prepare = prepare)
             ) %>%
               dplyr::rename(unitname = id)
           })
