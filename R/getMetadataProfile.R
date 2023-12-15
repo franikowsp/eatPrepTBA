@@ -27,18 +27,29 @@ getMetadataProfile <- function(url) {
     ) %>%
     tidyr::unnest(profile)
 
-  profile_read %>%
-    dplyr::filter(
-      stringr::str_detect(prefLabel.de, "sprachlich oder inhaltlich ähnliche Wörter")
-    )
+  # Merge notation
+  if (tibble::has_name(profile_read, "notation")) {
+    profile_relabel <-
+      profile_read %>%
+      dplyr::mutate(
+        label = dplyr::case_when(
+          !is.na(notation) ~ stringr::str_glue("{{{notation}}} {prefLabel.de}") %>% as.character(),
+          .default = prefLabel.de
+        )
+      )
+  } else {
+    profile_relabel <-
+      profile_read %>%
+      dplyr::rename(
+        label = prefLabel.de
+      )
+  }
 
-
-  profile_read %>%
+  profile_relabel %>%
     dplyr::select(
       name,
       value.id = id,
-      notation,
-      label = prefLabel.de,
+      label,
       multiple
     ) %>%
     tidyr::nest(
