@@ -3,7 +3,6 @@
 \name{getLogs,WorkspaceTestcenter-method}
 \alias{getLogs,WorkspaceTestcenter-method}
 \alias{getResponses}
-\alias{getResponses,Workspace-method}
 \alias{getResponses,WorkspaceTestcenter-method}
 \alias{getSystemCheck,WorkspaceTestcenter-method}
 \title{Get responses}
@@ -17,7 +16,7 @@ getResponses(workspace, groups)
 \S4method{getSystemCheck}{WorkspaceTestcenter}(workspace, groups)
 }
 \arguments{
-\item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve unit information and resources from the API.}
+\item{workspace}{\linkS4class{WorkspaceTestcenter}. Workspace information necessary to retrieve unit information and resources from the API.}
 
 \item{groups}{Character. Name of the groups to be retrieved.}
 }

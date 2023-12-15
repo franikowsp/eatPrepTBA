@@ -11,7 +11,7 @@ listUnits(workspace, ...)
 
 \S4method{listUnits}{WorkspaceTestcenter}(workspace)
 
-\S4method{listUnits}{WorkspaceStudio}(workspace, metadata = TRUE)
+\S4method{listUnits}{WorkspaceStudio}(workspace)
 }
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve unit list from the API.}

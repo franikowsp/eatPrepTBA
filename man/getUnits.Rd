@@ -2,15 +2,19 @@
 % Please edit documentation in R/getUnits.R
 \name{getUnits}
 \alias{getUnits}
-\alias{getUnits,Workspace-method}
+\alias{getUnits,WorkspaceTestcenter-method,WorkspaceStudio-method}
+\alias{getUnits,WorkspaceTestcenter-method}
+\alias{getUnits,WorkspaceStudio-method}
 \title{Get multiple units with resources}
 \usage{
 getUnits(workspace, ...)
 
-\S4method{getUnits}{Workspace}(workspace, id = NULL)
+\S4method{getUnits}{WorkspaceTestcenter}(workspace, id = NULL)
+
+\S4method{getUnits}{WorkspaceStudio}(workspace, id = NULL)
 }
 \arguments{
-\item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve multiple unit information and resources (coding schemes) from the API.}
+\item{workspace}{\linkS4class{WorkspaceTestcenter}. Workspace information necessary to retrieve multiple unit information and resources (coding schemes) from the API.}
 
 \item{id}{Character vector (optional). Names of the units to be retrieved. If no id is set, all units files and their resources in the workspace are retrieved.}
 }
@@ -22,6 +26,8 @@ This function returns the unit information for multiple units by repeatedly call
 }
 \section{Functions}{
 \itemize{
-\item \code{getUnits(Workspace)}: Get multiple unit information and coding schemes in a defined workspace
+\item \code{getUnits(WorkspaceTestcenter)}: Get multiple unit information and coding schemes in a defined workspace
+
+\item \code{getUnits(WorkspaceStudio)}: Get multiple unit information and coding schemes in a defined workspace
 
 }}
