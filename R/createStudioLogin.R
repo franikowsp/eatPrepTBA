@@ -6,6 +6,8 @@
 #' @param domain Character. Domain of the hosted instance of the IQB Studio Lite. Default is the IQB Studio Lite.
 #' @param dialog Logical. Should the password be entered using RStudio dialogs (`TRUE`) or using the console (`FALSE`). Defaults to `TRUE`.
 #' @param version Character. App version of the IQB Studio instance. Defaults to "5.2.1".
+#' @param keyring Logical. Should the [keyring] package be used to save the passkey? This saves your credentials to your local machine.
+#' @param keyring Logical. If your password on the domain has changed - should the [keyring] password be changed?
 #'
 #' @return An object of the [LoginStudio-class] class.
 #' @export
@@ -29,36 +31,63 @@
 #'
 createStudioLogin <- function(domain = "https://www.iqb-studio.de/api",
                               dialog = TRUE,
-                              version = "5.2.1", ...) {
+                              version = "5.2.1",
+                              keyring = FALSE,
+                              changeKey = FALSE,
+                              ...) {
   cli_setting()
-
+  isRStudio <- Sys.getenv("RSTUDIO") == "1"
   test_mode <- getOption("eatPrepTBA.test_mode")
 
-  if (is.null(test_mode) || ! test_mode) {
-    isRStudio <- Sys.getenv("RSTUDIO") == "1"
+  if (keyring) {
+    name <- keyring::key_list(service = domain)[["username"]]
+    hasKey <- length(name) != 0
 
-    if (isRStudio & dialog) {
-      name <- rstudioapi::askForPassword("Enter your username: ")
-      password <- rstudioapi::askForPassword("Enter your password: ")
-    } else {
-      name <- readline(prompt = "Enter your username: ")
-      password <- readline(prompt = "Enter your password: ")
+    if (! hasKey || changeKey) {
+      if (changeKey) {
+        keyring::key_delete(service = domain, username = name)
+      }
+
+      if (isRStudio) {
+        name <- rstudioapi::askForPassword(stringr::str_glue("Enter your username for {domain}: "))
+      } else {
+        name <- readline(prompt = "Enter your username: ")
+      }
+
+      keyring::key_set(service = domain, username = name)
     }
 
     credentials <- list(
       name = name,
-      password = URLencode(password, reserved = TRUE)
+      password = URLencode(keyring::key_get(service = domain, username = name), reserved = TRUE)
     )
-  } else {
-    # Routine for testing purposes only
-    credentials <- list(...)
 
-    if (is.null(credentials) || is.null(credentials$name) || is.null(credentials$password)) {
+  } else {
+    if (is.null(test_mode) || ! test_mode) {
+      if (isRStudio & dialog) {
+        name <- rstudioapi::askForPassword("Enter your username: ")
+        password <- rstudioapi::askForPassword("Enter your password: ")
+      } else {
+        name <- readline(prompt = "Enter your username: ")
+        password <- readline(prompt = "Enter your password: ")
+      }
+
       credentials <- list(
-        name = "eatPrepTBA",
-        password = URLencode("eatPrepTBA", reserved = TRUE)
+        name = name,
+        password = URLencode(password, reserved = TRUE)
       )
+    } else {
+      # Routine for testing purposes only
+      credentials <- list(...)
+
+      if (is.null(credentials) || is.null(credentials$name) || is.null(credentials$password)) {
+        credentials <- list(
+          name = "eatPrepTBA",
+          password = URLencode("eatPrepTBA", reserved = TRUE)
+        )
+      }
     }
+
   }
 
   headers = c(
@@ -66,7 +95,7 @@ createStudioLogin <- function(domain = "https://www.iqb-studio.de/api",
   )
 
   request <- httr::POST(url = glue::glue("{domain}/login?username={credentials$name}&password={credentials$password}"),
-                  httr::add_headers(headers))
+                        httr::add_headers(headers))
 
   if (request$status_code == 201) {
     response <- stringr::str_remove_all(httr::content(request, as = "text"), "\"")
@@ -76,7 +105,7 @@ createStudioLogin <- function(domain = "https://www.iqb-studio.de/api",
                  "Authorization" = as.character(token))
 
     request_workspaces <- httr::GET(url = glue::glue("{domain}/auth-data"),
-                              httr::add_headers(headers))
+                                    httr::add_headers(headers))
 
     ws_group_ids <-
       httr::content(request_workspaces)$workspaces %>%

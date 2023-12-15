@@ -18,7 +18,8 @@ Imports:
     forcats,
     stringr,
     cli,
-    zip
+    zip,
+    keyring
 Suggests: 
     knitr,
     rmarkdown,

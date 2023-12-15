@@ -8,6 +8,8 @@ createStudioLogin(
   domain = "https://www.iqb-studio.de/api",
   dialog = TRUE,
   version = "5.2.1",
+  keyring = FALSE,
+  changeKey = FALSE,
   ...
 )
 }
@@ -17,6 +19,8 @@ createStudioLogin(
 \item{dialog}{Logical. Should the password be entered using RStudio dialogs (\code{TRUE}) or using the console (\code{FALSE}). Defaults to \code{TRUE}.}
 
 \item{version}{Character. App version of the IQB Studio instance. Defaults to "5.2.1".}
+
+\item{keyring}{Logical. If your password on the domain has changed - should the \link{keyring} password be changed?}
 }
 \value{
 An object of the \linkS4class{LoginStudio} class.

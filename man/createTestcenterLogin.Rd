@@ -7,6 +7,8 @@
 createTestcenterLogin(
   domain = "https://iqb-testcenter.de/api",
   dialog = TRUE,
+  keyring = FALSE,
+  changeKey = FALSE,
   ...
 )
 }
