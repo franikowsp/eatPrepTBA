@@ -5,15 +5,13 @@
 \alias{Login-class}
 \title{Login credentials}
 \description{
-A class containing the token to communicate with the Testcenter API. Objects of this class will be created by the function \code{\link[=createLogin]{createLogin()}}.
+A class containing the token to communicate with the API of the IQB Studio Lite or the IQB Testcenter. Objects of this class will be created by the function \code{\link[=createStudioLogin]{createStudioLogin()}} or \code{\link[=createTestcenterLogin]{createTestcenterLogin()}}.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{domain}}{Character. Domain of the IQB Testcenter instance.}
+\item{\code{domain}}{Character. Domain of the IQB instance.}
 
-\item{\code{token}}{Character. Access token to communicate with the IQB Testcenter API (will be handled internally).}
-
-\item{\code{workspace}}{Named character vector. Returns the labels and ids of the workspaces the user has access to.}
+\item{\code{token}}{Character. Access token to communicate with the API (will be handled internally).}
 }}
 

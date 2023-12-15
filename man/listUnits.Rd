@@ -3,11 +3,15 @@
 \name{listUnits}
 \alias{listUnits}
 \alias{listUnits,Workspace-method}
+\alias{listUnits,WorkspaceTestcenter-method}
+\alias{listUnits,WorkspaceStudio-method}
 \title{List unit files}
 \usage{
-listUnits(workspace)
+listUnits(workspace, ...)
 
-\S4method{listUnits}{Workspace}(workspace)
+\S4method{listUnits}{WorkspaceTestcenter}(workspace)
+
+\S4method{listUnits}{WorkspaceStudio}(workspace, metadata = TRUE)
 }
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve unit list from the API.}
@@ -23,6 +27,8 @@ This function serves as a wrapper for \code{\link[=getFiles]{getFiles()}}.
 }
 \section{Functions}{
 \itemize{
-\item \code{listUnits(Workspace)}: List all units in a defined workspace
+\item \code{listUnits(WorkspaceTestcenter)}: List all units in a defined workspace
+
+\item \code{listUnits(WorkspaceStudio)}: List all units in a defined workspace
 
 }}

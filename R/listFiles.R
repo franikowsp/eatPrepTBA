@@ -19,7 +19,7 @@ setGeneric("listFiles", function(workspace, ...) {
 #'
 #' @param type Character (optional). Type of the files to retrieve from the API. If no type is specified, all files are listed.
 setMethod("listFiles",
-          signature = signature(workspace = "Workspace"),
+          signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace, type = NULL) {
             headers = c(
               AuthToken = workspace@login@token
@@ -29,7 +29,7 @@ setMethod("listFiles",
             ws_id <- workspace@id
 
             request <- httr::GET(url = glue::glue(
-              "{login@domain}/workspace/{ws_id}/files"
+              "{domain}/workspace/{ws_id}/files"
             ),
             httr::add_headers(.headers=headers)
             )

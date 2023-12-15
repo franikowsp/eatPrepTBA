@@ -18,7 +18,7 @@ setGeneric("getTesttaker", function(workspace, id) {
 
 #' @describeIn getTesttaker Get testtaker information in a in a defined workspace
 setMethod("getTesttaker",
-          signature = signature(workspace = "Workspace"),
+          signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace, id) {
             domain <- workspace@login@domain
             ws_id <- workspace@id

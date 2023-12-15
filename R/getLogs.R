@@ -1,6 +1,6 @@
-#' Get responses
+#' Get logs
 #'
-#' @param workspace [WorkspaceTestcenter-class]. Workspace information necessary to retrieve unit information and resources from the API.
+#' @param workspace [Workspace-class]. Workspace information necessary to retrieve unit information and resources from the API.
 #' @param groups Character. Name of the groups to be retrieved.
 #'
 #' @description
@@ -11,13 +11,13 @@
 #'
 #' @examples
 #' @aliases
-#' getResponses,WorkspaceTestcenter-method
-setGeneric("getResponses", function(workspace, groups) {
-  standardGeneric("getResponses")
+#' getResponses,Workspace-method
+setGeneric("getLogs", function(workspace, groups) {
+  standardGeneric("getLogs")
 })
 
 #' @describeIn getResponses Get responses of a defined workspace
-setMethod("getResponses",
+setMethod("getLogs",
           signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace, groups) {
             domain <- workspace@login@domain
@@ -33,7 +33,7 @@ setMethod("getResponses",
 
             # Read response JSONs -----------------------------------------------------
             request_json <- httr::GET(url = glue::glue(
-              "{domain}/workspace/{ws_id}/report/response"
+              "{domain}/workspace/{ws_id}/report/log"
             ),
             httr::add_headers(.headers = headers),
             query = params
@@ -52,24 +52,7 @@ setMethod("getResponses",
                   value = purrr::map(value, \(x) tibble::as_tibble(x))
                 ) %>%
                 # Entpacken
-                tidyr::unnest(value) %>%
-                # Schleife zum Spreaden der Response- und LastState-Einträge (Auslesen in tibble)
-                dplyr::mutate(
-                  responses = purrr::map(responses, \(x) x$content %>%
-                                           jsonlite::parse_json(simplifyVector = TRUE) %>%
-                                           tibble::as_tibble()),
-                  laststate = purrr::map(laststate, \(x) x %>%
-                                           jsonlite::parse_json(simplifyVector = TRUE) %>%
-                                           tibble::as_tibble()),
-                ) %>%
-                # Entpacken
-                tidyr::unnest(c(
-                  responses,
-                  laststate
-                )) %>%
-                dplyr::rename(
-                  variable_id = id
-                )
+                tidyr::unnest(value)
             } else {
               response_json <- tibble::tibble()
             }

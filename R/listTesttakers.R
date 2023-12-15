@@ -18,7 +18,7 @@ setGeneric("listTesttakers", function(workspace) {
 
 #' @describeIn listTesttakers List all testtakers in a defined workspace
 setMethod("listTesttakers",
-          signature = signature(workspace = "Workspace"),
+          signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace) {
             ws_testtakers <- listFiles(workspace, type = "Testtakers")
 

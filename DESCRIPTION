@@ -15,7 +15,10 @@ Imports:
     dplyr,
     tidyr,
     purrr,
-    cli
+    forcats,
+    stringr,
+    cli,
+    zip
 Suggests: 
     knitr,
     rmarkdown,

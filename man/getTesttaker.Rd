@@ -3,11 +3,12 @@
 \name{getTesttaker}
 \alias{getTesttaker}
 \alias{getTesttaker,Workspace-method}
+\alias{getTesttaker,WorkspaceTestcenter-method}
 \title{Get testtakers file}
 \usage{
 getTesttaker(workspace, id)
 
-\S4method{getTesttaker}{Workspace}(workspace, id)
+\S4method{getTesttaker}{WorkspaceTestcenter}(workspace, id)
 }
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve testtakers file from the API.}
@@ -22,6 +23,6 @@ This function only returns the testtakers information for a single testtakers fi
 }
 \section{Functions}{
 \itemize{
-\item \code{getTesttaker(Workspace)}: Get testtaker information in a in a defined workspace
+\item \code{getTesttaker(WorkspaceTestcenter)}: Get testtaker information in a in a defined workspace
 
 }}

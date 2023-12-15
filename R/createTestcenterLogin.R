@@ -1,4 +1,4 @@
-#' Generate a [Login-class] object
+#' Generate a [Login-class] object for the IQB Testcenter
 #'
 #' @description
 #' Provides a routine to login to an instance of the IQB Testcenter.
@@ -6,15 +6,15 @@
 #' @param domain Character. Domain of the hosted instance of the IQB Testcenter. Default is the IQB Testcenter.
 #' @param dialog Logical. Should the password be entered using RStudio dialogs (`TRUE`) or using the console (`FALSE`). Defaults to `TRUE`.
 #'
-#' @return An object of the [Login-class] class.
+#' @return An object of the [LoginTestcenter-class] class.
 #' @export
 #'
 #' @examples
-#' login <- createLogin(domain = "https://iqb-testcenter.de/api")
+#' login <- createTestcenterLogin(domain = "https://iqb-testcenter.de/api")
 #' workspace <- accessWorkspace(login = login, id = 125)
 #'
 #' @details
-#' Calling the `createLogin()` function generates the following curl request
+#' Calling the `createTestcenterLogin()` function generates the following curl request
 #' on the `domain` (default is https://iqb-testcenter.de/api) with the `name` and
 #' the `password` provided by the user:
 #'
@@ -29,7 +29,7 @@
 #' Note that the name and the password are only available to the function call
 #' and cannot be accessed later as they are not part of the [Login-class] object generated.
 #'
-createLogin <- function(domain = "https://iqb-testcenter.de/api", dialog = TRUE, ...) {
+createTestcenterLogin <- function(domain = "https://iqb-testcenter.de/api", dialog = TRUE, ...) {
   cli_setting()
 
   test_mode <- getOption("eatPrepTBA.test_mode")
@@ -62,7 +62,6 @@ createLogin <- function(domain = "https://iqb-testcenter.de/api", dialog = TRUE,
 
   }
 
-
   request <- httr::PUT(glue::glue("{domain}/session/admin"),
                        config = httr::content_type_json(),
                        body = jsonlite::toJSON(credentials, auto_unbox = TRUE))
@@ -76,7 +75,7 @@ createLogin <- function(domain = "https://iqb-testcenter.de/api", dialog = TRUE,
 
     names(ws_ids) <- ws_labels
 
-    Login <- new("Login",
+    Login <- new("LoginTestcenter",
                  domain = domain,
                  token = request_content$token,
                  workspace = ws_ids

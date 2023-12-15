@@ -8,22 +8,32 @@ prepareUnitXml <- function(xml) {
     tidyr::unnest(BaseVariables) %>%
     dplyr::mutate(
       value = purrr::map(value, function(x) {
-        x$Values %>%
-          tibble::enframe(name = NULL) %>%
-          dplyr::mutate(
-            value = purrr::map(value, function(x) x %>%
-                                 tibble::enframe() %>%
-                                 tidyr::pivot_wider())
-          ) %>%
-          tidyr::unnest(value) %>%
-          tidyr::unnest(c(label, value)) %>%
-          tidyr::unnest(c(label, value))
+        # TODO: Hotfix for textarea
+        if (length(x$value) > 0) {
+          x$Values %>%
+            tibble::enframe(name = NULL) %>%
+            dplyr::mutate(
+              value = purrr::map(value, function(x) x %>%
+                                   tibble::enframe() %>%
+                                   tidyr::pivot_wider())
+            ) %>%
+            tidyr::unnest(value) %>%
+            tidyr::unnest(c(label, value)) %>%
+            tidyr::unnest(c(label, value))
+        } else {
+          tibble::tibble()
+        }
       })
     ) %>%
-    tidyr::unnest(value) %>%
-    dplyr::rename(
-      option_label = label
-    )
+    tidyr::unnest(value)
+
+  # TODO: Hotfix for textarea
+  if ("label" %in% names(base_variables)) {
+    base_variables <-
+      dplyr::rename(
+        option_label = label
+      )
+  }
 
   metadata <-
     xml$Metadata[[1]] %>%
@@ -36,8 +46,13 @@ prepareUnitXml <- function(xml) {
       unit_label = Label
     )
 
-  dplyr::cross_join(
-    metadata,
-    base_variables
-  )
+  # TODO: hotfix for textarea
+  if (nrow(base_variables) > 0) {
+    dplyr::cross_join(
+      metadata,
+      base_variables
+    )
+  } else {
+    metadata
+  }
 }

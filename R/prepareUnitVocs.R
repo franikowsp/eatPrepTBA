@@ -18,12 +18,13 @@ prepareUnitVocs <- function(vocs) {
       x %>%
         purrr::map(function(x) tibble::enframe(x) %>% tidyr::pivot_wider()) %>%
         purrr::reduce(dplyr::bind_rows) %>%
-        tidyr::unnest(cols = c(id, label, score, manualInstruction)) %>%
-        tidyr::unnest(rules) %>%
+        tidyr::unnest(cols = c(id, label, score, rules, manualInstruction)) %>%
         dplyr::mutate(
-          rules = purrr::map(rules, tibble::as_tibble),
+          rules = purrr::map(rules, tibble::enframe),
         ) %>%
         tidyr::unnest(rules) %>%
+        tidyr::pivot_wider(names_from = name, values_from = value) %>%
+        tidyr::unnest(cols = c(method, parameters), keep_empty = TRUE) %>%
         dplyr::mutate(
           parameters = purrr::map(parameters,
                                   function(x) stringr::str_c(x, collapse = ","))

@@ -2,15 +2,15 @@
 % Please edit documentation in R/getResults.R
 \name{getResults}
 \alias{getResults}
-\alias{getResults,Workspace-method}
+\alias{getResults,WorkspaceTestcenter-method}
 \title{Get results}
 \usage{
 getResults(workspace)
 
-\S4method{getResults}{Workspace}(workspace)
+\S4method{getResults}{WorkspaceTestcenter}(workspace)
 }
 \arguments{
-\item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve results information.}
+\item{workspace}{\linkS4class{WorkspaceTestcenter}. Workspace information necessary to retrieve results information.}
 }
 \value{
 A tibble.
@@ -20,6 +20,6 @@ This function returns responses for the selected groups.
 }
 \section{Functions}{
 \itemize{
-\item \code{getResults(Workspace)}: Get responses of a defined workspace
+\item \code{getResults(WorkspaceTestcenter)}: Get responses of a defined workspace
 
 }}

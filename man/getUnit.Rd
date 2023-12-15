@@ -5,9 +5,9 @@
 \alias{getUnit,Workspace-method}
 \title{Get a unit with resources}
 \usage{
-getUnit(workspace, id)
+getUnit(workspace, id, ...)
 
-\S4method{getUnit}{Workspace}(workspace, id)
+\S4method{getUnit}{Workspace}(workspace, id, prepare = TRUE)
 }
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve unit information and resources from the API.}

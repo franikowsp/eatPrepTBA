@@ -2,12 +2,16 @@
 % Please edit documentation in R/accessWorkspace.R
 \name{accessWorkspace}
 \alias{accessWorkspace}
-\alias{accessWorkspace,Login-method}
+\alias{accessWorkspace,LoginTestcenter-method,LoginStudio-method}
+\alias{accessWorkspace,LoginTestcenter-method}
+\alias{accessWorkspace,LoginStudio-method}
 \title{Access a workspace}
 \usage{
 accessWorkspace(login, ...)
 
-\S4method{accessWorkspace}{Login}(login, id = NULL, label = NULL)
+\S4method{accessWorkspace}{LoginTestcenter}(login, id = NULL, label = NULL)
+
+\S4method{accessWorkspace}{LoginStudio}(login, id = NULL, label = NULL)
 }
 \arguments{
 \item{login}{Login.}
@@ -24,7 +28,9 @@ Access a workspace
 }
 \section{Functions}{
 \itemize{
-\item \code{accessWorkspace(Login)}: Provide access to a selected workspace after loggin in
+\item \code{accessWorkspace(LoginTestcenter)}: Provide access to a selected workspace after logging in
+
+\item \code{accessWorkspace(LoginStudio)}: Provide access to a selected workspace after logging in
 
 }}
 \examples{

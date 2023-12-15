@@ -14,6 +14,6 @@ setMethod(f = "show",
           definition = function(object) {
             cli_setting()
 
-            cli::cli_text("This object provides a valid login for data retrieval from the workspace {.ws {object@label}} (id {.ws-id {object@id}}) of the IQB-Testcenter.")
+            cli::cli_text("This object provides a valid login for data retrieval from the workspace {.ws {object@label}} (id {.ws-id {object@id}}).")
 
           })

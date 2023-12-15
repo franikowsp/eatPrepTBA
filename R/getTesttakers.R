@@ -18,7 +18,7 @@ setGeneric("getTesttakers", function(workspace, ...) {
 
 #' @describeIn getTesttakers Get multiple testtakers files in a defined workspace
 setMethod("getTesttakers",
-          signature = signature(workspace = "Workspace"),
+          signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace, id = NULL) {
             getFiles(
               workspace = workspace,

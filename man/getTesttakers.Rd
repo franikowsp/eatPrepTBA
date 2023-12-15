@@ -3,11 +3,12 @@
 \name{getTesttakers}
 \alias{getTesttakers}
 \alias{getTesttakers,Workspace-method}
+\alias{getTesttakers,WorkspaceTestcenter-method}
 \title{Get multiple testtakers files}
 \usage{
 getTesttakers(workspace, ...)
 
-\S4method{getTesttakers}{Workspace}(workspace, id = NULL)
+\S4method{getTesttakers}{WorkspaceTestcenter}(workspace, id = NULL)
 }
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve testtakers files from the API.}
@@ -22,6 +23,6 @@ This function returns information for multiple testtakers files by repeatedly ca
 }
 \section{Functions}{
 \itemize{
-\item \code{getTesttakers(Workspace)}: Get multiple testtakers files in a defined workspace
+\item \code{getTesttakers(WorkspaceTestcenter)}: Get multiple testtakers files in a defined workspace
 
 }}

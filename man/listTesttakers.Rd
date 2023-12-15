@@ -3,11 +3,12 @@
 \name{listTesttakers}
 \alias{listTesttakers}
 \alias{listTesttakers,Workspace-method}
+\alias{listTesttakers,WorkspaceTestcenter-method}
 \title{List testtakers files}
 \usage{
 listTesttakers(workspace)
 
-\S4method{listTesttakers}{Workspace}(workspace)
+\S4method{listTesttakers}{WorkspaceTestcenter}(workspace)
 }
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve testtakers list from the API.}
@@ -20,6 +21,6 @@ This function serves as a wrapper for \code{\link[=getFiles]{getFiles()}}.
 }
 \section{Functions}{
 \itemize{
-\item \code{listTesttakers(Workspace)}: List all testtakers in a defined workspace
+\item \code{listTesttakers(WorkspaceTestcenter)}: List all testtakers in a defined workspace
 
 }}

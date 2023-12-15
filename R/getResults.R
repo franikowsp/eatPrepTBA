@@ -1,6 +1,6 @@
 #' Get results
 #'
-#' @param workspace [Workspace-class]. Workspace information necessary to retrieve results information.
+#' @param workspace [WorkspaceTestcenter-class]. Workspace information necessary to retrieve results information.
 #'
 #' @description
 #' This function returns responses for the selected groups.
@@ -10,14 +10,14 @@
 #'
 #' @examples
 #' @aliases
-#' getResults,Workspace-method
+#' getResults,WorkspaceTestcenter-method
 setGeneric("getResults", function(workspace) {
   standardGeneric("getResults")
 })
 
 #' @describeIn getResults Get responses of a defined workspace
 setMethod("getResults",
-          signature = signature(workspace = "Workspace"),
+          signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace) {
             domain <- workspace@login@domain
             ws_id <- workspace@id
@@ -28,7 +28,7 @@ setMethod("getResults",
 
             # Read response JSONs -----------------------------------------------------
             request_json <- httr::GET(url = glue::glue(
-              "{login@domain}/workspace/{ws_id}/results"
+              "{domain}/workspace/{ws_id}/results"
             ),
             httr::add_headers(.headers=headers)
             )
