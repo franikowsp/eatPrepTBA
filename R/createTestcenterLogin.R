@@ -36,60 +36,10 @@ createTestcenterLogin <- function(domain = "https://iqb-testcenter.de/api",
                                   ...) {
   cli_setting()
 
-  isRStudio <- Sys.getenv("RSTUDIO") == "1"
-  test_mode <- getOption("eatPrepTBA.test_mode")
-
-  if (keyring) {
-    name <- keyring::key_list(service = domain)[["username"]]
-    hasKey <- length(name) != 0
-
-    if (! hasKey || changeKey) {
-      if (changeKey) {
-        keyring::key_delete(service = domain, username = name)
-      }
-
-      if (isRStudio) {
-        name <- rstudioapi::askForPassword(stringr::str_glue("Enter your username for {domain}: "))
-      } else {
-        name <- readline(prompt = "Enter your username: ")
-      }
-
-      keyring::key_set(service = domain, username = name)
-    }
-
-    credentials <- list(
-      name = name,
-      password = URLencode(keyring::key_get(service = domain, username = name), reserved = TRUE)
-    )
-
-  } else {
-    if (is.null(test_mode) || ! test_mode) {
-      isRStudio <- Sys.getenv("RSTUDIO") == "1"
-
-      if (isRStudio & dialog) {
-        name <- rstudioapi::askForPassword("Enter your username: ")
-        password <- rstudioapi::askForPassword("Enter your password: ")
-      } else {
-        name <- readline(prompt = "Enter your username: ")
-        password <- readline(prompt = "Enter your password: ")
-      }
-
-      credentials <- list(
-        name = name,
-        password = password
-      )
-    } else {
-      # Routine for testing purposes only
-      credentials <- list(...)
-
-      if (is.null(credentials) || is.null(credentials$name) || is.null(credentials$password)) {
-        credentials <- list(
-          name = "eatPrepTBA",
-          password = "eatPrepTBA"
-        )
-      }
-    }
-  }
+  credentials <- getCredentials(domain = domain,
+                                dialog = dialog,
+                                keyring = keyring,
+                                changeKey = changeKey)
 
   request <- httr::PUT(glue::glue("{domain}/session/admin"),
                        config = httr::content_type_json(),
