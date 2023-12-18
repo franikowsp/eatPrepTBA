@@ -39,7 +39,8 @@ createTestcenterLogin <- function(domain = "https://iqb-testcenter.de/api",
   credentials <- getCredentials(domain = domain,
                                 dialog = dialog,
                                 keyring = keyring,
-                                changeKey = changeKey)
+                                changeKey = changeKey,
+                                encode = FALSE)
 
   request <- httr::PUT(glue::glue("{domain}/session/admin"),
                        config = httr::content_type_json(),

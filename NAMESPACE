@@ -2,6 +2,7 @@
 
 export("%>%")
 export(accessWorkspace)
+export(addMetadata)
 export(createStudioLogin)
 export(createTestcenterLogin)
 export(downloadUnits)

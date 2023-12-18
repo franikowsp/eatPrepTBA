@@ -15,12 +15,18 @@ getMetadataProfile <- function(url) {
     profile %>%
     purrr::pluck("groups", 1, "entries") %>%
     purrr::map(function(x) unlist(x) %>% as.list() %>% tibble::as_tibble()) %>%
-    purrr::reduce(dplyr::bind_rows)
+    purrr::reduce(dplyr::bind_rows) %>%
+    dplyr::mutate(
+      profile_name = stringr::str_replace_all(label.value, str_replacements, "_")
+    )
 
   profile_read <-
     profile_prepared %>%
-    dplyr::select(profile_id = id, name = label.value,
-                  type, profile_url = parameters.url,
+    dplyr::select(profile_name,
+                  profile_id = id,
+                  profile_label = label.value,
+                  profile_url = parameters.url,
+                  profile_type = type,
                   multiple = parameters.allowMultipleValues) %>%
     dplyr::mutate(
       profile = purrr::map(profile_url, prepare_profile_list)
@@ -29,34 +35,31 @@ getMetadataProfile <- function(url) {
 
   # Merge notation
   if (tibble::has_name(profile_read, "notation")) {
-    profile_relabel <-
+    profile_read <-
       profile_read %>%
       dplyr::mutate(
-        label = dplyr::case_when(
+        prefLabel.de = dplyr::case_when(
           !is.na(notation) ~ stringr::str_glue("{{{notation}}} {prefLabel.de}") %>% as.character(),
           .default = prefLabel.de
         )
       )
-  } else {
-    profile_relabel <-
-      profile_read %>%
-      dplyr::rename(
-        label = prefLabel.de
-      )
   }
 
-  profile_relabel %>%
+  profile_read %>%
     dplyr::select(
-      name,
-      value.id = id,
-      label,
+      profile_name,
+      profile_label,
+      value_id = id,
+      value_label = prefLabel.de,
+      profile_type,
       multiple
     ) %>%
     tidyr::nest(
-      data = -c(name, multiple)
+      data = -c(profile_name, profile_label, profile_type, multiple)
     ) %>%
     dplyr::mutate(
-      data = purrr::map(data, function(x) x %>% dplyr::mutate(label = factor(label, levels = label)))
+      data = purrr::map(data, function(x) x %>% dplyr::mutate(value_label = factor(value_label, levels = value_label))),
+      multiple = ifelse(is.na(multiple), FALSE, multiple) %>% as.logical()
     )
 }
 
@@ -89,6 +92,6 @@ prepare_profile_list <- function(url) {
       narrow_profile_list()
 
   } else {
-    tibble::tibble()
+    tibble::tibble(id = NA)
   }
 }

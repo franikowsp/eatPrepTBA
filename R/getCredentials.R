@@ -1,4 +1,15 @@
-getCredentials <- function(domain, dialog, keyring, changeKey) {
+#' Get credentials for access management
+#'
+#' @param workspace [Workspace-class]. Workspace information necessary to retrieve booklet from the API.
+#' @param id Character. Name of the booklet to be retrieved.
+#'
+#' @description
+#' This function only returns the booklet information for a single booklet. To retrieve multiple booklets, use [getBooklets()].
+#'
+#' @return A `list` with entries name and password.
+#'
+#' @examples
+getCredentials <- function(domain, dialog, keyring, changeKey, encode = TRUE) {
   isRStudio <- Sys.getenv("RSTUDIO") == "1"
   test_mode <- getOption("eatPrepTBA.test_mode")
 
@@ -24,9 +35,10 @@ getCredentials <- function(domain, dialog, keyring, changeKey) {
       keyring::key_set(service = domain, username = name)
     }
 
+
     credentials <- list(
       name = name,
-      password = URLencode(keyring::key_get(service = domain, username = name), reserved = TRUE)
+      password = URLencode(keyring::key_get(service = domain, username = name), reserved = encode)
     )
 
   } else {

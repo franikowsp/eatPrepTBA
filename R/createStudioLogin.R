@@ -40,7 +40,8 @@ createStudioLogin <- function(domain = "https://www.iqb-studio.de/api",
   credentials <- getCredentials(domain = domain,
                                 dialog = dialog,
                                 keyring = keyring,
-                                changeKey = changeKey)
+                                changeKey = changeKey,
+                                encode = TRUE)
 
   headers = c(
     "app-version" = version

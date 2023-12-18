@@ -106,6 +106,8 @@ setMethod("getUnit",
             )
 
             if (request$status_code == 200) {
+              str_replacements <- "[-:/ ]+"
+
               unit <- httr::content(request)
 
               unit_meta <-
@@ -121,29 +123,67 @@ setMethod("getUnit",
 
               # Unit-Metadaten
               if (!is.null(unit$metadata$profiles)) {
-                unit_profiles <-
+                unit_profiles_prep <-
                   unit$metadata$profiles %>%
                   purrr::keep("isCurrent") %>%
                   purrr::pluck(1, "entries") %>%
-                  purrr::map(function(x) unlist(x) %>% tibble::enframe() %>% tidyr::pivot_wider()) %>%
-                  purrr::reduce(dplyr::bind_rows) %>%
-                  dplyr::select(label.value, value.id, valueAsText.value)
+                  purrr::map(function(x) {
+                    unlist(x) %>%
+                      as.list() %>%
+                      tibble::enframe() %>%
+                      tidyr::unnest(value) %>%
+                      tidyr::pivot_wider(values_fn = function(x) stringr::str_c(x, collapse = ";"))
+                  }) %>%
+                  purrr::reduce(dplyr::bind_rows)
+
+                value_id_exists <- tibble::has_name(unit_profiles_prep, "value.id")
+                value_text_exists <- tibble::has_name(unit_profiles_prep, "valueAsText.value")
+
+                unit_profiles <-
+                  unit_profiles_prep %>%
+                  dplyr::mutate(
+                    value.id = if (value_id_exists) value.id else NA,
+                    valueAsText.value = if (value_text_exists) valueAsText.value else NA,
+                    dplyr::across(c(value.id, valueAsText.value), function(x) stringr::str_split(x, ";")),
+                    profile_name = stringr::str_replace_all(label.value, str_replacements, "_")
+                  ) %>%
+                  tidyr::unnest(c(value.id, valueAsText.value)) %>%
+                  dplyr::select(
+                    profile_name,
+                    # profile_label = label.value,
+                    value_id = value.id,
+                    value_text = valueAsText.value
+                  )
               } else {
                 unit_profiles <-
-                  tibble::tibble()
+                  tibble::tibble(
+                    profile_name = NA,
+                    # profile_label = label.value,
+                    value_id = NA,
+                    value_text = NA
+                  )
               }
 
               # Item-Metadaten
-              items_meta <-
-                unit$metadata$items %>%
-                purrr::map(function(x) {
-                  purrr::discard(x, .p = names(x) == "profiles") %>%
-                    tibble::as_tibble()
-                }) %>%
-                tibble::enframe(name = "item") %>%
-                tidyr::unnest(value)
+              if (length(items_meta) != 0) {
+                items_meta <-
+                  unit$metadata$items %>%
+                  purrr::map(function(x) {
+                    purrr::discard(x, .p = names(x) == "profiles") %>%
+                      tibble::as_tibble()
+                  }) %>%
+                  tibble::enframe(name = "item") %>%
+                  tidyr::unnest(value)
+              } else {
+                items_meta <-
+                  tibble::tible(
+                  item = NA
+                )
+              }
 
-              if (!is.null(unit$metadata$items %>% purrr::map("profiles") %>% purrr::reduce(c))) {
+              # !is.null(unit$metadata$items %>% purrr::map("profiles") %>% purrr::reduce(c)) &&
+
+              if (length(unit$metadata$items) != 0) {
                 items_profiles <-
                   unit$metadata$items %>%
                   purrr::map(function(x) {
@@ -168,10 +208,26 @@ setMethod("getUnit",
                   dplyr::mutate(
                     dplyr::across(c(value.id, valueAsText.value), function(x) stringr::str_split(x, ";"))
                   ) %>%
-                  tidyr::unnest(c(value.id, valueAsText.value))
+                  tidyr::unnest(c(value.id, valueAsText.value)) %>%
+                  dplyr::mutate(
+                    profile_name = stringr::str_replace_all(label.value, str_replacements, "_")
+                  ) %>%
+                  dplyr::select(
+                    item,
+                    profile_name,
+                    # profile_label = label.value,
+                    value_id = value.id,
+                    value_text = valueAsText.value
+                  )
               } else {
                 items_profiles <-
-                  tibble::tibble()
+                  tibble::tibble(
+                    item = NA,
+                    profile_name = NA,
+                    # profile_label = label.value,
+                    value_id = NA,
+                    value_text = NA
+                  )
               }
 
               response <-
@@ -185,7 +241,7 @@ setMethod("getUnit",
                   unit_id = id
                 )
             } else {
-              response <- tibble::tibble()
+              response <- tibble::tibble(unit_profiles)
             }
 
             return(response)
