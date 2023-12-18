@@ -35,12 +35,7 @@ getCredentials <- function(domain, dialog, keyring, changeKey, encode = TRUE) {
       keyring::key_set(service = domain, username = name)
     }
 
-
-    credentials <- list(
-      name = name,
-      password = URLencode(keyring::key_get(service = domain, username = name), reserved = encode)
-    )
-
+    password <- keyring::key_get(service = domain, username = name)
   } else {
     if (is.null(test_mode) || ! test_mode) {
       if (isRStudio & dialog) {
@@ -50,23 +45,28 @@ getCredentials <- function(domain, dialog, keyring, changeKey, encode = TRUE) {
         name <- readline(prompt = name_prompt)
         password <- readline(prompt = password_prompt)
       }
-
-      credentials <- list(
-        name = name,
-        password = URLencode(password, reserved = TRUE)
-      )
     } else {
       # Routine for testing purposes only
       credentials <- list(...)
 
       if (is.null(credentials) || is.null(credentials$name) || is.null(credentials$password)) {
-        credentials <- list(
-          name = "eatPrepTBA",
-          password = URLencode("eatPrepTBA", reserved = TRUE)
-        )
+        name <- "eatPrepTBA"
+        password <- "eatPrepTBA"
+      }
+
+      if (!is.null(credentials$name)) {
+        name <- credentials$name
+      }
+      if (!is.null(credentials$password)) {
+        password <- credentials$password
       }
     }
   }
+
+  credentials <- list(
+    name = name,
+    password = URLencode(password, reserved = encode)
+  )
 
   return(credentials)
 }

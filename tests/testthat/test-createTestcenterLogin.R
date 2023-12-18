@@ -4,13 +4,13 @@
 options("eatPrepTBA.test_mode" = TRUE)
 
 cli::test_that_cli("login works as inteded", {
-  expect_snapshot(createLogin())
+  expect_snapshot(createTestcenterLogin())
 })
 
 cli::test_that_cli("login fails with wrong or omitted name and/or password", {
-  expect_snapshot(createLogin(name = "eatPrepTBA", password = ""))
-  expect_snapshot(createLogin(name = "", password = "eatPrepTBA"))
-  expect_snapshot(createLogin(name = "", password = ""))
+  expect_snapshot(createTestcenterLogin(name = "eatPrepTBA", password = ""))
+  expect_snapshot(createTestcenterLogin(name = "", password = "eatPrepTBA"))
+  expect_snapshot(createTestcenterLogin(name = "", password = ""))
 })
 
 options("eatPrepTBA.test_mode" = originalTestMode)
