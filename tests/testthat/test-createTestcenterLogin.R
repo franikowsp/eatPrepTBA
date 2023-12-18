@@ -1,5 +1,5 @@
 # Prepare tests with global variable --------------------------------------
-# originalTestMode <- getOption("eatPrepTBA.test_mode")
+originalTestMode <- getOption("eatPrepTBA.test_mode")
 
 options("eatPrepTBA.test_mode" = TRUE)
 

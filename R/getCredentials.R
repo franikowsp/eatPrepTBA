@@ -9,7 +9,7 @@
 #' @return A `list` with entries name and password.
 #'
 #' @examples
-getCredentials <- function(domain, dialog, keyring, changeKey, encode = TRUE) {
+getCredentials <- function(domain, dialog, keyring, changeKey, encode = TRUE, ...) {
   isRStudio <- Sys.getenv("RSTUDIO") == "1"
   test_mode <- getOption("eatPrepTBA.test_mode")
 
