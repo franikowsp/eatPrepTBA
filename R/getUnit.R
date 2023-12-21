@@ -165,7 +165,7 @@ setMethod("getUnit",
               }
 
               # Item-Metadaten
-              if (length(items_meta) != 0) {
+              if (length(unit$metadata$items) != 0) {
                 items_meta <-
                   unit$metadata$items %>%
                   purrr::map(function(x) {
@@ -173,11 +173,18 @@ setMethod("getUnit",
                       tibble::as_tibble()
                   }) %>%
                   tibble::enframe(name = "item") %>%
-                  tidyr::unnest(value)
+                  tidyr::unnest(value) %>%
+                  # Omit naming conflicts
+                  dplyr::rename(
+                    items_description = description
+                  )
               } else {
                 items_meta <-
-                  tibble::tible(
-                  item = NA
+                  tibble::tibble(
+                  item = NA_integer_,
+                  profile_name = "Itemformat",
+                  value_id = NA_character_,
+                  value_text = ""
                 )
               }
 
@@ -230,8 +237,16 @@ setMethod("getUnit",
                   )
               }
 
+              # TODO: Add this to the global workspace object
+              ws_info <-
+                getSettings(workspace, metadata = FALSE) %>%
+                dplyr::select(
+                  ws_id, ws_name, ws_groupId, ws_groupName
+                )
+
               response <-
                 unit_meta %>%
+                dplyr::bind_cols(ws_info) %>%
                 dplyr::mutate(
                   unit_profiles = list(unit_profiles),
                   items_meta = list(items_meta),

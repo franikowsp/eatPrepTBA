@@ -9,6 +9,8 @@
 #'
 #' @examples
 getMetadataProfile <- function(url) {
+  str_replacements <- "[-:/ ]+"
+
   profile <- jsonlite::read_json(url)
 
   profile_prepared <-

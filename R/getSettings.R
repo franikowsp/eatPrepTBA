@@ -93,6 +93,12 @@ setMethod("getSettings",
 
               ws_info <-
                 ws_meta %>%
+                dplyr::rename(
+                  ws_id = id,
+                  ws_name = name,
+                  ws_groupName = groupName,
+                  ws_groupId = groupId
+                ) %>%
                 dplyr::bind_cols(ws_settings)
 
             } else {

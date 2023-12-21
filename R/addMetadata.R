@@ -28,13 +28,13 @@ setMethod("addMetadata",
               units %>%
               dplyr::select(
                 -c(unit_profiles, items_profiles)
-              ) #%>%
-              # TODO: This does not work as the items are messy
-              # tidyr::unnest(
-              #
-              # )
+              ) %>%
+              tidyr::unnest(
+                items_meta
+              )
 
-            units %>%
+            items_meta <-
+              units %>%
               dplyr::select(unitname, items_profiles) %>%
               tidyr::unnest(items_profiles) %>%
               addProfile(c(unitname, item), profile = items_profile)
@@ -45,10 +45,19 @@ setMethod("addMetadata",
               tidyr::unnest(unit_profiles) %>%
               addProfile(unitname, profile = unit_profile)
 
+            # ws_info <-
+            #   ws_settings %>%
+            #   dplyr::select(
+            #     ws_id, ws_name, ws_groupId, ws_groupName
+            #   )
+
             unit_start %>%
-              dplyr::left_join(unit_meta, items_meta)
+              # dplyr::bind_cols(ws_info) %>%
+              dplyr::left_join(unit_meta) %>%
+              dplyr::left_join(items_meta)
           })
 
+# Adds profiles to all columns if possible
 addProfile <- function(metadata, id, profile) {
   profile_multiples <-
     profile %>%
