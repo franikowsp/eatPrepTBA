@@ -170,22 +170,27 @@ setMethod("getUnit",
                   unit$metadata$items %>%
                   purrr::map(function(x) {
                     purrr::discard(x, .p = names(x) == "profiles") %>%
+                      purrr::map(function(x) if (is.null(x)) NA else x) %>%
                       tibble::as_tibble()
                   }) %>%
                   tibble::enframe(name = "item") %>%
-                  tidyr::unnest(value) %>%
-                  # Omit naming conflicts
-                  dplyr::rename(
-                    items_description = description
-                  )
+                  tidyr::unnest(value)
+
+                if (tibble::has_name(items_meta, "description")) {
+                  items_meta <-
+                    items_meta %>%
+                    dplyr::rename(
+                      items_description = description
+                    )
+                }
               } else {
                 items_meta <-
                   tibble::tibble(
-                  item = NA_integer_,
-                  profile_name = "Itemformat",
-                  value_id = NA_character_,
-                  value_text = ""
-                )
+                    item = NA_integer_,
+                    profile_name = "Itemformat",
+                    value_id = NA_character_,
+                    value_text = ""
+                  )
               }
 
               # !is.null(unit$metadata$items %>% purrr::map("profiles") %>% purrr::reduce(c)) &&
