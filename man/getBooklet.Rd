@@ -2,15 +2,15 @@
 % Please edit documentation in R/getBooklet.R
 \name{getBooklet}
 \alias{getBooklet}
-\alias{getBooklet,Workspace-method}
+\alias{getBooklet,WorkspaceTestcenter-method}
 \title{Get a booklet}
 \usage{
 getBooklet(workspace, id)
 
-\S4method{getBooklet}{Workspace}(workspace, id)
+\S4method{getBooklet}{WorkspaceTestcenter}(workspace, id)
 }
 \arguments{
-\item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve booklet from the API.}
+\item{workspace}{\linkS4class{WorkspaceTestcenter}. Workspace information necessary to retrieve booklet from the API.}
 
 \item{id}{Character. Name of the booklet to be retrieved.}
 }
@@ -22,6 +22,6 @@ This function only returns the booklet information for a single booklet. To retr
 }
 \section{Functions}{
 \itemize{
-\item \code{getBooklet(Workspace)}: Get a booklet in a defined workspace
+\item \code{getBooklet(WorkspaceTestcenter)}: Get a booklet in a defined workspace
 
 }}

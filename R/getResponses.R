@@ -55,10 +55,22 @@ setMethod("getResponses",
                 tidyr::unnest(value) %>%
                 # Schleife zum Spreaden der Response- und LastState-Einträge (Auslesen in tibble)
                 dplyr::mutate(
-                  responses = purrr::map(responses, \(x) x$content %>%
-                                           jsonlite::parse_json(simplifyVector = TRUE) %>%
-                                           tibble::as_tibble()),
-                  laststate = purrr::map(laststate, \(x) x %>%
+                  responses = purrr::map(responses, function(x) {
+                    responses <- x$content %>%
+                      jsonlite::parse_json(simplifyVector = TRUE) %>%
+                      tibble::as_tibble()
+
+                    if (tibble::has_name(responses, "value")) {
+                      responses %>%
+                        dplyr::mutate(
+                          value = purrr::map(value, as.list)
+                        )
+                    } else {
+                      responses
+                    }
+
+                  }),
+                  laststate = purrr::map(laststate, function(x) x %>%
                                            jsonlite::parse_json(simplifyVector = TRUE) %>%
                                            tibble::as_tibble()),
                 ) %>%

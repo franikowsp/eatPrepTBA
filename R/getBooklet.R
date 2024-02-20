@@ -1,6 +1,6 @@
 #' Get a booklet
 #'
-#' @param workspace [Workspace-class]. Workspace information necessary to retrieve booklet from the API.
+#' @param workspace [WorkspaceTestcenter-class]. Workspace information necessary to retrieve booklet from the API.
 #' @param id Character. Name of the booklet to be retrieved.
 #'
 #' @description
@@ -10,7 +10,7 @@
 #'
 #' @examples
 #' @aliases
-#' getBooklet,Workspace-method
+#' getBooklet,WorkspaceTestcenter-method
 setGeneric("getBooklet", function(workspace, id) {
   cli_setting()
   standardGeneric("getBooklet")
@@ -18,7 +18,7 @@ setGeneric("getBooklet", function(workspace, id) {
 
 #' @describeIn getBooklet Get a booklet in a defined workspace
 setMethod("getBooklet",
-          signature = signature(workspace = "Workspace"),
+          signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace, id) {
 
             domain <- workspace@login@domain

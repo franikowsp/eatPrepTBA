@@ -29,6 +29,10 @@ setMethod("addMetadata",
               dplyr::select(
                 -c(unit_profiles, items_profiles)
               ) %>%
+              # dplyr::mutate(
+              #   items_meta = purrr::map(items_meta,
+              #                           function(x) x %>% dplyr::mutate(item = as.character(item)))
+              # ) %>%
               tidyr::unnest(
                 items_meta
               )

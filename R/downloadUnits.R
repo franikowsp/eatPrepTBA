@@ -37,7 +37,7 @@ setMethod("downloadUnits",
               Authorization = workspace@login@token
             )
 
-            unit_keys <- listUnits(workspace, metadata = FALSE)
+            unit_keys <- listUnits(workspace)
             unit_ids <- unit_keys[units]
 
             unitIdList <-

@@ -22,7 +22,7 @@ setGeneric("accessWorkspace", function(login, ...) {
 # TODO: Refactor cli messages. Should return more informative message when label and id don't match.
 setMethod("accessWorkspace",
           signature = signature(login = "LoginTestcenter"),
-          function(login, id = NULL, label = NULL) {
+          function(login, id = NULL, label = NULL, verbose = TRUE) {
 
             if (is.null(label) && is.null(id)) {
               cli::cli_abort("Either workspace {.ws label} or {.ws-id id} must be defined.")
@@ -70,7 +70,7 @@ setMethod("accessWorkspace",
 #' @param label Character. Workspace label.
 setMethod("accessWorkspace",
           signature = signature(login = "LoginStudio"),
-          function(login, id = NULL, label = NULL) {
+          function(login, id = NULL, label = NULL, verbose = TRUE) {
 
             if (is.null(label) && is.null(id)) {
               cli::cli_abort("Either workspace {.ws label} or {.ws-id id} must be defined.")
@@ -102,12 +102,25 @@ setMethod("accessWorkspace",
               }
             }
 
+            wsg <-
+              login@workspace_groups %>%
+              purrr::keep(function(x) id %in% x$workspaces) %>%
+              purrr::map("id") %>%
+              purrr::list_simplify()
+
             Workspace <- new("WorkspaceStudio",
                              login = login,
                              id = as.numeric(ws_id),
-                             label = ws_label)
+                             label = ws_label,
+                             group_id = as.numeric(wsg),
+                             group_label = names(wsg)
+            )
 
-            cli::cli_alert_success("Workspace {.ws-id {ws_id}}: {.ws {ws_label}} can be accessed with the generated object.")
+            cli::cli_alert_success("Workspace can be accessed with the generated object.")
+
+            if (verbose) {
+              show(workspace)
+            }
 
             return(Workspace)
           })

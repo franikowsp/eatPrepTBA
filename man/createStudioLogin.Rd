@@ -7,9 +7,10 @@
 createStudioLogin(
   domain = "https://www.iqb-studio.de/api",
   dialog = TRUE,
-  version = "5.2.1",
+  version = "6.1.2",
   keyring = FALSE,
   changeKey = FALSE,
+  verbose = TRUE,
   ...
 )
 }
@@ -18,7 +19,7 @@ createStudioLogin(
 
 \item{dialog}{Logical. Should the password be entered using RStudio dialogs (\code{TRUE}) or using the console (\code{FALSE}). Defaults to \code{TRUE}.}
 
-\item{version}{Character. App version of the IQB Studio instance. Defaults to "5.2.1".}
+\item{version}{Character. App version of the IQB Studio instance. Defaults to "6.1.0".}
 
 \item{keyring}{Logical. If your password on the domain has changed - should the \link{keyring} password be changed?}
 }
@@ -34,7 +35,7 @@ on the \code{domain} (default is "https://www.iqb-studio.de/api/) with the \code
 and the \code{password} provided by the user:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{curl --location --request POST '\{domain\}/api/login?username=\{name\}&password=\{password\}'
---header 'app-version: 5.2.1'
+--header 'app-version: 6.1.0'
 \}'
 }\if{html}{\out{</div>}}
 

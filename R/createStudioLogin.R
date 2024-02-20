@@ -5,7 +5,7 @@
 #'
 #' @param domain Character. Domain of the hosted instance of the IQB Studio Lite. Default is the IQB Studio Lite.
 #' @param dialog Logical. Should the password be entered using RStudio dialogs (`TRUE`) or using the console (`FALSE`). Defaults to `TRUE`.
-#' @param version Character. App version of the IQB Studio instance. Defaults to "5.2.1".
+#' @param version Character. App version of the IQB Studio instance. Defaults to "6.1.0".
 #' @param keyring Logical. Should the [keyring] package be used to save the passkey? This saves your credentials to your local machine.
 #' @param keyring Logical. If your password on the domain has changed - should the [keyring] password be changed?
 #'
@@ -23,7 +23,7 @@
 #'
 #' ```
 #' curl --location --request POST '{domain}/api/login?username={name}&password={password}'
-#' --header 'app-version: 5.2.1'
+#' --header 'app-version: 6.1.0'
 #' }'
 #' ```
 #' Note that the name and the password are only available to the function call
@@ -31,9 +31,10 @@
 #'
 createStudioLogin <- function(domain = "https://www.iqb-studio.de/api",
                               dialog = TRUE,
-                              version = "6.0.0",
+                              version = "6.1.2",
                               keyring = FALSE,
                               changeKey = FALSE,
+                              verbose = TRUE,
                               ...) {
   cli_setting()
 
@@ -60,31 +61,57 @@ createStudioLogin <- function(domain = "https://www.iqb-studio.de/api",
     request_workspaces <- httr::GET(url = glue::glue("{domain}/auth-data"),
                                     httr::add_headers(headers))
 
+    ws_groups <- httr::content(request_workspaces)$workspaces
+
     ws_group_ids <-
-      httr::content(request_workspaces)$workspaces %>%
-      purrr::map_depth(.depth = 1, "id")
+      ws_groups %>%
+      purrr::map(function(x) {
+        group_id <- x$id
 
-    workspaces <-
-      httr::content(request_workspaces)$workspaces %>%
-      purrr::map_depth(.depth = 1, "workspaces")
+        names <-
+          x$workspaces %>%
+          purrr::map("name") %>%
+          unlist()
 
-    ws_ids <- purrr::map_depth(.depth = 2, workspaces, "id") %>% unlist() %>% as.character()
-    ws_labels <- purrr::map_depth(.depth = 2, workspaces, "name") %>% unlist()
+        ids <-
+          x$workspaces %>%
+          purrr::map("id") %>%
+          unlist() %>%
+          as.character()
 
-    names(ws_ids) <- ws_labels
+        names(ids) <- names
+
+        ws_groups <-
+          list(
+          id = group_id,
+          workspaces = ids
+        )
+      })
+
+    ws_group_labels <-
+      ws_groups %>%
+      purrr::map_depth(.depth = 1, "name")
+
+    names(ws_group_ids) <- ws_group_labels
+
+    ws_ids <-
+      ws_group_ids %>%
+      purrr::map("workspaces") %>%
+      purrr::reduce(c)
 
     Login <- new("LoginStudio",
                  domain = domain,
                  token = token,
                  version = version,
-                 workspace = ws_ids
+                 workspace = ws_ids,
+                 workspace_groups = ws_group_ids
     )
 
     cli::cli_alert_success("Login was successful.")
-    cli::cli_text("A token was generated to access the following workspaces ({.ws-id id}: {.ws label}):")
-    cli::cli_li(items = glue::glue("{{.ws-id {Login@workspace}}}: {{.ws {names(Login@workspace)}}}"))
-    cli::cli_alert_info("Please note that the login becomes invalid if you log in to the Testcenter manually.")
 
+    if (verbose) {
+      show(Login)
+    }
 
     return(invisible(Login))
   } else {

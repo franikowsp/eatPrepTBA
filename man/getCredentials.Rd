@@ -4,7 +4,7 @@
 \alias{getCredentials}
 \title{Get credentials for access management}
 \usage{
-getCredentials(domain, dialog, keyring, changeKey, encode = TRUE)
+getCredentials(domain, dialog, keyring, changeKey, encode = TRUE, ...)
 }
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve booklet from the API.}

@@ -12,7 +12,7 @@
 #' @examples
 #' @aliases
 #' getUnits,WorkspaceTestcenter-method,WorkspaceStudio-method
-setGeneric("getUnits", function(workspace, ...) {
+setGeneric("getUnits", function(workspace, id, prepare) {
   standardGeneric("getUnits")
 })
 
@@ -25,7 +25,9 @@ setMethod("getUnits",
               id = id,
               type = "unit",
               listFun = listUnits,
-              getFun = function(workspace, id) getUnit(workspace = workspace, id = id, prepare = prepare)
+              getFun = function(workspace, id) getUnit(workspace = workspace,
+                                                       id = id,
+                                                       prepare = prepare)
             ) %>%
               dplyr::rename(unitname = id)
           })
@@ -33,13 +35,15 @@ setMethod("getUnits",
 #' @describeIn getUnits Get multiple unit information and coding schemes in a defined workspace
 setMethod("getUnits",
           signature = signature(workspace = "WorkspaceStudio"),
-          function(workspace, id = NULL) {
+          function(workspace, id = NULL, prepare = TRUE) {
             getFiles(
               workspace = workspace,
               id = id,
               type = "unit",
               listFun = listUnits,
-              getFun = getUnit
+              getFun = function(workspace, id) getUnit(workspace = workspace,
+                                                       id = id,
+                                                       prepare = prepare)
             ) %>%
               dplyr::rename(unitname = id)
           })

@@ -32,6 +32,7 @@ setClass("LoginStudio",
          contains = "Login",
          slots = c(
            workspace = "character",
+           workspace_groups = "list",
            version = "character"
            # TODO: Must become a list!
          ))
@@ -62,7 +63,9 @@ setClass("WorkspaceStudio",
          slots = c(
            login = "LoginStudio",
            label = "character",
-           id = "numeric"
+           id = "numeric",
+           group_label = "character",
+           group_id = "numeric"
          ))
 
 setClass("WorkspaceTestcenter",

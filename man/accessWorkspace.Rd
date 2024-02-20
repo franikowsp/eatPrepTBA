@@ -9,9 +9,9 @@
 \usage{
 accessWorkspace(login, ...)
 
-\S4method{accessWorkspace}{LoginTestcenter}(login, id = NULL, label = NULL)
+\S4method{accessWorkspace}{LoginTestcenter}(login, id = NULL, label = NULL, verbose = TRUE)
 
-\S4method{accessWorkspace}{LoginStudio}(login, id = NULL, label = NULL)
+\S4method{accessWorkspace}{LoginStudio}(login, id = NULL, label = NULL, verbose = TRUE)
 }
 \arguments{
 \item{login}{Login.}

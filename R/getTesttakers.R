@@ -28,3 +28,4 @@ setMethod("getTesttakers",
               getFun = getTesttaker
             )
           })
+

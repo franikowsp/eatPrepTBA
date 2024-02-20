@@ -56,7 +56,7 @@ setMethod("getSettings",
                 settings <- ws$settings
 
                 # States
-                if (!is.null(settings$states)) {
+                if (!is.null(settings$states) & length(settings$states) != 0) {
                   ws_states <-
                     ws$settings$states %>%
                     purrr::map(function(x) unlist(x) %>% tibble::enframe() %>% tidyr::pivot_wider()) %>%

@@ -10,11 +10,11 @@
 \usage{
 \S4method{addMetadata}{WorkspaceStudio}(workspace, units)
 
-getUnits(workspace, ...)
+getUnits(workspace, id, prepare)
 
 \S4method{getUnits}{WorkspaceTestcenter}(workspace, id = NULL, prepare = TRUE)
 
-\S4method{getUnits}{WorkspaceStudio}(workspace, id = NULL)
+\S4method{getUnits}{WorkspaceStudio}(workspace, id = NULL, prepare = TRUE)
 }
 \arguments{
 \item{workspace}{\linkS4class{WorkspaceTestcenter}. Workspace information necessary to retrieve multiple unit information and resources (coding schemes) from the API.}

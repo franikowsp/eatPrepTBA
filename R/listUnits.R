@@ -54,8 +54,12 @@ setMethod("listUnits",
                 names(out) <- x[["key"]]
 
                 return(out)
-              }) %>%
-              purrr::reduce(append)
+              })
 
-            return(response)
+            if (length(response) != 0) {
+              response %>%
+                purrr::reduce(append)
+            } else {
+              tibble::tibble()
+            }
           })
