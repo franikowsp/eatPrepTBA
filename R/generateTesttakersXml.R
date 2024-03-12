@@ -86,7 +86,12 @@ prepareTesttakerGroups <- function(testtakers) {
     logins %>%
     as.list() %>%
     purrr::list_transpose(simplify = FALSE) %>%
-    purrr::set_names(purrr::map(., "name"))
+    purrr::set_names(purrr::map(., "name")) %>%
+    # Deletes empty nodes (including passwords set to NA)
+    purrr::modify_tree(leaf = function(x) if(is.na(x)) NULL else x,
+                       post = purrr::compact)
+
+  logins_prep$gdwy1hwk$pw
 
   booklets_prep <-
     booklets %>%
@@ -112,9 +117,14 @@ prepareTesttakerGroups <- function(testtakers) {
   logins_insert <-
     logins_prep %>%
     purrr::imap(function(x, i) {
-      BookletMerge <- booklets_prep[names_booklet == i] %>%
+      BookletMerge <-
+        booklets_prep[names_booklet == i] %>%
         purrr::map(purrr::set_names, "Booklet") %>%
-        purrr::pluck(i) %>%
+        # purrr::pluck(i) %>%
+        # Changed from == to %in%
+        purrr::keep(names(.) %in% names_booklet) %>%
+        unname(.) %>%
+        purrr::reduce(c) %>%
         list(.)
 
       c(x, BookletMerge)

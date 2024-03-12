@@ -32,14 +32,14 @@ setMethod(f = "show",
             cli::cli_end(ul)
           })
 
-setMethod(f = "show",
-          signature = "Workspace",
-          definition = function(object) {
-            cli_setting()
-
-            cli::cli_text("This object provides a valid login for data retrieval from the workspace {.ws {object@label}} (id {.ws-id {object@id}}).")
-
-          })
+# setMethod(f = "show",
+#           signature = "Workspace",
+#           definition = function(object) {
+#             cli_setting()
+#
+#             cli::cli_text("This object provides a valid login for data retrieval from the workspace {.ws {object@label}} (id {.ws-id {object@id}}).")
+#
+#           })
 
 setMethod(f = "show",
           signature = "WorkspaceStudio",

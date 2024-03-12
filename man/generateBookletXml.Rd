@@ -4,10 +4,17 @@
 \alias{generateBookletXml}
 \title{Generates booklets XML from unit information}
 \usage{
-generateBookletXml(Id, Label, BookletConfig = NULL, units)
+generateBookletXml(
+  Id,
+  Label,
+  Description = NULL,
+  BookletConfig = NULL,
+  units = NULL,
+  testlets = NULL
+)
 }
 \arguments{
-\item{units}{}
+\item{testlets}{}
 }
 \description{
 Generates booklets XML from unit information

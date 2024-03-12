@@ -28,10 +28,10 @@
 #' ```
 #' Note that the name and the password are only available to the function call
 #' and cannot be accessed later as they are not part of the [Login-class] object generated.
-#'
+#' %>%
 createStudioLogin <- function(domain = "https://www.iqb-studio.de/api",
                               dialog = TRUE,
-                              version = "6.1.2",
+                              version = "6.2.0",
                               keyring = FALSE,
                               changeKey = FALSE,
                               verbose = TRUE,

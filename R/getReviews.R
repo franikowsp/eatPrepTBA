@@ -1,7 +1,7 @@
 #' Get reviews
 #'
 #' @param workspace [Workspace-class]. Workspace information necessary to retrieve reviews from the API.
-#' @param groups Character. Name of the groups to be retrieved.
+#' @param groups Character. Name of the groups to be retrieved or all groups if not specified.
 #'
 #' @description
 #' This function returns responses for the selected groups.
@@ -12,20 +12,25 @@
 #' @examples
 #' @aliases
 #' getReviews,Workspace-method
-setGeneric("getReviews", function(workspace, groups) {
+setGeneric("getReviews", function(workspace, groups = NULL) {
   standardGeneric("getReviews")
 })
 
 #' @describeIn getReviews Get responses of a defined workspace
 setMethod("getReviews",
           signature = signature(workspace = "WorkspaceTestcenter"),
-          function(workspace, groups) {
+          function(workspace, groups = NULL) {
             domain <- workspace@login@domain
             ws_id <- workspace@id
 
             headers = c(
               AuthToken = workspace@login@token
             )
+
+            if (is.null(groups)) {
+              testtakers <- getTesttakers(workspace)
+              groups <- unique(testtakers$groupname)
+            }
 
             params = list(
               dataIds = glue::glue_collapse(groups, sep = ",")

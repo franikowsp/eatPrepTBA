@@ -1,7 +1,7 @@
 #' Get responses
 #'
 #' @param workspace [WorkspaceTestcenter-class]. Workspace information necessary to retrieve unit information and resources from the API.
-#' @param groups Character. Name of the groups to be retrieved.
+#' @param groups Character. Name of the groups to be retrieved or all groups if not specified.
 #'
 #' @description
 #' This function returns responses for the selected groups.
@@ -12,20 +12,25 @@
 #' @examples
 #' @aliases
 #' getResponses,WorkspaceTestcenter-method
-setGeneric("getResponses", function(workspace, groups) {
+setGeneric("getResponses", function(workspace, groups = NULL) {
   standardGeneric("getResponses")
 })
 
 #' @describeIn getResponses Get responses of a defined workspace
 setMethod("getResponses",
           signature = signature(workspace = "WorkspaceTestcenter"),
-          function(workspace, groups) {
+          function(workspace, groups = NULL) {
             domain <- workspace@login@domain
             ws_id <- workspace@id
 
             headers = c(
               AuthToken = workspace@login@token
             )
+
+            if (is.null(groups)) {
+              testtakers <- getTesttakers(workspace)
+              groups <- unique(testtakers$groupname)
+            }
 
             params = list(
               dataIds = glue::glue_collapse(groups, sep = ",")

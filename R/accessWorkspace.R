@@ -108,7 +108,7 @@ setMethod("accessWorkspace",
               purrr::map("id") %>%
               purrr::list_simplify()
 
-            Workspace <- new("WorkspaceStudio",
+            workspace <- new("WorkspaceStudio",
                              login = login,
                              id = as.numeric(ws_id),
                              label = ws_label,
@@ -122,5 +122,5 @@ setMethod("accessWorkspace",
               show(workspace)
             }
 
-            return(Workspace)
+            return(workspace)
           })
