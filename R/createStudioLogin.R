@@ -31,7 +31,7 @@
 #' %>%
 createStudioLogin <- function(domain = "https://www.iqb-studio.de/api",
                               dialog = TRUE,
-                              version = "6.2.0",
+                              version = "7.3.1",
                               keyring = FALSE,
                               changeKey = FALSE,
                               verbose = TRUE,

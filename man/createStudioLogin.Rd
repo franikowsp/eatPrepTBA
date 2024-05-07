@@ -7,7 +7,7 @@
 createStudioLogin(
   domain = "https://www.iqb-studio.de/api",
   dialog = TRUE,
-  version = "6.1.2",
+  version = "7.3.1",
   keyring = FALSE,
   changeKey = FALSE,
   verbose = TRUE,
@@ -41,6 +41,7 @@ and the \code{password} provided by the user:
 
 Note that the name and the password are only available to the function call
 and cannot be accessed later as they are not part of the \linkS4class{Login} object generated.
+\%>\%
 }
 \examples{
 login <- createStudioLogin(domain = "https://iqb-testcenter.de/api")

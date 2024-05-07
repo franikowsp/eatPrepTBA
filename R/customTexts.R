@@ -1,6 +1,10 @@
 customTexts <- function(...) {
-  list(
-    ...
-  ) %>%
+  (...) %>%
+    purrr::imap(function(x, n) {
+      list(
+        list(x),
+        key = n
+      )
+    }) %>%
     purrr::set_names("CustomText")
 }

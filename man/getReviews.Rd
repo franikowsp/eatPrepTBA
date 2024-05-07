@@ -6,14 +6,14 @@
 \alias{getReviews,WorkspaceTestcenter-method}
 \title{Get reviews}
 \usage{
-getReviews(workspace, groups)
+getReviews(workspace, groups = NULL)
 
-\S4method{getReviews}{WorkspaceTestcenter}(workspace, groups)
+\S4method{getReviews}{WorkspaceTestcenter}(workspace, groups = NULL)
 }
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve reviews from the API.}
 
-\item{groups}{Character. Name of the groups to be retrieved.}
+\item{groups}{Character. Name of the groups to be retrieved or all groups if not specified.}
 }
 \value{
 A tibble.

@@ -54,7 +54,11 @@ setMethod("getResponses",
                 # Schleife zum Spreaden der Einträge (Auslesen in tibble)
                 dplyr::mutate(
                   # Ladebalken?
-                  value = purrr::map(value, \(x) tibble::as_tibble(x))
+                  value = purrr::map(value, function(x) {
+                    x %>%
+                      purrr::discard(is.null) %>%
+                      tibble::as_tibble()
+                  })
                 ) %>%
                 # Entpacken
                 tidyr::unnest(value) %>%
@@ -75,9 +79,15 @@ setMethod("getResponses",
                     }
 
                   }),
-                  laststate = purrr::map(laststate, function(x) x %>%
-                                           jsonlite::parse_json(simplifyVector = TRUE) %>%
-                                           tibble::as_tibble()),
+                  laststate = purrr::map(laststate, function(x) {
+                    if (!is.na(x)) {
+                      x %>%
+                        jsonlite::parse_json(simplifyVector = TRUE) %>%
+                        tibble::as_tibble()
+                    } else {
+                      tibble::tibble(PLAYER = NA_character_)
+                    }
+                  })
                 ) %>%
                 # Entpacken
                 tidyr::unnest(c(

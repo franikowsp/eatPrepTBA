@@ -12,7 +12,7 @@
 #' @examples
 #' @aliases
 #' uploadFile,Workspace-method
-setGeneric("uploadFile", function(workspace, path) {
+setGeneric("uploadFile", function(workspace, path, status = c("success", "info", "error", "warning")) {
   cli_setting()
   standardGeneric("uploadFile")
 })
@@ -20,7 +20,7 @@ setGeneric("uploadFile", function(workspace, path) {
 #' @describeIn uploadFile Upload a file in a defined workspace
 setMethod("uploadFile",
           signature = signature(workspace = "WorkspaceTestcenter"),
-          function(workspace, path) {
+          function(workspace, path, status = c("success", "info", "error", "warning")) {
 
             domain <- workspace@login@domain
             ws_id <- workspace@id
@@ -52,12 +52,14 @@ setMethod("uploadFile",
                     cli::cli_h3(i)
                     x %>%
                       purrr::iwalk(function(x, i) {
-                        switch(i,
-                               "success" = purrr::walk(x, cli::cli_alert_success),
-                               "info" = purrr::walk(x, cli::cli_alert_info),
-                               "warning" = purrr::walk(x, cli::cli_alert_warning),
-                               "error" = purrr::walk(x, cli::cli_alert_danger)
-                        )
+                        if (i %in% status) {
+                          switch(i,
+                                 "success" = purrr::walk(x, cli::cli_alert_success),
+                                 "info" = purrr::walk(x, cli::cli_alert_info),
+                                 "warning" = purrr::walk(x, cli::cli_alert_warning),
+                                 "error" = purrr::walk(x, cli::cli_alert_danger)
+                          )
+                        }
                       })
                   }
                 )

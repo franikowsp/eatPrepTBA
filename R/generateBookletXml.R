@@ -62,6 +62,7 @@ generateBookletXml <- function(Id, Label, Description = NULL, BookletConfig = NU
 prepareRestrictions <- function(code_to_enter = NULL,
                                 code = NULL,
                                 minutes = NULL,
+                                leave = NULL,
                                 presentation = NULL,
                                 response = NULL) {
   # Following XML Restrictions structure
@@ -72,7 +73,8 @@ prepareRestrictions <- function(code_to_enter = NULL,
         code = code
       ),
       TimeMax = list(
-        minutes = minutes
+        minutes = minutes,
+        leave = leave
       ),
       DenyNavigationOnIncomplete = list(
         presentation = presentation,

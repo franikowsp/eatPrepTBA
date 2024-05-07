@@ -14,7 +14,7 @@ getUnit(workspace, id, ...)
 
 \S4method{getUnit}{WorkspaceTestcenter}(workspace, id, prepare = TRUE)
 
-\S4method{getUnit}{WorkspaceStudio}(workspace, id, prepare = TRUE)
+\S4method{getUnit}{WorkspaceStudio}(workspace, id, prepare = TRUE, definition = FALSE, scheme = FALSE)
 }
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve unit information and resources from the API.}

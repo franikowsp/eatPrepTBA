@@ -87,7 +87,10 @@ setMethod("getUnit",
 #' @describeIn getUnit Get unit information and coding scheme in a defined workspace
 setMethod("getUnit",
           signature = signature(workspace = "WorkspaceStudio"),
-          function(workspace, id, prepare = TRUE) {
+          function(workspace, id,
+                   prepare = TRUE,
+                   definition = FALSE,
+                   scheme = FALSE) {
             headers = c(
               Authorization = workspace@login@token,
               "app-version" = workspace@login@version
@@ -212,14 +215,14 @@ setMethod("getUnit",
                             as.list() %>%
                             tibble::enframe() %>%
                             tidyr::unnest(value) %>%
-                            tidyr::pivot_wider(values_fn = function(x) stringr::str_c(x, collapse = ";"))
+                            tidyr::pivot_wider(values_fn = function(x) stringr::str_c(x, collapse = "_-_-_"))
                         }) %>%
                         purrr::reduce(dplyr::bind_rows, .init = tibble::tibble())}) %>%
                     tibble::enframe(name = "item") %>%
                     tidyr::unnest(value) %>%
                     dplyr::select(item, label.value, value.id, valueAsText.value) %>%
                     dplyr::mutate(
-                      dplyr::across(c(value.id, valueAsText.value), function(x) stringr::str_split(x, ";"))
+                      dplyr::across(c(value.id, valueAsText.value), function(x) stringr::str_split(x, "_-_-_"))
                     ) %>%
                     tidyr::unnest(c(value.id, valueAsText.value)) %>%
                     dplyr::mutate(
@@ -270,6 +273,96 @@ setMethod("getUnit",
               }
             } else {
               response <- tibble::tibble(unit_profiles)
+            }
+
+            if (definition) {
+              request_definition <- httr::GET(url = glue::glue(
+                "{domain}/workspace/{ws_id}/{id}/definition"
+              ),
+              config = httr::add_headers(.headers = headers)
+              )
+
+              if (request_definition$status_code == 200) {
+                unit_definition <- httr::content(request_definition)
+
+                new_definition <- list()
+
+                new_definition$variables <-
+                  unit_definition$variables %>%
+                  purrr::list_transpose() %>%
+                  tibble::as_tibble() %>%
+                  list()
+
+                new_definition$definition <-
+                  unit_definition$definition %>%
+                  jsonlite::parse_json() %>%
+                  list()
+
+                new_definition <-
+                  new_definition %>%
+                  tibble::as_tibble()
+
+                response$variables <- NULL
+
+                response <-
+                  response %>%
+                  dplyr::bind_cols(new_definition)
+              }
+            }
+
+            if (scheme) {
+              request_scheme <- httr::GET(url = glue::glue(
+                "{domain}/workspace/{ws_id}/{id}/scheme"
+              ),
+              config = httr::add_headers(.headers = headers)
+              )
+
+              if (request_scheme$status_code == 200) {
+                unit_scheme <- httr::content(request_scheme)
+
+                unit_variables <-
+                  unit_scheme$variables %>%
+                  purrr::map(function(variables) {
+                    variables %>%
+                      purrr::discard(function(x) length(x) == 0) %>%
+                      tibble::as_tibble()
+                  }) %>%
+                  purrr::reduce(dplyr::bind_rows)
+
+                if (exists("values", unit_variables)) {
+                  unit_variables <-
+                    unit_variables %>%
+                    dplyr::mutate(
+                      values = purrr::map(values, function(x) {
+                        if (length(x) == 0) {
+                          tibble::tibble(value = NA, label = NA)
+                        } else {
+                          tibble::as_tibble(x)
+                        }
+                      })
+                    ) %>%
+                    tidyr::unnest(values) %>%
+                    tidyr::nest(values = c(label, value)) %>%
+                    dplyr::rename(item_id = id) %>%
+                    tidyr::nest(scheme = everything())
+                } else {
+                  unit_variables <-
+                    unit_variables %>%
+                    dplyr::mutate(
+                      label = NA,
+                      value = NA
+                    ) %>%
+                    dplyr::rename(item_id = id) %>%
+                    tidyr::nest(values = c(label, value)) %>%
+                    tidyr::nest(scheme = everything())
+                }
+
+                # TODO: Further work this out
+                # unit_scheme$scheme %>% jsonlite::parse_json()
+                response <-
+                  response %>%
+                  dplyr::bind_cols(unit_variables)
+              }
             }
 
             return(response)
