@@ -27,7 +27,7 @@ generateTesttakersXml <- function(testtakers, CustomTexts = NULL) {
                CustomTexts = CustomTexts),
           TesttakerGroups),
         "xmlns:xsi" = "http://www.w3.org/2001/XMLSchema-instance",
-        "xsi:noNamespaceSchemaLocation" = "https://raw.githubusercontent.com/iqb-berlin/testcenter/15.0.0/definitions/vo_Testtakers.xsd"
+        "xsi:noNamespaceSchemaLocation" = "https://raw.githubusercontent.com/iqb-berlin/testcenter/15.1.6/definitions/vo_Testtakers.xsd"
       ))
 
   # Bug in XSD scheme (CustomTexts MUST be filled)

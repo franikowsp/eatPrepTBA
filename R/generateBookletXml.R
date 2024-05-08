@@ -53,7 +53,7 @@ generateBookletXml <- function(Id, Label, Description = NULL, BookletConfig = NU
            BookletConfig = BookletConfig,
            Units = Units),
       "xmlns:xsi" = "http://www.w3.org/2001/XMLSchema-instance",
-      "xsi:noNamespaceSchemaLocation" = "https://raw.githubusercontent.com/iqb-berlin/testcenter/15.0.0/definitions/vo_Booklet.xsd"
+      "xsi:noNamespaceSchemaLocation" = "https://raw.githubusercontent.com/iqb-berlin/testcenter/15.1.6/definitions/vo_Booklet.xsd"
     ))  %>%
     list2Xml() %>%
     xml2::as_xml_document()
