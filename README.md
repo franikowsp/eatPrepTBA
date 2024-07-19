@@ -10,7 +10,9 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![R-CMD-check](https://github.com/franikowsp/eatPrepTBA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/franikowsp/eatPrepTBA/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of eatPrepTBA is to …
+The goal of eatPrepTBA is provide wrapper functions to interact with the
+IQB Studio and the IQB Testcenter APIs. Moreover, provides some routines
+for preparing and blending data from these different resources.
 
 ## Installation
 
@@ -28,5 +30,4 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(eatPrepTBA)
-## basic example code
 ```
