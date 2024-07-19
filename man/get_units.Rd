@@ -26,7 +26,7 @@ get_units(
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve unit information and resources from the API.}
 
-\item{unit_ids}{Integer (optinonal). Vector of the IDs of the unit to be retrieved. If no ID is given, all units files and their resources in the workspace are retrieved.}
+\item{unit_ids}{Integer (optional). Vector of the IDs of the unit to be retrieved. If no ID is given, all units files and their resources in the workspace are retrieved.}
 
 \item{metadata}{Logical. Should the metadata be added? Defaults to \code{TRUE}.}
 
