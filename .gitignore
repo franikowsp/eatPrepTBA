@@ -51,4 +51,8 @@ inst/doc
 /Meta/
 
 # User-defined
-R/ZZZ_DEV.R
+inst/ZZZ_DEV.R
+test.R
+to_be_reactivated/
+docs/
+src/

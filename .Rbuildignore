@@ -7,3 +7,6 @@
 ^doc$
 ^Meta$
 ^\.httr-oauth$
+^\.github$
+^README\.Rmd$
+pkkdown/

@@ -4,13 +4,12 @@
 #' @param keyring Logical. Should the [keyring] package be used?
 #' @param change_key Logical. Should the [keyring] credentials be changed (only valid, if keyring is set to `TRUE`)?
 #' @param dialog Logical. Should the dialog asking for username and password be used?
+#' @param ... Additional arguments. Only for testing purposes.
 #'
 #' @description
 #' This function returns credentials object for either signing in to the IQB Studio Lite or the IQB Testcenter (only used internally).
 #'
 #' @return A `list` with entries name and password.
-#'
-#' @examples
 get_credentials <- function(base_url, keyring, change_key, dialog, ...) {
   is_r_studio <- Sys.getenv("RSTUDIO") == "1"
   test_mode <- getOption("eatPrepTBA.test_mode")
