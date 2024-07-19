@@ -1,7 +1,7 @@
 #' Get multiple units with resources
 #'
 #' @param workspace [Workspace-class]. Workspace information necessary to retrieve unit information and resources from the API.
-#' @param unit_ids Integer (optinonal). Vector of the IDs of the unit to be retrieved. If no ID is given, all units files and their resources in the workspace are retrieved.
+#' @param unit_ids Integer (optional). Vector of the IDs of the unit to be retrieved. If no ID is given, all units files and their resources in the workspace are retrieved.
 #' @param unit_definition Logical. Should the unit definition be added? Defaults to `FALSE`.
 #' @param metadata Logical. Should the metadata be added? Defaults to `TRUE`.
 #' @param coding_scheme Logical. Should the coding scheme be added? Defaults to `FALSE`.
