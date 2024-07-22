@@ -10,6 +10,8 @@
 #' This function returns credentials object for either signing in to the IQB Studio Lite or the IQB Testcenter (only used internally).
 #'
 #' @return A `list` with entries name and password.
+#'
+#' @keywords internal
 get_credentials <- function(base_url, keyring, change_key, dialog, ...) {
   is_r_studio <- Sys.getenv("RSTUDIO") == "1"
   test_mode <- getOption("eatPrepTBA.test_mode")

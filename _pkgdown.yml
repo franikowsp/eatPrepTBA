@@ -1,4 +1,65 @@
 url: https://franikowsp.github.io/eatPrepTBA/
 template:
   bootstrap: 5
-
+reference:
+- title: Connecting to the API
+  desc: >
+    Functions and classes for communicating with the IQB Testcenter API
+- subtitle: Functions for access
+  contents:
+  - login_studio
+  - login_testcenter
+  - access_workspace
+- subtitle: Classes
+  contents:
+  - Login-class
+  - LoginStudio-class
+  - LoginTestcenter-class
+  - Workspace-class
+  - WorkspaceStudio-class
+  - WorkspaceTestcenter-class
+- title: Preparing unit metadata and coding schemes
+  desc: >
+    Functions to prepare unit data from IQB Studio or Testcenter
+- subtitle: Functions to list resources on IQB Studio
+  contents:
+  - list_units
+  - list_groups
+- subtitle: Functions to list resources on IQB Testcenter
+  contents:
+  - list_files
+  - list_resources
+  - list_units
+  - list_booklets
+  - list_testtakers
+  - list_system_checks
+- subtitle: Functions to handle units and workspaces on IQB Studio
+  contents:
+  - get_units
+  # - getBooklets
+  # - getTesttakers
+- subtitle: Functions to retrieve responses from IQB Testcenter
+  contents:
+  - get_results
+  - get_responses
+  - get_logs
+  - get_reviews
+  - read_responses
+- subtitle: Functions for units
+  contents:
+  - add_metadata
+- title: Managing studies
+  desc: >
+    Functions to check units, prepare material for administration and coding
+- subtitle: Prepare studies on IQB Studio
+  contents:
+  - get_units
+  - get_states
+  - get_settings
+  - get_coding_report
+  - prepare_coding_scheme
+  - download_codebook
+  - download_units
+- subtitle: Prepere studies on IQB Testcenter
+  contents:
+  - upload_file

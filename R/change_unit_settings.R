@@ -13,10 +13,10 @@
 #'
 #' @return NULL
 #'
-#' @export
-#'
 #' @aliases
 #' change_unit_settings,WorkspaceStudio-method
+#'
+#' @keywords internal
 setGeneric("change_unit_settings", function(workspace,
                                             unit_id,
                                             player = NULL,

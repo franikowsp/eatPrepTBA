@@ -15,6 +15,8 @@
 #' @aliases
 #' change_units_settings,WorkspaceStudio-method
 #' @export
+#'
+#' @keywords internal
 setGeneric("change_units_settings", function(workspace,
                                              unit_ids,
                                              player = NULL,

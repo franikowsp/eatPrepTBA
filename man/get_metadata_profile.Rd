@@ -15,3 +15,4 @@ A tibble.
 \description{
 This function only returns the unit information and coding scheme for a single unit. To retrieve multiple units, use \code{\link[=get_units]{get_units()}}.
 }
+\keyword{internal}

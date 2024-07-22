@@ -6,6 +6,8 @@
 #' This function only returns the unit information and coding scheme for a single unit. To retrieve multiple units, use [get_units()].
 #'
 #' @return A tibble.
+#'
+#' @keywords internal
 get_metadata_profile <- function(url) {
   str_replacements <- "[-:/ ]+"
 

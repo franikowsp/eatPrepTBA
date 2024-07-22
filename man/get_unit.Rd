@@ -27,7 +27,7 @@ get_unit(
 )
 }
 \arguments{
-\item{workspace}{.}
+\item{workspace}{\linkS4class{WorkspaceStudio}. Workspace information necessary to retrieve unit information and resources from the API.}
 
 \item{unit_id}{Integer. ID of the unit to be retrieved (either \code{unit_id} or \code{unit_key} must be given; if these are discordant, only \code{unit_id} will be used).}
 
@@ -52,3 +52,4 @@ This function only returns the unit information and coding scheme for a single u
 \item \code{get_unit(WorkspaceStudio)}: Get unit information and coding scheme in a defined workspace
 
 }}
+\keyword{internal}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/login_testcenter.R
 \name{login_testcenter}
 \alias{login_testcenter}
-\title{Generate a \linkS4class{Login} object for the IQB Testcenter}
+\title{Generate a \linkS4class{LoginTestcenter} object for the IQB Testcenter}
 \usage{
 login_testcenter(
   base_url = "https://iqb-testcenter2.de/",

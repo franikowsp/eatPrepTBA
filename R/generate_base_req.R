@@ -9,6 +9,8 @@
 #' This function returns the base API request for a an instance.
 #'
 #' @return A `function` with arguments `method`, `endpoint`, and `query`.
+#'
+#' @keywords internal
 generate_base_req <- function(type,
                               base_url,
                               auth_token,

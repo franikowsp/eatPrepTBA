@@ -48,3 +48,4 @@ This function updates the Studio metadata, i.e., versions for player, editor, or
 \item \code{change_units_settings(WorkspaceStudio)}: Get unit information and coding scheme in a defined workspace
 
 }}
+\keyword{internal}

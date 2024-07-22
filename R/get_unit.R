@@ -15,6 +15,8 @@
 #'
 #' @aliases
 #' get_unit,WorkspaceTestcenter-method,WorkspaceStudio-method
+#'
+#' @keywords internal
 setGeneric("get_unit", function(workspace,
                                 unit_id,
                                 # TODO: This should not stay for the Testcenter call ...
@@ -28,7 +30,7 @@ setGeneric("get_unit", function(workspace,
   standardGeneric("get_unit")
 })
 
-#' @param workspace .
+#' @param workspace [WorkspaceStudio-class]. Workspace information necessary to retrieve unit information and resources from the API.
 #'
 #' @describeIn get_unit Get unit information and coding scheme in a defined workspace
 setMethod("get_unit",

@@ -3,7 +3,6 @@
 export("%>%")
 export(access_workspace)
 export(add_metadata)
-export(change_unit_settings)
 export(change_units_settings)
 export(download_codebook)
 export(download_units)

@@ -23,3 +23,4 @@ A \code{list} with entries name and password.
 \description{
 This function returns credentials object for either signing in to the IQB Studio Lite or the IQB Testcenter (only used internally).
 }
+\keyword{internal}

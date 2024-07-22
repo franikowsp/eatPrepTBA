@@ -1,4 +1,4 @@
-#' Generate a [Login-class] object for the IQB Testcenter
+#' Generate a [LoginTestcenter-class] object for the IQB Testcenter
 #'
 #' @description
 #' Provides a routine to login to an instance of the IQB Testcenter.

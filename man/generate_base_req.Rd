@@ -21,3 +21,4 @@ A \code{function} with arguments \code{method}, \code{endpoint}, and \code{query
 \description{
 This function returns the base API request for a an instance.
 }
+\keyword{internal}
