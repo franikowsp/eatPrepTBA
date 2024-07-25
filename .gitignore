@@ -52,6 +52,7 @@ inst/doc
 
 # User-defined
 inst/ZZZ_DEV.R
+inst/achim.R
 test.R
 to_be_reactivated/
 docs/

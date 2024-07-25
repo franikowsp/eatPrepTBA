@@ -25,6 +25,8 @@ prepare_coding_scheme <- function(coding_scheme) {
       processing = "processing",
       fragmenting = "fragmenting",
       general_instruction = "manualInstruction",
+      # value_array_position = "valueArrayPos",
+      # code_model_parameters = "code_model"
       code_model = "codeModel",
       page = "page",
       codes = "codes"

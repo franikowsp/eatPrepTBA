@@ -77,8 +77,8 @@ setMethod("download_codebook",
                 onlyManual = only_manual,
                 closed = closed,
                 derived = derived,
-                show_score = showScore,
-                code_label_to_upper = codeLabelToUpper
+                showScore = show_score,
+                codeLabelToUpper = code_label_to_upper
               ) %>%
               purrr::map(stringr::str_to_lower)
 

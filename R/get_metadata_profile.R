@@ -88,7 +88,7 @@ narrow_profile_list <- function(x) {
 
 prepare_profile_list <- function(url) {
   if (!is.na(url)) {
-    httr2::request("https://w3id.org/iqb/v27/dp/") %>%
+    httr2::request(url) %>%
       httr2::req_perform() %>%
       httr2::resp_body_json() %>%
       purrr::pluck("hasTopConcept") %>%
