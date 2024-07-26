@@ -26,7 +26,10 @@ setClass("Login",
 #' @slot base_url Character. Base URL of the IQB Studio installation.
 #' @slot base_req Function. Base [httr2] request (will be handled internally).
 #' @slot ws_list Named list. Returns a list of the labels and ids of the workspaces the user has access to.
-#'  #' @slot wsg_list Named list. Returns a list of the workspace groups the user has access to.
+#' @slot wsg_list Named list. Returns a list of the workspace groups the user has access to.
+#' @slot user_id Numeric. ID of the user.
+#' @slot user_key Character. Short name of the user (login name).
+#' @slot user_label Character. Long name of the user.
 #' @slot app_version Character. The version of the IQB Studio.
 #'
 #' @name LoginStudio-class
@@ -37,6 +40,9 @@ setClass("LoginStudio",
          contains = "Login",
          slots = c(
            wsg_list = "list",
+           user_id = "numeric",
+           user_key = "character",
+           user_label = "character",
            app_version = "character"
          ))
 

@@ -113,6 +113,9 @@ login_studio <- function(base_url = "https://www.iqb-studio.de/",
                base_req = base_req,
                ws_list = ws_list,
                wsg_list = wsg_list,
+               user_id = resp$userId,
+               user_key = resp$userName,
+               user_label = resp$userLongName,
                app_version = app_version
   )
 

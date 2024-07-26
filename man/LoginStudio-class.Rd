@@ -14,8 +14,15 @@ A class extending the Login class with additional information for the IQB Studio
 
 \item{\code{base_req}}{Function. Base \link{httr2} request (will be handled internally).}
 
-\item{\code{ws_list}}{Named list. Returns a list of the labels and ids of the workspaces the user has access to.
-#' @slot wsg_list Named list. Returns a list of the workspace groups the user has access to.}
+\item{\code{ws_list}}{Named list. Returns a list of the labels and ids of the workspaces the user has access to.}
+
+\item{\code{wsg_list}}{Named list. Returns a list of the workspace groups the user has access to.}
+
+\item{\code{user_id}}{Numeric. ID of the user.}
+
+\item{\code{user_key}}{Character. Short name of the user (login name).}
+
+\item{\code{user_label}}{Character. Long name of the user.}
 
 \item{\code{app_version}}{Character. The version of the IQB Studio.}
 }}
