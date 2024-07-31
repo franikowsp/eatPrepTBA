@@ -2,8 +2,8 @@ Package: eatPrepTBA
 Title: Prepare IQB Technology Based Assesssment (TBA)
 Version: 0.6.3.9000
 Authors@R: 
-    person("Philipp", "Franikowski", , "philipp.franikowski@iqb.hu-berlin.de", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-2109-7388"))
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: 
     Provides wrapper functions to interact with the IQB Studio and the IQB Testcenter APIs. 
     Moreover, provides some routines for preparing and blending data from these different
@@ -33,5 +33,5 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-VignetteBuilder: knitr
 URL: https://franikowsp.github.io/eatPrepTBA/
+VignetteBuilder: knitr

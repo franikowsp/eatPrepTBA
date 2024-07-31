@@ -19,6 +19,7 @@ setGeneric("add_metadata", function(workspace, units) {
 setMethod("add_metadata",
           signature = signature(workspace = "WorkspaceStudio"),
           function(workspace, units) {
+
             ws_settings <- get_settings(workspace, metadata = TRUE)
             items_profile <- ws_settings %>% purrr::pluck("item_metadata", 1)
             unit_profile <- ws_settings %>% purrr::pluck("unit_metadata", 1)

@@ -137,7 +137,7 @@ prepare_metadata <- function(unit, resp_metadata, workspace) {
         value_id = value.id,
         value_text = valueAsText.value
       ) %>%
-      dplyr::left_join(items_general)
+      dplyr::left_join(items_general, by = dplyr::join_by(item))
   } else {
     items_profiles <-
       tibble::tibble(

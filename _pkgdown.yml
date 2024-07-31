@@ -3,7 +3,7 @@ template:
   bootstrap: 5
 reference:
 - title: Connecting to the API
-  desc: >
+  desc: |
     Functions and classes for communicating with the IQB Testcenter API
 - subtitle: Functions for access
   contents:
@@ -19,7 +19,7 @@ reference:
   - WorkspaceStudio-class
   - WorkspaceTestcenter-class
 - title: Preparing unit metadata and coding schemes
-  desc: >
+  desc: |
     Functions to prepare unit data from IQB Studio or Testcenter
 - subtitle: Functions to list resources on IQB Studio
   contents:
@@ -34,10 +34,7 @@ reference:
   - list_testtakers
   - list_system_checks
 - subtitle: Functions to handle units and workspaces on IQB Studio
-  contents:
-  - get_units
-  # - getBooklets
-  # - getTesttakers
+  contents: get_units
 - subtitle: Functions to retrieve responses from IQB Testcenter
   contents:
   - get_results
@@ -46,10 +43,9 @@ reference:
   - get_reviews
   - read_responses
 - subtitle: Functions for units
-  contents:
-  - add_metadata
+  contents: add_metadata
 - title: Managing studies
-  desc: >
+  desc: |
     Functions to check units, prepare material for administration and coding
 - subtitle: Prepare studies on IQB Studio
   contents:
@@ -61,5 +57,5 @@ reference:
   - download_codebook
   - download_units
 - subtitle: Prepere studies on IQB Testcenter
-  contents:
-  - upload_file
+  contents: upload_file
+
