@@ -12,6 +12,8 @@
 #' @aliases
 #' add_metadata,WorkspaceStudio-method
 setGeneric("add_metadata", function(workspace, units) {
+  cli_setting()
+
   standardGeneric("add_metadata")
 })
 
@@ -19,7 +21,6 @@ setGeneric("add_metadata", function(workspace, units) {
 setMethod("add_metadata",
           signature = signature(workspace = "WorkspaceStudio"),
           function(workspace, units) {
-
             ws_settings <- get_settings(workspace, metadata = TRUE)
             items_profile <- ws_settings %>% purrr::pluck("item_metadata", 1)
             unit_profile <- ws_settings %>% purrr::pluck("unit_metadata", 1)
@@ -41,7 +42,7 @@ setMethod("add_metadata",
               units %>%
               dplyr::select(unit_id, items_profiles) %>%
               tidyr::unnest(items_profiles) %>%
-              add_profile(c(unit_id, variable_id, item), profile = items_profile)
+              add_profile(c(unit_id, item_no), profile = items_profile)
 
             unit_meta <-
               units %>%
