@@ -40,7 +40,7 @@ setMethod("add_metadata",
               units %>%
               dplyr::select(unit_id, items_profiles) %>%
               tidyr::unnest(items_profiles) %>%
-              add_profile(c(unit_id, item), profile = items_profile)
+              add_profile(c(unit_id, variable_id, item), profile = items_profile)
 
             unit_meta <-
               units %>%

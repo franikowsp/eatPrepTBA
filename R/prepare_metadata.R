@@ -70,6 +70,7 @@ prepare_metadata <- function(unit, resp_metadata, workspace) {
     items_meta <-
       tibble::tibble(
         item = NA_integer_,
+        variable_id = NA_character_,
         profile_name = "Itemformat",
         value_id = NA_character_,
         value_text = ""
@@ -79,6 +80,25 @@ prepare_metadata <- function(unit, resp_metadata, workspace) {
   # !is.null(unit$metadata$items %>% purrr::map("profiles") %>% purrr::reduce(c)) &&
 
   if (length(resp_metadata$metadata$items) != 0) {
+    items_general <-
+      resp_metadata$metadata$items %>%
+      purrr::map(function(x) {
+        x["profiles"] <- NULL
+        x
+      }) %>%
+      purrr::list_transpose() %>%
+      tibble::as_tibble() %>%
+      dplyr::mutate(
+        id = as.integer(id)
+      ) %>%
+      dplyr::rename(
+        any_of(c(
+          "item" = "id",
+          "variable_id" = "variableId",
+          "item_description" = "description"
+        ))
+      )
+
     items_profiles <-
       resp_metadata$metadata$items %>%
       purrr::map(function(x) {
@@ -116,7 +136,8 @@ prepare_metadata <- function(unit, resp_metadata, workspace) {
         # profile_label = label.value,
         value_id = value.id,
         value_text = valueAsText.value
-      )
+      ) %>%
+      dplyr::left_join(items_general)
   } else {
     items_profiles <-
       tibble::tibble(

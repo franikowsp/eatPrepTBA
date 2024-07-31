@@ -66,7 +66,7 @@ setMethod("change_unit_settings",
 
             run_safe(run_req,
                      error_message = "Settings could not be changed for
-                       unit with id {id} {.url {url}}.")
+                       unit with id {unit_id} {.url {url}}.")
 
           })
 

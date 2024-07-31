@@ -1,6 +1,6 @@
 Package: eatPrepTBA
 Title: Prepare IQB Technology Based Assesssment (TBA)
-Version: 0.6.2.9000
+Version: 0.6.3.9000
 Authors@R: 
     person("Philipp", "Franikowski", , "philipp.franikowski@iqb.hu-berlin.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2109-7388"))
@@ -26,6 +26,7 @@ Imports:
     curl,
     glue,
     readr,
+    rlang,
     rstudioapi
 Suggests: 
     knitr,

@@ -14,7 +14,7 @@ add_comment(workspace, unit_id, comment = NULL)
 
 \item{unit_id}{Unit ID to be changed.}
 
-\item{comment}{Comment to be added to the unit.}
+\item{comment}{Comment to be added to the unit. Should contain html markup.}
 }
 \description{
 This function adds an entry in the comment tab of the Studio of a single unit.
