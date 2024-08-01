@@ -44,6 +44,7 @@ prepare_definition <- function(unit, resp_definition) {
   # will no longer be necessary
   variable_pages <-
     unit_definition$pages %>%
+    purrr::keep(function(x) !x$alwaysVisible) %>%
     purrr::map(function(page) {
       get_deepest_elements(page, label = "id") %>%
         purrr::list_simplify()
