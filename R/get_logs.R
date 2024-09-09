@@ -50,5 +50,5 @@ setMethod("get_logs",
               tidyr::unnest(value)
 
             ### TODO: tryCatch
-            return(response_json)
+            # return(response_json)
           })
