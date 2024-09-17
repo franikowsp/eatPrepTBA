@@ -1,6 +1,6 @@
 Package: eatPrepTBA
 Title: Prepare IQB Technology Based Assesssment (TBA)
-Version: 0.6.5.9000
+Version: 0.6.6.9000
 Authors@R: 
     person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
