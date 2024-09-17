@@ -14,7 +14,7 @@ get_reviews(workspace, groups = NULL, use_new_version = TRUE)
 
 \item{groups}{Character. Name of the groups to be retrieved or all groups if not specified.}
 
-\item{use_new_format}{Logical. Should the new or the output format be used. Defaults to \code{TRUE}.}
+\item{use_new_version}{Logical. Should the new or the output format be used. Defaults to \code{TRUE}.}
 }
 \value{
 A tibble.

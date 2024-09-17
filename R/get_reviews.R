@@ -2,7 +2,7 @@
 #'
 #' @param workspace [WorkspaceTestcenter-class]. IQB Testcenter workspace information necessary to retrieve reviews from the API.
 #' @param groups Character. Name of the groups to be retrieved or all groups if not specified.
-#' @param use_new_format Logical. Should the new or the output format be used. Defaults to `TRUE`.
+#' @param use_new_version Logical. Should the new or the output format be used. Defaults to `TRUE`.
 #'
 #' @description
 #' This function returns responses for the selected groups.
