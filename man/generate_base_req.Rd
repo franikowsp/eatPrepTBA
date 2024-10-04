@@ -4,7 +4,13 @@
 \alias{generate_base_req}
 \title{Generate API request function}
 \usage{
-generate_base_req(type, base_url, auth_token, app_version = NULL)
+generate_base_req(
+  type,
+  base_url,
+  auth_token,
+  app_version = NULL,
+  insecure = FALSE
+)
 }
 \arguments{
 \item{type}{Character. Type of the URL request, e.g., \code{GET} or \code{POST}.}
@@ -14,6 +20,8 @@ generate_base_req(type, base_url, auth_token, app_version = NULL)
 \item{auth_token}{Character. Token to interact with the instance API.}
 
 \item{app_version}{Character. Version of the IQB Studio Lite (not necessary for the IQB Testcenter).}
+
+\item{insecure}{Logical. Should the https security certificate be ignored (only recommended for Intranet requests that might not have a valid security certificate).}
 }
 \value{
 A \code{function} with arguments \code{method}, \code{endpoint}, and \code{query}.

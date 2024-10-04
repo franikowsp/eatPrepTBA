@@ -22,7 +22,7 @@ login_testcenter(
 
 \item{dialog}{Logical. Should the password be entered using the RStudio dialog (\code{TRUE}) or using the console (\code{FALSE}). Defaults to \code{TRUE}.}
 
-\item{insecure}{Logical. Should the https security certificate should be ignored (only recommended for Intranet requests that might not have a valid security certificate).}
+\item{insecure}{Logical. Should the https security certificate be ignored (only recommended for Intranet requests that might not have a valid security certificate).}
 
 \item{verbose}{Logical. If \code{TRUE}, additional information is printed. Defaults to \code{FALSE}.}
 }

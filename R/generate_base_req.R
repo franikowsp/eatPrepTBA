@@ -4,6 +4,7 @@
 #' @param base_url Character. Base URL of the instance.
 #' @param auth_token Character. Token to interact with the instance API.
 #' @param app_version Character. Version of the IQB Studio Lite (not necessary for the IQB Testcenter).
+#' @param insecure Logical. Should the https security certificate be ignored (only recommended for Intranet requests that might not have a valid security certificate).
 #'
 #' @description
 #' This function returns the base API request for a an instance.
@@ -14,7 +15,8 @@
 generate_base_req <- function(type,
                               base_url,
                               auth_token,
-                              app_version = NULL) {
+                              app_version = NULL,
+                              insecure = FALSE) {
   if (type == "studio") {
     base_call <-
       httr2::request(base_url = base_url) %>%
@@ -25,6 +27,16 @@ generate_base_req <- function(type,
     base_call <-
       httr2::request(base_url = base_url) %>%
       httr2::req_headers(AuthToken = auth_token)
+
+    if (insecure) {
+      # Added for Intranet requests
+      base_call <-
+        base_call %>%
+        httr2::req_options(
+          ssl_verifypeer = FALSE,
+          ssl_verifyhost = FALSE
+        )
+    }
   }
 
   function(method, endpoint, query = NULL) {

@@ -7,7 +7,7 @@
 #' @param keyring Logical. Should the [keyring] package be used to save the passkey? This saves your credentials to your local machine. Defaults to `FALSE`.
 #' @param change_key Logical. If your password on the domain has changed - should the [keyring] password be changed? Defaults to `FALSE`.
 #' @param dialog Logical. Should the password be entered using the RStudio dialog (`TRUE`) or using the console (`FALSE`). Defaults to `TRUE`.
-#' @param insecure Logical. Should the https security certificate should be ignored (only recommended for Intranet requests that might not have a valid security certificate).
+#' @param insecure Logical. Should the https security certificate be ignored (only recommended for Intranet requests that might not have a valid security certificate).
 #' @param verbose Logical. If `TRUE`, additional information is printed. Defaults to `FALSE`.
 #'
 #' @return An object of the [LoginTestcenter-class] class.
@@ -81,7 +81,8 @@ login_testcenter <- function(base_url = "https://iqb-testcenter2.de/",
 
   base_req <- generate_base_req(type = "testcenter",
                                 base_url = base_url,
-                                auth_token = resp$token)
+                                auth_token = resp$token,
+                                insecure = insecure)
 
   ws_list <-
     resp$claims$workspaceAdmin %>%
