@@ -7,6 +7,7 @@
 #' @param keyring Logical. Should the [keyring] package be used to save the passkey? This saves your credentials to your local machine. Defaults to `FALSE`.
 #' @param change_key Logical. If your password on the domain has changed - should the [keyring] password be changed? Defaults to `FALSE`.
 #' @param dialog Logical. Should the password be entered using the RStudio dialog (`TRUE`) or using the console (`FALSE`). Defaults to `TRUE`.
+#' @param insecure Logical. Should the https security certificate should be ignored (only recommended for Intranet requests that might not have a valid security certificate).
 #' @param verbose Logical. If `TRUE`, additional information is printed. Defaults to `FALSE`.
 #'
 #' @return An object of the [LoginTestcenter-class] class.
@@ -31,6 +32,7 @@ login_testcenter <- function(base_url = "https://iqb-testcenter2.de/",
                              keyring = FALSE,
                              change_key = FALSE,
                              dialog = TRUE,
+                             insecure = FALSE,
                              verbose = FALSE) {
   cli_setting()
 
@@ -41,11 +43,24 @@ login_testcenter <- function(base_url = "https://iqb-testcenter2.de/",
                                  dialog = dialog)
 
   run_req <- function() {
-    httr2::request(base_url = base_url) %>%
+    base_req <-
+      httr2::request(base_url = base_url) %>%
       httr2::req_url_path_append("api", "session", "admin") %>%
       httr2::req_headers("Content-Type" = "application/json") %>%
       httr2::req_method("PUT") %>%
-      httr2::req_body_json(credentials) %>%
+      httr2::req_body_json(credentials)
+
+    if (insecure) {
+      # Added for Intranet requests
+      base_req <-
+        base_req %>%
+        httr2::req_options(
+          ssl_verifypeer = FALSE,
+          ssl_verifyhost = FALSE
+        )
+    }
+
+    base_req %>%
       httr2::req_perform() %>%
       httr2::resp_body_json()
   }
