@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">eatPrepTBA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.7.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.8.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,7 +37,13 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generate_base_req</span><span class="op">(</span><span class="va">type</span>, <span class="va">base_url</span>, <span class="va">auth_token</span>, app_version <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generate_base_req</span><span class="op">(</span></span>
+<span>  <span class="va">type</span>,</span>
+<span>  <span class="va">base_url</span>,</span>
+<span>  <span class="va">auth_token</span>,</span>
+<span>  app_version <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  insecure <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -59,6 +65,10 @@
 <dt id="arg-app-version">app_version<a class="anchor" aria-label="anchor" href="#arg-app-version"></a></dt>
 <dd><p>Character. Version of the IQB Studio Lite (not necessary for the IQB Testcenter).</p></dd>
 
+
+<dt id="arg-insecure">insecure<a class="anchor" aria-label="anchor" href="#arg-insecure"></a></dt>
+<dd><p>Logical. Should the https security certificate be ignored (only recommended for Intranet requests that might not have a valid security certificate).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -70,7 +80,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by First Last.</p>
+  <p>Developed by Philipp Franikowski.</p>
 </div>
 
 <div class="pkgdown-footer-right">
