@@ -1,9 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.1.0
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   eatPrepTBA: eatPrepTBA.html
-last_built: 2024-09-17T16:18Z
+last_built: 2024-10-04T09:34Z
 urls:
   reference: https://franikowsp.github.io/eatPrepTBA/reference
   article: https://franikowsp.github.io/eatPrepTBA/articles
