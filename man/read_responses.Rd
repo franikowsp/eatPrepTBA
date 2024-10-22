@@ -7,7 +7,7 @@
 read_responses(file)
 }
 \arguments{
-\item{file}{Chracter. Path to the csv file from the IQB Testcenter to be read.}
+\item{file}{Character. Path to the csv file from the IQB Testcenter to be read.}
 }
 \value{
 A tibble.

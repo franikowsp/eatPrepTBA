@@ -7,11 +7,11 @@
 read_system_checks(file)
 }
 \arguments{
-\item{file}{Chracter. Path to the csv file from the IQB Testcenter to be read.}
+\item{file}{Character. Path to the csv file from the IQB Testcenter to be read.}
 }
 \value{
 A tibble.
 }
 \description{
-This function only returns the system check data for a downloaded sytem check file.
+This function only returns the system check data for a downloaded system check file.
 }
