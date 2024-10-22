@@ -41,7 +41,9 @@ reference:
   - get_responses
   - get_logs
   - get_reviews
+  - get_system_checks
   - read_responses
+  - read_system_checks
 - subtitle: Functions for units
   contents: add_metadata
 - title: Managing studies
