@@ -1,6 +1,6 @@
 #' Reads and prepares testtakers file
 #'
-#' @param file Chracter. Path to the csv file from the IQB Testcenter to be read.
+#' @param file Character. Path to the csv file from the IQB Testcenter to be read.
 #'
 #' @description
 #' This function only returns the testtakers information for a downloaded testtakers file.

@@ -1,9 +1,9 @@
 #' Reads and prepares system check file
 #'
-#' @param file Chracter. Path to the csv file from the IQB Testcenter to be read.
+#' @param file Character. Path to the csv file from the IQB Testcenter to be read.
 #'
 #' @description
-#' This function only returns the system check data for a downloaded sytem check file.
+#' This function only returns the system check data for a downloaded system check file.
 #'
 #' @return A tibble.
 #'
