@@ -59,5 +59,7 @@ reference:
   - download_codebook
   - download_units
 - subtitle: Prepere studies on IQB Testcenter
-  contents: upload_file
-
+  contents:
+  - generate_testtakers
+  - generate_booklet
+  - upload_file
