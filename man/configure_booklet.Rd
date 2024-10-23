@@ -67,10 +67,9 @@ configure_booklet(
 \item{show_fullscreen_button}{Tbd.}
 }
 \value{
-A booklet XML.
-
 A list with a valid booklet configuration.
 }
 \description{
 Helper function to prepare booklet configuration header
 }
+\keyword{internal}

@@ -20,9 +20,9 @@
 #' @param ask_for_fullscreen Tbd.
 #' @param show_fullscreen_button Tbd.
 #'
-#' @return A booklet XML.
-#'
 #' @return A list with a valid booklet configuration.
+#'
+#' @keywords internal
 configure_booklet <- function(
     loading_mode = c("lazy", "eager"),
     log_policy = c("rich", "disabled", "lean", "debug"),
