@@ -13,21 +13,22 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
-    magrittr,
-    tibble,
-    dplyr,
-    tidyr,
-    purrr,
-    stringr,
     cli,
-    httr2,
-    keyring,
-    jsonlite,
     curl,
+    dplyr,
     glue,
+    httr2,
+    jsonlite,
+    keyring,
+    magrittr,
+    purrr,
     readr,
     rlang,
-    rstudioapi
+    rstudioapi,
+    stringr,
+    tibble,
+    tidyr,
+    xml2
 Suggests: 
     knitr,
     rmarkdown,
