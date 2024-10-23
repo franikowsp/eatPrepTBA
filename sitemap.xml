@@ -17,9 +17,12 @@
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/add_metadata.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/change_unit_settings.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/change_units_settings.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/configure_booklet.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/download_codebook.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/download_units.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/generate_base_req.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/generate_booklet.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/generate_testtakers.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_coding_report.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_credentials.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_logs.html</loc></url>
@@ -29,6 +32,7 @@
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_reviews.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_settings.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_states.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_system_checks.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_unit.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_units.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/index.html</loc></url>
@@ -44,6 +48,7 @@
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/pipe.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/prepare_coding_scheme.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/read_responses.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/read_system_checks.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/upload_file.html</loc></url>
 </urlset>
 
