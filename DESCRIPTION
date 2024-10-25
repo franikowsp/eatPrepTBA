@@ -1,6 +1,6 @@
 Package: eatPrepTBA
 Title: Prepare IQB Technology Based Assesssment (TBA)
-Version: 0.6.9.9000
+Version: 0.8.0.9000
 Authors@R: 
     person("Philipp", "Franikowski", , "philipp.franikowski@iqb.hu-berlin.de", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2109-7388"))
@@ -16,6 +16,7 @@ Imports:
     cli,
     curl,
     dplyr,
+    eatAutoCode,
     glue,
     httr2,
     jsonlite,
@@ -33,6 +34,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
+Remotes: franikowsp/eatAutoCode
 Config/testthat/edition: 3
 URL: https://franikowsp.github.io/eatPrepTBA/
 VignetteBuilder: knitr
