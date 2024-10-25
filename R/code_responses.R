@@ -131,6 +131,8 @@ code_responses <- function(responses,
 #' This function automatically codes responses of one unit by using the `eatAutoCode` package.
 #'
 #' @return A tibble.
+#'
+#' @keywords internal
 code_unit <- function(unit_responses, coding_scheme) {
   unit_responses %>%
     dplyr::mutate(

@@ -21,11 +21,11 @@ reference:
 - title: Preparing unit metadata and coding schemes
   desc: |
     Functions to prepare unit data from IQB Studio or Testcenter
-- subtitle: Functions to list resources on IQB Studio
+- subtitle: List resources on IQB Studio
   contents:
   - list_units
   - list_groups
-- subtitle: Functions to list resources on IQB Testcenter
+- subtitle: List resources on IQB Testcenter
   contents:
   - list_files
   - list_resources
@@ -33,9 +33,9 @@ reference:
   - list_booklets
   - list_testtakers
   - list_system_checks
-- subtitle: Functions to handle units and workspaces on IQB Studio
+- subtitle: Handle units and workspaces on IQB Studio
   contents: get_units
-- subtitle: Functions to retrieve responses from IQB Testcenter
+- subtitle: Retrieve responses from IQB Testcenter
   contents:
   - get_results
   - get_responses
@@ -58,8 +58,11 @@ reference:
   - prepare_coding_scheme
   - download_codebook
   - download_units
-- subtitle: Prepere studies on IQB Testcenter
+- subtitle: Prepare studies on IQB Testcenter
   contents:
   - generate_testtakers
   - generate_booklet
   - upload_file
+- subtitle: Work with data from IQB Testcenter
+  contents:
+  - code_responses

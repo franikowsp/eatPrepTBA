@@ -17,3 +17,4 @@ A tibble.
 \description{
 This function automatically codes responses of one unit by using the \code{eatAutoCode} package.
 }
+\keyword{internal}
