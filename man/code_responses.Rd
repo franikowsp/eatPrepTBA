@@ -4,7 +4,14 @@
 \alias{code_responses}
 \title{Code unit responses with coding schemes}
 \usage{
-code_responses(responses, units, prepare = FALSE, by = NULL)
+code_responses(
+  responses,
+  units,
+  prepare = FALSE,
+  by = NULL,
+  codes_manual = NULL,
+  missings = NULL
+)
 }
 \arguments{
 \item{responses}{Tibble. Response data retrieved from the IQB Testcenter with setting the argument \code{prepare = FALSE} for \code{\link[=get_responses]{get_responses()}} or \code{\link[=read_responses]{read_responses()}}.}
@@ -14,6 +21,10 @@ code_responses(responses, units, prepare = FALSE, by = NULL)
 \item{prepare}{Logical. Whether to unpack the coding results and to add information from the coding schemes.}
 
 \item{by}{Character. Additional columns as subgroups for the coding (e.g., in case of duplicate unit data for a specific person that could emerge in offline settings).}
+
+\item{codes_manual}{Tibble (optional). Data frame holding the manual codes. Defaults to \code{NULL} and does only automatic coding.}
+
+\item{missings}{Tibble (optional). Provide missing meta data with \code{code_id}, \code{status}, \code{score}, and \code{code_type}. Defaults to \code{NULL} and uses default scheme.}
 }
 \value{
 A tibble.

@@ -4,10 +4,12 @@
 \alias{read_responses}
 \title{Reads and prepares testtakers file}
 \usage{
-read_responses(file)
+read_responses(file, prepare = TRUE)
 }
 \arguments{
 \item{file}{Character. Path to the csv file from the IQB Testcenter to be read.}
+
+\item{prepare}{Logical. Should the data be prepared, i.e., should the JSON objects in the laststate and the responses be unpacked? Defaults to \code{TRUE}.}
 }
 \value{
 A tibble.
