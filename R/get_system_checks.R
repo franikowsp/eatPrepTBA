@@ -28,6 +28,10 @@ setMethod("get_system_checks",
                    prepare = TRUE) {
             if (is.null(groups)) {
               groups <- list_system_checks(workspace)$id
+
+              if (is.null(groups)) {
+                cli::cli_abort("There seems to be no system check data that could be retrieved from this workspace. Please check.")
+              }
             }
 
             base_req <- workspace@login@base_req
@@ -107,7 +111,8 @@ setMethod("get_system_checks",
                           if (!is.null(cont) & cont != "[]") {
                             cont %>%
                               jsonlite::parse_json(simplifyVector = TRUE) %>%
-                              tibble::as_tibble()
+                              tibble::as_tibble() %>%
+                              dplyr::mutate(value = as.character(value))
                           } else {
                             NULL
                           }
