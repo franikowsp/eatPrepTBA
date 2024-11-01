@@ -30,6 +30,12 @@ code_responses <- function(responses,
       )
   }
 
+  cli::cli_h2("Automatic coding routine")
+
+  start_time <- Sys.time()
+
+  cli::cli_text("Time started: {start_time}")
+
   cli::cli_h3("Prepare responses")
 
   responses_prepared <-
@@ -58,9 +64,14 @@ code_responses <- function(responses,
   coding_schemes <-
     units %>%
     dplyr::filter(
-      unit_key %in% (responses_prepared$unit_key)
+      unit_key %in% responses_prepared$unit_key
     ) %>%
     dplyr::select(unit_key, coding_scheme)
+
+  unit_keys <- coding_schemes$unit_key
+  n_units <- length(unique(unit_keys))
+
+  cli::cli_text("Identified {n_units} units that can be coded.")
 
   # Insert manual codes
   if (!is.null(codes_manual) || prepare) {
@@ -78,7 +89,16 @@ code_responses <- function(responses,
                                                                          "fragmenting",
                                                                          "valueArrayPos")))
                                              },
-                                             .progress = "Prepare coding schemes")
+                                             .progress = list(
+                                               type ="custom",
+                                               show_after = 0,
+                                               extra = list(
+                                                 unit_keys = unit_keys
+                                               ),
+                                               format = "Preparing {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
+                                               format_done = "Prepared {cli::pb_total} coding scheme{?s} in {cli::pb_elapsed}.",
+                                               clear = FALSE
+                                             ))
       ) %>%
       tidyr::unnest(prepared_coding_schemes) %>%
       dplyr::select(unit_key, variable_id, source_type, code_id, code_type, code_score, derive_sources)
@@ -94,6 +114,8 @@ code_responses <- function(responses,
   }
 
   if (!is.null(codes_manual)) {
+    cli::cli_h3("Insert manual codes")
+
     pcs_variables_insert <-
       pcs_variables %>%
       dplyr::select(-source_type)
@@ -113,6 +135,7 @@ code_responses <- function(responses,
         unit_key = "unitId",
         code_id = "code"
       ))) %>%
+      dplyr::filter(unit_key %in% unit_keys) %>%
       dplyr::mutate(
         code_id = as.integer(code_id)
       ) %>%
@@ -125,30 +148,59 @@ code_responses <- function(responses,
       ) %>%
       dplyr::select(-status_miss, -code_score_miss)
 
-    codes_to_merge <-
+    codes_manual_nested <-
       codes_manual_prepared %>%
       dplyr::rename(id = variable_id, code = code_id, score = code_score) %>%
-      dplyr::mutate(
-        value = code
-      ) %>%
       tidyr::nest(
-        codes_manual = c(id, code, score, status, value)
+        codes_manual = c(id, code, score, status)
       ) %>%
+      dplyr::arrange(unit_key)
+
+    manual_unit_keys <- codes_manual_nested$unit_key
+
+    codes_to_merge <-
+      codes_manual_nested %>%
       dplyr::mutate(
         codes_manual = purrr::map(codes_manual, function(x) {
           x %>%
             as.list() %>%
             purrr::list_transpose()
-        })
+        },
+        .progress = list(
+          type ="custom",
+          show_after = 0,
+          extra = list(
+            unit_keys = manual_unit_keys
+          ),
+          format = "Preparing manual code cases for {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
+          format_done = "Prepared {cli::pb_total} manual code case{?s} in {cli::pb_elapsed}.",
+          clear = FALSE
+        ))
       )
 
-    responses_inserted <-
+    # TODO: Add filter for unit_keys that are only in coding_schemes, also needs to be arranged
+    responses_insert_prepared <-
       responses_prepared %>%
       dplyr::left_join(
         codes_to_merge, by = dplyr::join_by("group_id", "login_code", "booklet_id", "unit_key")
-      ) %>%
+      )
+
+    prep_unit_keys <- responses_insert_prepared$unit_key
+
+    responses_inserted <-
+      responses_insert_prepared %>%
       dplyr::mutate(
-        responses = purrr::map2_chr(responses, codes_manual, update_list)
+        responses = purrr::map2_chr(responses, codes_manual, update_list,
+                                    .progress = list(
+                                      type ="custom",
+                                      show_after = 0,
+                                      extra = list(
+                                        unit_keys = prep_unit_keys
+                                      ),
+                                      format = "Inserting manual code cases for {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
+                                      format_done = "Inserted {cli::pb_total} manual code case{?s} in {cli::pb_elapsed}.",
+                                      clear = FALSE
+                                    ))
       ) %>%
       dplyr::select(-codes_manual)
   } else {
@@ -163,19 +215,18 @@ code_responses <- function(responses,
     dplyr::left_join(coding_schemes, by = dplyr::join_by("unit_key")) %>%
     dplyr::arrange(unit_key)
 
-  unit_keys <- responses_for_coding$unit_key
-  n_units <- length(unique(units))
+  final_unit_keys <- responses_for_coding$unit_key
 
   cli::cli_h3("Start coding")
 
   if (is.null(by)) {
-    progress_bar_format <- "Coding unit {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}"
+    progress_bar_format <- "Coding unit {.unit-key {cli::pb_extra$final_unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}"
 
-    progress_bar_format_done <- "Successfully coded {cli::pb_total} unit{?s} in {cli::pb_elapsed}."
+    progress_bar_format_done <- "Coded {cli::pb_total} unit{?s} in {cli::pb_elapsed}."
   } else {
-    progress_bar_format <- "Coding unit {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} for subgroup: {cli::pb_current}/{cli::pb_total} {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}"
+    progress_bar_format <- "Coding unit {.unit-key {cli::pb_extra$final_unit_keys[cli::pb_current+1]}} for subgroup: {cli::pb_current}/{cli::pb_total} {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}"
 
-    progress_bar_format_done <- "Successfully coded {cli::pb_extra$n_units} unit{?s} in {cli::pb_total} subgroup{?s} in {cli::pb_elapsed}."
+    progress_bar_format_done <- "Coded {cli::pb_extra$n_units} unit{?s} in {cli::pb_total} subgroup{?s} in {cli::pb_elapsed}."
   }
 
   responses_coded <-
@@ -188,7 +239,7 @@ code_responses <- function(responses,
           type ="custom",
           show_after = 0,
           extra = list(
-            unit_keys = unit_keys,
+            final_unit_keys = final_unit_keys,
             n_units = n_units
           ),
           format = progress_bar_format,
@@ -198,29 +249,44 @@ code_responses <- function(responses,
     )
 
   if (prepare) {
-    # TODO: Does not work if no code_ids are available (e.g., only coding errors)
-    responses_coded %>%
-      dplyr::select(unit_key, unit_codes) %>%
-      tidyr::unnest(unit_codes) %>%
-      dplyr::select(unit_key, group_id, login_name, login_code,
-                    booklet_id, codes) %>%
-      tidyr::unnest(codes) %>%
-      dplyr::rename(variable_id = id, code_id = code) %>%
-      tidyr::unnest(value, keep_empty = TRUE) %>%
-      dplyr::left_join(pcs_variables, by = dplyr::join_by("unit_key", "variable_id")) %>%
-      dplyr::left_join(pcs_codes, by = dplyr::join_by("unit_key", "variable_id", "code_id")) %>%
-      dplyr::select(
-        unit_key,
-        variable_id,
-        source_type,
-        group_id,
-        login_code,
-        value,
-        status,
-        code_id,
-        code_type,
-        score)
+    tryCatch(
+      error = function(cnd) {
+        cli::cli_alert_danger("Preparation could not be completed. Returning coded data frame.",
+                              wrap = TRUE)
+
+        # Default return
+        return(responses_coded)
+      },
+      # TODO: Does not work if no code_ids are available (e.g., only coding errors)
+      responses_coded %>%
+        dplyr::select(any_of(c("unit_key", by, "unit_codes"))) %>%
+        tidyr::unnest(unit_codes) %>%
+        dplyr::select(any_of(c("unit_key", by, "group_id", "login_name", "login_code",
+                               "booklet_id", "codes"))) %>%
+        tidyr::unnest(codes) %>%
+        dplyr::rename(variable_id = id, code_id = code) %>%
+        tidyr::unnest(value, keep_empty = TRUE) %>%
+        dplyr::left_join(pcs_variables, by = dplyr::join_by("unit_key", "variable_id")) %>%
+        dplyr::left_join(pcs_codes, by = dplyr::join_by("unit_key", "variable_id", "code_id")) %>%
+        dplyr::select(any_of(c(
+          "unit_key",
+          by,
+          "variable_id",
+          "source_type",
+          "group_id",
+          "login_code",
+          "value",
+          "status",
+          "code_id",
+          "code_type",
+          "score"
+        ))),
+      finally = cli::cli_text("Time finished: {Sys.time()}")
+    )
   } else {
+    finish_time <- Sys.time()
+    cli::cli_text("Time finished: {Sys.time()}")
+
     return(responses_coded)
   }
 }
@@ -271,54 +337,30 @@ code_unit <- function(unit_responses, coding_scheme) {
 #'
 #' @keywords internal
 update_list <- function(unit_responses, unit_codes_manual) {
-  if (!is.null(unit_codes_manual) && length(unit_codes_manual) > 0) {
-    unit_responses_unpacked <-
-      unit_responses %>%
-      jsonlite::parse_json()
-
-    base_ids <-
-      unit_responses_unpacked %>%
-      purrr::map_chr("id")
-
-    manual_ids <-
-      unit_codes_manual %>%
-      purrr::map_chr("id")
-
-    unit_responses_inserted <- unit_responses_unpacked
-
-    # Base variable replacement
-    if (any(manual_ids %in% base_ids)) {
-      unit_responses_inserted <-
-        unit_responses_inserted %>%
-        purrr::map(function(old_item) {
-          # Check if there is a matching item in codes_manual based on id
-          match_item <- purrr::detect(unit_codes_manual, function(new_item) new_item$id == old_item$id)
-          # If there's a match, use it; otherwise, keep the original item from list_a
-          if (!is.null(match_item)) {
-            purrr::list_modify(old_item, !!! match_item)
-          } else {
-            old_item
-          }
-        })
-    }
-
-    # Derived variable addition
-    if (any(! manual_ids %in% base_ids)) {
-      additions <-
-        unit_codes_manual %>%
-        purrr::keep(function(x) ! x$id %in% base_ids)
-
-      unit_responses_inserted <-
-        unit_responses_inserted %>%
-        c(additions)
-
-    }
-
-    unit_responses_inserted %>%
-      jsonlite::toJSON(auto_unbox = TRUE, null = "null") %>%
-      as.character()
-
-  } else {
+  # Check if unit_codes_manual is NULL or empty, return original unit_responses if so
+  if (is.null(unit_codes_manual) || length(unit_codes_manual) == 0) {
     return(unit_responses)
   }
+
+  # Unpack JSON and prepare lookup for manual codes
+  unit_responses_unpacked <- jsonlite::parse_json(unit_responses)
+  unit_codes_lookup <- purrr::set_names(unit_codes_manual, purrr::map_chr(unit_codes_manual, "id"))
+
+  # Process items in unit_responses_unpacked
+  unit_responses_inserted <- purrr::map(unit_responses_unpacked, function(item) {
+    id <- item$id
+    if (!is.null(unit_codes_lookup[[id]])) {
+      purrr::list_modify(item, !!!unit_codes_lookup[[id]])
+    } else {
+      item
+    }
+  })
+
+  # Add new items from unit_codes_manual that aren’t in unit_responses
+  missing_items <- purrr::keep(unit_codes_manual,
+                               function(x) !(x$id %in% purrr::map_chr(unit_responses_unpacked, "id")))
+  unit_responses_combined <- c(unit_responses_inserted, missing_items)
+
+  # Convert back to JSON
+  jsonlite::toJSON(unit_responses_combined, auto_unbox = TRUE, null = "null") %>% as.character()
 }
