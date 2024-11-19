@@ -71,6 +71,16 @@ setMethod("get_reviews",
                   )
               }
 
+              if (!all(c("content", "design", "tech") %in% names(resp_table))) {
+                new_cols <- setdiff(c("content", "design", "tech"), names(resp_table))
+
+                for (col in new_cols) {
+                  resp_table <-
+                    resp_table %>%
+                    tibble::add_column(!!col := FALSE)
+                }
+              }
+
               resp_table %>%
                 tidyr::unnest(dplyr::any_of(c("content", "design", "tech")),
                               keep_empty = TRUE) %>%
@@ -90,7 +100,11 @@ setMethod("get_reviews",
                   user_agent = "userAgent",
                   page = "page",
                   page_label = "pagelabel"
-                )))
+                ))) %>%
+                dplyr::relocate(dplyr::all_of(
+                  c("content", "design", "tech")
+                ), .before = "reviewtime"
+                )
             } else {
               tibble::tibble()
             }
