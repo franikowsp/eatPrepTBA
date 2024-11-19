@@ -275,7 +275,7 @@ code_responses <- function(responses,
   responses_coded <-
     responses_for_coding %>%
     dplyr::mutate(
-      unit_codes = pmap(
+      unit_codes = purrr::pmap(
         .l = list(unit_responses, coding_scheme),
         .f = code_unit,
         .progress = list(
