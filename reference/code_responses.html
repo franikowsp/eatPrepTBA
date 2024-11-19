@@ -44,7 +44,9 @@
 <span>  prepare <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  codes_manual <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  missings <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  missings <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  n_cores <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -74,6 +76,14 @@
 
 <dt id="arg-missings">missings<a class="anchor" aria-label="anchor" href="#arg-missings"></a></dt>
 <dd><p>Tibble (optional). Provide missing meta data with <code>code_id</code>, <code>status</code>, <code>score</code>, and <code>code_type</code>. Defaults to <code>NULL</code> and uses default scheme.</p></dd>
+
+
+<dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
+<dd><p>Logical. Should the coding be conducted on multiple cores?</p></dd>
+
+
+<dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
+<dd><p>Integer. Number of the cores to be used for coding (only relevant if <code>parallel = TRUE</code>). Will default to number of available system cores - 1.</p></dd>
 
 </dl></div>
     <div class="section level2">
