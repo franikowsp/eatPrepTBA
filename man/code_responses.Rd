@@ -10,7 +10,9 @@ code_responses(
   prepare = FALSE,
   by = NULL,
   codes_manual = NULL,
-  missings = NULL
+  missings = NULL,
+  parallel = FALSE,
+  n_cores = NULL
 )
 }
 \arguments{
@@ -25,6 +27,10 @@ code_responses(
 \item{codes_manual}{Tibble (optional). Data frame holding the manual codes. Defaults to \code{NULL} and does only automatic coding.}
 
 \item{missings}{Tibble (optional). Provide missing meta data with \code{code_id}, \code{status}, \code{score}, and \code{code_type}. Defaults to \code{NULL} and uses default scheme.}
+
+\item{parallel}{Logical. Should the coding be conducted on multiple cores?}
+
+\item{n_cores}{Integer. Number of the cores to be used for coding (only relevant if \code{parallel = TRUE}). Will default to number of available system cores - 1.}
 }
 \value{
 A tibble.

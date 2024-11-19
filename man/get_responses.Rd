@@ -3,20 +3,16 @@
 \name{get_responses}
 \alias{get_responses}
 \alias{get_responses,WorkspaceTestcenter-method}
-\title{Get responses}
+\title{Get responses directly from Testcenter}
 \usage{
-get_responses(workspace, groups = NULL, prepare = TRUE, debug = FALSE)
+get_responses(workspace, groups = NULL)
 
-\S4method{get_responses}{WorkspaceTestcenter}(workspace, groups = NULL, prepare = TRUE, debug = FALSE)
+\S4method{get_responses}{WorkspaceTestcenter}(workspace, groups = NULL)
 }
 \arguments{
 \item{workspace}{\linkS4class{WorkspaceTestcenter}. Workspace information necessary to retrieve unit information and resources from the API.}
 
 \item{groups}{Character. Name of the groups to be retrieved or all groups if not specified.}
-
-\item{prepare}{Logical. Should the data be prepared, i.e., should the JSON objects in the laststate and the responses be unpacked? Defaults to \code{TRUE}.}
-
-\item{debug}{Logical. Should a debugging applied to the Testcenter data, i.e., deleting empty rows or state variables. Defaults to \code{FALSE}.}
 }
 \value{
 A tibble.

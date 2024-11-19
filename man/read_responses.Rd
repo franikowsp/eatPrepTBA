@@ -2,14 +2,12 @@
 % Please edit documentation in R/read_responses.R
 \name{read_responses}
 \alias{read_responses}
-\title{Reads and prepares testtakers file}
+\title{Reads responses files}
 \usage{
-read_responses(file, prepare = TRUE)
+read_responses(files)
 }
 \arguments{
-\item{file}{Character. Path to the csv file from the IQB Testcenter to be read.}
-
-\item{prepare}{Logical. Should the data be prepared, i.e., should the JSON objects in the laststate and the responses be unpacked? Defaults to \code{TRUE}.}
+\item{files}{Character. Vector of paths to the csv files from the IQB Testcenter to be read.}
 }
 \value{
 A tibble.
