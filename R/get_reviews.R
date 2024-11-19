@@ -52,23 +52,27 @@ setMethod("get_reviews",
                 resp_table <-
                   resp_table %>%
                   dplyr::rename(
-                    content = "category_content",
-                    design = "category_design",
-                    tech = "category_tech",
+                    dplyr::any_of(c(
+                      content = "category_content",
+                      design = "category_design",
+                      tech = "category_tech"
+                    ))
                   )
               } else {
                 # Old format
                 resp_table <-
                   resp_table %>%
                   dplyr::rename(
-                    content = "category: content",
-                    design = "category: design",
-                    tech = "category: tech",
+                    dplyr::any_of(c(
+                      content = "category_content",
+                      design = "category_design",
+                      tech = "category_tech"
+                    ))
                   )
               }
 
               resp_table %>%
-                tidyr::unnest(c(content, design, tech),
+                tidyr::unnest(dplyr::any_of(c("content", "design", "tech")),
                               keep_empty = TRUE) %>%
                 dplyr::rename(any_of(c(
                   group_id = "groupname",
