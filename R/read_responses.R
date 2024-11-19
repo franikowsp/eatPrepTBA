@@ -1,8 +1,6 @@
-#' Reads and prepares testtakers file
+#' Reads responses files
 #'
-#' @param file Character. Path to the csv file from the IQB Testcenter to be read.
-#' @param prepare Logical. Should the data be prepared, i.e., should the JSON objects in the laststate and the responses be unpacked? Defaults to `TRUE`.
-
+#' @param files Character. Vector of paths to the csv files from the IQB Testcenter to be read.
 #'
 #' @description
 #' This function only returns the testtakers information for a downloaded testtakers file.
@@ -10,69 +8,116 @@
 #' @return A tibble.
 #'
 #' @export
-read_responses <- function(file, prepare = TRUE) {
-  responses_raw <- readr::read_delim(file, delim = ";")
-  # TODO: Make the output more comparable to the get_responses output so that both outputs can
-  # be integrated
-
-  if (prepare) {
-    responses_raw %>%
-      dplyr::relocate(laststate, .before = responses) %>%
+read_responses <- function(files) {
+  if (length(files) == 1) {
+    responses_raw <-
+      readr::read_delim(file, delim = ";",
+                        col_types = readr::cols(.default = readr::col_character()))
+  } else {
+    responses_raw <-
+      tibble::tibble(
+        file = files
+      ) %>%
       dplyr::mutate(
-        responses = purrr::map(responses, function(x) {
-          content <-
-            x %>%
-            jsonlite::parse_json() %>%
-            purrr::pluck(1, "content")
-
-          if (!is.null(content)) {
-            responses <- content %>%
-              jsonlite::parse_json(simplifyVector = TRUE) %>%
-              tibble::as_tibble()
-          } else {
-            responses <- tibble::tibble(id = NA)
-          }
-
-          if (tibble::has_name(responses, "value")) {
-            responses %>%
-              dplyr::mutate(
-                value = purrr::map(value, as.list)
-              )
-          } else {
-            responses
-          }
-        }),
-        laststate = purrr::map(laststate, function(x) {
-          if (!is.na(x)) {
-            x %>%
-              jsonlite::parse_json(simplifyVector = TRUE) %>%
-              tibble::as_tibble()
-          } else {
-            tibble::tibble(PLAYER = NA_character_)
-          }
+        data = purrr::map(file, function(file) {
+          readr::read_delim(file, delim = ";",
+                            col_types = readr::cols(.default = readr::col_character()))
         })
       ) %>%
       tidyr::unnest(
-        c(laststate, responses)
-      ) %>%
-      dplyr::rename(any_of(c(
+        data
+      )
+  }
+
+  # For legacy reasons, this has to be added
+  # TODO: Can this be removed at a later point in time?
+  if (tibble::has_name(responses_raw, "originalUnitId")) {
+    unit_cols <- c(
+      unit_key = "originalUnitId",
+      unit_alias = "unitname"
+    )
+
+    responses_raw %>%
+      dplyr::mutate(
+        originalUnitId = ifelse(is.na(originalUnitId), unitname, originalUnitId)
+      )
+  } else {
+    unit_cols <- c(
+      unit_key = "unitname"
+    )
+  }
+
+  responses_raw %>%
+    dplyr::select(
+      dplyr::any_of(c(
         group_id = "groupname",
         login_name = "loginname",
-        code = "code",
+        login_code = "code",
         booklet_id = "bookletname",
-        unit_key = "unitname",
+        unit_cols,
+        responses_nest = "responses",
+        laststate_nest = "laststate"
+      ))
+    ) %>%
+    dplyr::mutate(
+      responses_nest = purrr::map(responses_nest, unnest_responses_json, .progress = "Prepare responses"),
+      laststate_nest = purrr::map(laststate_nest, unnest_laststate, .progress = "Prepare state information")
+    ) %>%
+    tidyr::unnest(c("responses_nest", "laststate_nest"), keep_empty = TRUE) %>%
+    dplyr::group_by(
+      dplyr::across(dplyr::any_of(c("file", "group_id", "login_name",
+                                    "login_code", "booklet_id", "unit_key")))
+    ) %>%
+    tidyr::pivot_wider(
+      names_from = c("id"),
+      values_from = dplyr::any_of(c("content", "ts")),
+      names_glue = "{id}_{.value}"
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::rename(
+      dplyr::any_of(c(
+        responses = "elementCodes_content",
+        state_variables = "stateVariableCodes_content",
+        responses_ts = "elementCodes_ts",
+        state_variables_ts = "stateVariableCodes_ts",
         player = "PLAYER",
         presentation_progress = "PRESENTATION_PROGRESS",
         response_progress = "RESPONSE_PROGRESS",
         page_no = "CURRENT_PAGE_NR",
         page_id = "CURRENT_PAGE_ID",
-        page_count = "PAGE_COUNT",
-        variable_id = "id",
-        value = "value",
-        status = "status"
-      )))
-  } else {
-    responses_raw
+        page_count = "PAGE_COUNT"
+      ))
+    )
+}
+
+# Function
+unnest_responses_json <- function(json) {
+  if (json == "[]") {
+    return(tibble::tibble(
+      id = "elementCodes",
+      content = NA_character_
+    ))
   }
 
+  json_parsed <-
+    json %>%
+    jsonlite::parse_json()
+
+  if ("lastSeenPageIndex" %in% purrr::map_chr(json_parsed, "id")) {
+    return(tibble::tibble(
+      id = "elementCodes",
+      content = json
+    ))
+  } else {
+    json_parsed %>%
+      purrr::list_transpose() %>%
+      tibble::as_tibble() %>%
+      dplyr::select(
+        dplyr::any_of(c(
+          "id",
+          "content",
+          "ts"
+        ))
+      )
+  }
 }

@@ -6,6 +6,8 @@
 #' @param by Character. Additional columns as subgroups for the coding (e.g., in case of duplicate unit data for a specific person that could emerge in offline settings).
 #' @param codes_manual Tibble (optional). Data frame holding the manual codes. Defaults to `NULL` and does only automatic coding.
 #' @param missings Tibble (optional). Provide missing meta data with `code_id`, `status`, `score`, and `code_type`. Defaults to `NULL` and uses default scheme.
+#' @param parallel Logical. Should the coding be conducted on multiple cores?
+#' @param n_cores Integer. Number of the cores to be used for coding (only relevant if `parallel = TRUE`). Will default to number of available system cores - 1.
 #'
 #' @description
 #' This function automatically codes responses by using the `eatAutoCode` package.
@@ -17,16 +19,54 @@ code_responses <- function(responses,
                            prepare = FALSE,
                            by = NULL,
                            codes_manual = NULL,
-                           missings = NULL) {
+                           missings = NULL,
+                           parallel = FALSE,
+                           n_cores = NULL
+                           ) {
   cli_setting()
+  # progressr::handlers("cli")
+
+  # if (parallel) {
+  #   cli::cli_h2("Setting up parallel coding")
+  #
+  #   options <- furrr::furrr_options(seed = TRUE)
+  #
+  #   if (is.null(n_cores)) {
+  #     n_cores <- future::availableCores() - 1
+  #   }
+  #
+  #   cli::cli_text("Using {n_cores} cores")
+  #
+  #   future::plan(future::multisession, workers = n_cores)
+  #
+  #   map <- function(.x, .f, ..., .progress = .progress) {
+  #     furrr::future_map(.x = .x, .f = .f, ..., .options = options, .progress = .progress)
+  #   }
+  #   map2 <- function(.x, .y, .f, ..., .progress = .progress) {
+  #     furrr::future_map2(.x = .x, .y = .y, .f = .f, ..., .options = options, .progress = .progress)
+  #   }
+  #   map2_chr <- function(.x, .y, .f, ..., .progress = .progress) {
+  #     furrr::future_map2_chr(.x = .x, .y = .y, .f = .f, ..., .options = options, .progress = .progress)
+  #   }
+  #   pmap <- function(.l, .f, ..., .progress = .progress) {
+  #     furrr::future_pmap(.l = .l, .f = .f, ..., .options = options, .progress = .progress)
+  #   }
+  #
+  #
+  # } else {
+  #   map <- purrr::map
+  #   map2 <- purrr::map2
+  #   map2_chr <- purrr::map2_chr
+  #   pmap <- purrr::pmap
+  # }
 
   if (is.null(missings)) {
     missings <-
       tibble::tribble(
         ~code_id, ~status, ~code_score, ~code_type,
-        -97, "CODING_ERROR", -97, "MISSING CODING IMPOSSIBLE",
-        -98, "INVALID", -98, "MISSING INVALID RESPONSE",
-        -99, "DISPLAYED", -99, "MISSING BY OMISSION"
+        -97, "CODING_ERROR", 0, "MISSING CODING IMPOSSIBLE",
+        -98, "INVALID", 0, "MISSING INVALID RESPONSE",
+        -99, "DISPLAYED", 0, "MISSING BY OMISSION"
       )
   }
 
@@ -87,7 +127,9 @@ code_responses <- function(responses,
                                                  # ... could otherwise not be unpacked
                                                  dplyr::select(-any_of(c("page",
                                                                          "fragmenting",
-                                                                         "valueArrayPos")))
+                                                                         "valueArrayPos",
+                                                                         # TODO: Must urgently be reactivated and integrated!!
+                                                                         "variable_alias")))
                                              },
                                              .progress = list(
                                                type ="custom",
@@ -190,7 +232,7 @@ code_responses <- function(responses,
     responses_inserted <-
       responses_insert_prepared %>%
       dplyr::mutate(
-        responses = purrr::map2_chr(responses, codes_manual, update_list,
+        responses = purrr::map2_chr(responses, codes_manual, insert_manual,
                                     .progress = list(
                                       type ="custom",
                                       show_after = 0,
@@ -200,7 +242,8 @@ code_responses <- function(responses,
                                       format = "Inserting manual code cases for {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
                                       format_done = "Inserted {cli::pb_total} manual code case{?s} in {cli::pb_elapsed}.",
                                       clear = FALSE
-                                    ))
+                                    )
+        )
       ) %>%
       dplyr::select(-codes_manual)
   } else {
@@ -232,7 +275,7 @@ code_responses <- function(responses,
   responses_coded <-
     responses_for_coding %>%
     dplyr::mutate(
-      unit_codes = purrr::pmap(
+      unit_codes = pmap(
         .l = list(unit_responses, coding_scheme),
         .f = code_unit,
         .progress = list(
@@ -336,7 +379,7 @@ code_unit <- function(unit_responses, coding_scheme) {
 #' @return A tibble.
 #'
 #' @keywords internal
-update_list <- function(unit_responses, unit_codes_manual) {
+insert_manual <- function(unit_responses, unit_codes_manual) {
   # Check if unit_codes_manual is NULL or empty, return original unit_responses if so
   if (is.null(unit_codes_manual) || length(unit_codes_manual) == 0) {
     return(unit_responses)
