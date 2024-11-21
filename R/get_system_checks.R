@@ -71,12 +71,16 @@ setMethod("get_system_checks",
                   dplyr::across(c(environment, network, fileData),
                                 function(x) {
                                   purrr::map(x, function(y) {
-                                    y %>%
-                                      purrr::list_transpose() %>%
-                                      tibble::as_tibble() %>%
-                                      dplyr::select(name = label, value) %>%
-                                      tidyr::pivot_wider() %>%
-                                      tidyr::unnest(cols = dplyr::everything())
+                                    if (length(y) > 0) {
+                                      y %>%
+                                        purrr::list_transpose() %>%
+                                        tibble::as_tibble() %>%
+                                        dplyr::select(name = label, value) %>%
+                                        tidyr::pivot_wider() %>%
+                                        tidyr::unnest(cols = dplyr::everything())
+                                    } else {
+                                      tibble::tibble()
+                                    }
                                   })
                                 }),
                   dplyr::across(c(questionnaire),

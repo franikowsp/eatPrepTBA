@@ -64,6 +64,7 @@ code_responses <- function(responses,
     missings <-
       tibble::tribble(
         ~code_id, ~status, ~code_score, ~code_type,
+        -96, "NOT_REACHED", 0, "MISSING NOT REACHED",
         -97, "CODING_ERROR", 0, "MISSING CODING IMPOSSIBLE",
         -98, "INVALID", 0, "MISSING INVALID RESPONSE",
         -99, "DISPLAYED", 0, "MISSING BY OMISSION"
