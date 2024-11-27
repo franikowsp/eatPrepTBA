@@ -48,7 +48,10 @@ setMethod("add_metadata",
               units %>%
               dplyr::select(unit_id, unit_profiles) %>%
               tidyr::unnest(unit_profiles) %>%
-              add_profile(unit_id, profile = unit_profile)
+              add_profile(unit_id, profile = unit_profile) %>%
+              dplyr::rename(dplyr::any_of(c(
+                "Konstruktbereich" = "Konstrukt"
+              )))
 
             # ws_info <-
             #   ws_settings %>%
