@@ -39,10 +39,10 @@ setMethod("get_units",
               type = "unit",
               list_fun = list_units,
               get_fun = function(workspace, id) get_unit(workspace = workspace,
-                                                        unit_id = id,
-                                                        metadata = metadata,
-                                                        unit_definition = unit_definition,
-                                                        coding_scheme = coding_scheme)
+                                                         unit_id = id,
+                                                         metadata = metadata,
+                                                         unit_definition = unit_definition,
+                                                         coding_scheme = coding_scheme)
             )
           })
 

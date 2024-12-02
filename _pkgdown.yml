@@ -37,13 +37,14 @@ reference:
   contents: get_units
 - subtitle: Retrieve responses from IQB Testcenter
   contents:
-  - get_results
   - get_responses
+  - read_responses
+  - prepare_responses
+  - get_system_checks
+  - read_system_checks
+  - get_results
   - get_logs
   - get_reviews
-  - get_system_checks
-  - read_responses
-  - read_system_checks
 - subtitle: Functions for units
   contents: add_metadata
 - title: Managing studies
@@ -66,3 +67,4 @@ reference:
 - subtitle: Work with data from IQB Testcenter
   contents:
   - code_responses
+  - code_responses2

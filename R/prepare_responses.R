@@ -1,159 +1,43 @@
-#' #' Prepares responses
-#' #'
-#' #' @param files Character. Vector of paths to the csv files from the IQB Testcenter to be read.
-#' #' @param prepare Logical. Should the data be prepared, i.e., should the JSON objects in the laststate and the responses be unpacked? Defaults to `TRUE`.
+#' Prepares responses
 #'
-#' #'
-#' #' @description
-#' #' This function only returns the testtakers information for a downloaded testtakers file.
-#' #'
-#' #' @return A tibble.
-#' #'
-#' #' @export
-#' prepare_responses <- function(files, prepare = TRUE) {
-#'   if (length(files) == 1) {
-#'     responses_raw <-
-#'       readr::read_delim(file, delim = ";")
-#'   } else {
-#'     responses_raw <-
-#'       tibble::tibble(
-#'         file = files
-#'       ) %>%
-#'       dplyr::mutate(
-#'         data = purrr::map(readr::read_delim(file, delim = ";")
-#'       )
-#'   }
+#' @param responses Tibble. Responses retrieved from the IQB Testcenter via [read_responses()] or from an extracted csv and read via [read_responses()].
 #'
-#'   responses_raw <-
-#'     readr::read_delim(file, delim = ";") %>%
-#'     dplyr::select(
-#'       dplyr::any_of(c(
-#'         group_id = "groupname",
-#'         login_name = "loginname",
-#'         login_code = "code",
-#'         booklet_id = "bookletname",
-#'         unit_key = "originalUnitId",
-#'         unit_alias = "unitname",
-#'         responses_nest = "responses",
-#'         laststate_nest = "laststate"
-#'       ))
-#'     )
+#' @description
+#' `r lifecycle::badge("experimental")`
 #'
-#'   if (prepare) {
-#'     responses_raw %>%
-#'       dplyr::relocate(laststate, .before = responses) %>%
-#'       dplyr::mutate(
-#'         responses = purrr::map(responses, function(x) {
-#'           content <-
-#'             x %>%
-#'             jsonlite::parse_json() %>%
-#'             purrr::pluck(1, "content")
+#' This function returns the responses in a format where the values are still list columns that need to be unpacked.
 #'
-#'           if (!is.null(content)) {
-#'             responses <- content %>%
-#'               jsonlite::parse_json(simplifyVector = TRUE) %>%
-#'               tibble::as_tibble()
-#'           } else {
-#'             responses <- tibble::tibble(id = NA)
-#'           }
+#' @return A tibble.
 #'
-#'           if (tibble::has_name(responses, "value")) {
-#'             responses %>%
-#'               dplyr::mutate(
-#'                 value = purrr::map(value, as.list)
-#'               )
-#'           } else {
-#'             responses
-#'           }
-#'         }),
-#'         laststate = purrr::map(laststate, function(x) {
-#'           if (!is.na(x)) {
-#'             x %>%
-#'               jsonlite::parse_json(simplifyVector = TRUE) %>%
-#'               tibble::as_tibble()
-#'           } else {
-#'             tibble::tibble(PLAYER = NA_character_)
-#'           }
-#'         })
-#'       ) %>%
-#'       tidyr::unnest(
-#'         c(laststate, responses)
-#'       ) %>%
-#'       dplyr::rename(any_of(c(
-#'         group_id = "groupname",
-#'         login_name = "loginname",
-#'         code = "code",
-#'         booklet_id = "bookletname",
-#'         unit_key = "unitname",
-#'         player = "PLAYER",
-#'         presentation_progress = "PRESENTATION_PROGRESS",
-#'         response_progress = "RESPONSE_PROGRESS",
-#'         page_no = "CURRENT_PAGE_NR",
-#'         page_id = "CURRENT_PAGE_ID",
-#'         page_count = "PAGE_COUNT",
-#'         variable_id = "id",
-#'         value = "value",
-#'         status = "status"
-#'       )))
-#'   } else {
-#'     responses_raw
-#'   }
-#'
-#' }
-# from get_responses()
-#
-#             #     if (prepare) {
-#       responses <-
-#         responses %>%
-#         # Schleife zum Spreaden der
-#         # Response- und LastState-Einträge (Auslesen in tibble)
-#         dplyr::mutate(
-#           responses = purrr::map(responses, function(x) {
-#             responses <- x$content %>%
-#               jsonlite::parse_json(simplifyVector = TRUE) %>%
-#               tibble::as_tibble()
-#
-#             if (tibble::has_name(responses, "value")) {
-#               responses %>%
-#                 dplyr::mutate(
-#                   value = purrr::map(value, as.list)
-#                 )
-#             } else {
-#               responses
-#             }
-#
-#           }),
-#           laststate = purrr::map(laststate, function(x) {
-#             if (!is.na(x)) {
-#               x %>%
-#                 jsonlite::parse_json(simplifyVector = TRUE) %>%
-#                 tibble::as_tibble()
-#             } else {
-#               tibble::tibble(PLAYER = NA_character_)
-#             }
-#           })
-#         ) %>%
-#         # Entpacken
-#         tidyr::unnest(c(
-#           responses,
-#           laststate
-#         )) %>%
-#         dplyr::rename(any_of(c(
-#           group_id = "groupname",
-#           login_name = "loginname",
-#           code = "code",
-#           booklet_id = "bookletname",
-#           unit_key = "unitname",
-#           player = "PLAYER",
-#           presentation_progress = "PRESENTATION_PROGRESS",
-#           response_progress = "RESPONSE_PROGRESS",
-#           page_no = "CURRENT_PAGE_NR",
-#           page_id = "CURRENT_PAGE_ID",
-#           page_count = "PAGE_COUNT",
-#           variable_id = "id",
-#           value = "value",
-#           status = "status"
-#         ))
-#         )
-#     }
-#
+#' @export
+prepare_responses <- function(responses) {
+  responses %>%
+    dplyr::mutate(
+      responses = purrr::map(responses, function(x) {
+        if (!is.null(x)) {
+          resp <-
+            x %>%
+            jsonlite::parse_json(simplifyVector = TRUE) %>%
+            tibble::as_tibble()
+        } else {
+          resp <- tibble::tibble(id = NA)
+        }
+
+        if (tibble::has_name(resp, "value")) {
+          resp %>%
+            dplyr::mutate(
+              value = purrr::map(value, as.list)
+            )
+        } else {
+          resp
+        }
+      })
+    ) %>%
+    tidyr::unnest(
+      c(responses)
+    ) %>%
+    dplyr::rename(dplyr::any_of(c(
+      "variable_id" = "id",
+      "variable_status" = "status"
+    )))
+}

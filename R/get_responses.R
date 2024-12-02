@@ -76,9 +76,10 @@ setMethod("get_responses",
                   unit_alias = "unitname"
                 )
 
-                responses_raw %>%
+                responses_raw <-
+                  responses_raw %>%
                   dplyr::mutate(
-                    originalUnitId = ifelse(is.na(originalUnitId), unitname, originalUnitId)
+                    originalUnitId = ifelse(is.na(originalUnitId) | originalUnitId == "", unitname, originalUnitId)
                   )
               } else {
                 unit_cols <- c(
@@ -100,10 +101,15 @@ setMethod("get_responses",
                 ) %>%
                 dplyr::group_by(
                   dplyr::across(dplyr::any_of(c("group_id", "login_name",
-                                                "login_code", "booklet_id", "unit_key",
-                                                "laststate_nest")))
+                                                "login_code", "booklet_id",
+                                                "unit_key", "unit_alias")))
+                ) %>%
+                # TODO: Check for robustness of this fix!
+                dplyr::filter(
+                  !is.na(laststate_nest)
                 ) %>%
                 dplyr::summarise(
+                  laststate_nest = unique(laststate_nest),
                   responses_nest = list(purrr::reduce(list(responses_nest), c))
                 ) %>%
                 dplyr::mutate(
@@ -137,8 +143,6 @@ setMethod("get_responses",
                     page_count = "PAGE_COUNT"
                   ))
                 )
-
-              responses
             } else {
               tibble::tibble()
             }

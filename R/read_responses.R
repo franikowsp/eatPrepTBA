@@ -11,7 +11,7 @@
 read_responses <- function(files) {
   if (length(files) == 1) {
     responses_raw <-
-      readr::read_delim(file, delim = ";",
+      readr::read_delim(files, delim = ";",
                         col_types = readr::cols(.default = readr::col_character()))
   } else {
     responses_raw <-
