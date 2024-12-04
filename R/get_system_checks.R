@@ -112,7 +112,7 @@ setMethod("get_system_checks",
                       contents <-
                         content %>%
                         purrr::map(function(cont) {
-                          if (!is.null(cont) & cont != "[]") {
+                          if (!is.null(cont) && cont != "[]") {
                             cont %>%
                               jsonlite::parse_json(simplifyVector = TRUE) %>%
                               tibble::as_tibble() %>%
@@ -124,7 +124,7 @@ setMethod("get_system_checks",
                         purrr::reduce(dplyr::bind_rows)
                     })
                   ) %>%
-                  tidyr::unnest(responses)
+                  tidyr::unnest(responses, keep_empty = TRUE)
               }
 
               system_checks

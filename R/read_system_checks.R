@@ -24,7 +24,7 @@ read_system_checks <- function(file) {
         contents <-
           content %>%
           purrr::map(function(cont) {
-            if (!is.null(cont) & cont != "[]") {
+            if (!is.null(cont) && cont != "[]") {
               cont %>%
                 jsonlite::parse_json(simplifyVector = TRUE) %>%
                 tibble::as_tibble()
