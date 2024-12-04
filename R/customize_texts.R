@@ -1,5 +1,5 @@
 customize_texts <- function(...) {
-  args <- list2(...)
+  args <- rlang::list2(...)
 
   args %>%
     purrr::imap(function(x, n) {
