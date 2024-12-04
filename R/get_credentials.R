@@ -50,7 +50,7 @@ get_credentials <- function(base_url, keyring, change_key, dialog, ...) {
       }
     } else {
       # Routine for testing purposes only
-      credentials <- list(...)
+      credentials <- list2(...)
 
       if (is.null(credentials) || is.null(credentials$name) || is.null(credentials$password)) {
         name <- "eatPrepTBA"
