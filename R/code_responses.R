@@ -254,6 +254,8 @@ code_responses <- function(responses,
   responses_for_coding <-
     responses_inserted %>%
     tidyr::nest(unit_responses = -any_of(c("unit_key", by))) %>%
+    # To potentially identify reduplicated cases afterwards!
+    dplyr::mutate(code_case = seq_along(unit_key)) %>%
     # Filter off units without coding scheme
     dplyr::semi_join(coding_schemes, by = dplyr::join_by("unit_key")) %>%
     dplyr::left_join(coding_schemes, by = dplyr::join_by("unit_key")) %>%
