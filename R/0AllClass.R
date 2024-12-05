@@ -121,3 +121,25 @@ setClass("WorkspaceTestcenter",
          slots = c(
            login = "LoginTestcenter"
          ))
+
+#' Workspace group access for IQB Studio
+#'
+#' @description
+#' A class that contains a set of workspaces of a certain workspace group that can be accessed by [access_workspace_group()].
+#'
+#' @slot wsg_id ID of the workspace group. The workspace ID can also be found in the workspace URL.
+#' @slot wsg_label Label of the workspace group.
+#' @slot login [LoginStudio-class]. Login information for the IQB Studio.
+#' @slot ws_list List of objects from the [Workspace-class] class the [WorkspaceGroupStudio] object hast access to.
+#'
+#' @name WorkspaceGroupStudio-class
+#' @rdname WorkspaceGroupStudio-class
+#'
+#' @export
+setClass("WorkspaceGroupStudio",
+         slots = c(
+           login = "LoginStudio",
+           ws_list = "list",
+           wsg_id = "numeric",
+           wsg_label = "character"
+         ))

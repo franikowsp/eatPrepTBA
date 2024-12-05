@@ -52,3 +52,18 @@ setMethod(f = "show",
             cli::cli_text("You have access to the workspace {.ws-label {object@ws_label}} (id {.ws-id {object@ws_id}}).")
 
           })
+
+setMethod(f = "show",
+          signature = "WorkspaceGroupStudio",
+          definition = function(object) {
+            cli_setting()
+
+            cli::cli_text("You have access to the workspace group {.wsg-label {object@wsg_label}} (id {.wsg-id {object@wsg_id}}) that provides access to the following workspaces:")
+
+            ul <- cli::cli_ul()
+            object@ws_list %>%
+              purrr::map(function(ws) {
+                cli::cli_li(glue::glue("{{.ws-id {ws@ws_id}}}: {{.ws {ws@ws_label}}}"))
+              })
+            cli::cli_end(ul)
+          })

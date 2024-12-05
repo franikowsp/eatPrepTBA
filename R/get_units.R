@@ -1,6 +1,6 @@
 #' Get multiple units with resources
 #'
-#' @param workspace [Workspace-class]. Workspace information necessary to retrieve unit information and resources from the API.
+#' @param workspace [Workspace-class] or  [WorkspaceGroupStudio-class]. Workspace or workspace group information necessary to retrieve unit information and resources from the API.
 #' @param unit_ids Integer (optional). Vector of the IDs of the unit to be retrieved. If no ID is given, all units files and their resources in the workspace are retrieved.
 #' @param unit_definition Logical. Should the unit definition be added? Defaults to `FALSE`.
 #' @param metadata Logical. Should the metadata be added? Defaults to `TRUE`.
@@ -14,7 +14,7 @@
 #' @export
 #'
 #' @aliases
-#' get_units,WorkspaceTestcenter-method,WorkspaceStudio-method
+#' get_units,WorkspaceTestcenter-method,WorkspaceStudio-method,WorkspaceGroup-method
 setGeneric("get_units", function(workspace,
                                  unit_ids = NULL,
                                  metadata = TRUE,
@@ -44,6 +44,26 @@ setMethod("get_units",
                                                          unit_definition = unit_definition,
                                                          coding_scheme = coding_scheme)
             )
+          })
+
+#' @describeIn get_units Get multiple unit information and coding schemes in a given Studio workspace group
+setMethod("get_units",
+          signature = signature(workspace = "WorkspaceGroupStudio"),
+          function(workspace,
+                   unit_ids = NULL,
+                   # unit_keys = NULL,
+                   metadata = TRUE,
+                   unit_definition = FALSE,
+                   coding_scheme = FALSE) {
+            workspace@ws_list %>%
+              purrr::map(function(ws) {
+                get_units(workspace = ws,
+                          unit_ids = unit_ids,
+                          metadata = metadata,
+                          unit_definition = unit_definition,
+                          coding_scheme = coding_scheme)
+              }) %>%
+              purrr::reduce(dplyr::bind_rows)
           })
 
 # setMethod("get_units",

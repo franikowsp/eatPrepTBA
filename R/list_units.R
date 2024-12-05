@@ -1,13 +1,15 @@
 #' List unit files
 #'
-#' @param workspace [Workspace-class]. Workspace information necessary to retrieve unit list from the API.
+#' @param workspace [Workspace-class] or [WorkspaceGroupStudio-class]. Workspace or workspace group information necessary to retrieve unit list from the API.
 #'
 #' @return A tibble.
 #' @export
 #'
 #' @aliases
-#' list_units,WorkspaceStudio-method,WorkspaceTestcenter-method
-setGeneric("list_units", function(workspace) {
+#' list_units,WorkspaceStudio-method,WorkspaceGroupStudio-method,WorkspaceTestcenter-method
+setGeneric("list_units", function(workspace, ...) {
+  args <- rlang::list2(...)
+
   standardGeneric("list_units")
 })
 
@@ -40,6 +42,33 @@ setMethod("list_units",
                   unit_label = unit[["name"]]
                 )
               })
+          })
+
+#' @describeIn list_units List all units in a given IQB Studio workspace group
+#' @details
+#' This function returns a list of all units in a given workspace group.
+setMethod("list_units",
+          signature = signature(workspace = "WorkspaceGroupStudio"),
+          function(workspace, flat = FALSE) {
+            units_list <-
+              workspace@ws_list %>%
+              purrr::map(function(ws) {
+                ws_out <- list(
+                  ws_id = ws@ws_id,
+                  ws_label = ws@ws_label,
+                  units = list_units(ws)
+                )
+
+                ws_out
+              })
+
+            if (flat) {
+              units_list %>%
+                purrr::map("units") %>%
+                purrr::list_flatten()
+            } else {
+              units_list
+            }
           })
 
 #' @describeIn list_units List all units in a given IQB Testcenter workspace

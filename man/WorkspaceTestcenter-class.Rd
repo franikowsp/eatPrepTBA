@@ -5,7 +5,7 @@
 \alias{WorkspaceTestcenter-class}
 \title{Workspace access for IQB Testcenter}
 \description{
-A class extending the Login class with additional information for the IQB Studio. It can be created by the function \code{\link[=login_studio]{login_studio()}}.
+A class extending the \linkS4class{Workspace} class with additional information for the IQB Studio. It can be created by the function \code{\link[=access_workspace]{access_workspace()}}.
 }
 \section{Slots}{
 
