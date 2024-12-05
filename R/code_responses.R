@@ -305,9 +305,9 @@ code_responses <- function(responses,
       },
       # TODO: Does not work if no code_ids are available (e.g., only coding errors)
       responses_coded %>%
-        dplyr::select(any_of(c("unit_key", by, "unit_codes"))) %>%
+        dplyr::select(any_of(c("code_case", "unit_key", by, "unit_codes"))) %>%
         tidyr::unnest(unit_codes) %>%
-        dplyr::select(any_of(c("unit_key", by, "group_id", "login_name", "login_code",
+        dplyr::select(any_of(c("code_case", "unit_key", by, "group_id", "login_name", "login_code",
                                "booklet_id", "codes"))) %>%
         tidyr::unnest(codes) %>%
         dplyr::rename(variable_id = id, code_id = code) %>%
@@ -315,6 +315,7 @@ code_responses <- function(responses,
         dplyr::left_join(pcs_variables, by = dplyr::join_by("unit_key", "variable_id")) %>%
         dplyr::left_join(pcs_codes, by = dplyr::join_by("unit_key", "variable_id", "code_id")) %>%
         dplyr::select(any_of(c(
+          "code_case",
           "unit_key",
           by,
           "variable_id",
