@@ -9,12 +9,15 @@
 #' @return A tibble.
 #' @export
 prepare_coding_scheme <- function(coding_scheme) {
+  if (is.null(coding_scheme)) {
+    return(tibble::tibble())
+  }
+
   scheme_table <-
     coding_scheme %>%
     purrr::pluck("variableCodings") %>%
     purrr::list_transpose() %>%
     tibble::as_tibble()
-
 
   # For legacy reasons, this has to be added
   # TODO: Can this be removed at a later point in time?
@@ -23,6 +26,13 @@ prepare_coding_scheme <- function(coding_scheme) {
       variable_ref = "id",
       variable_id = "alias"
     )
+
+    scheme_table <-
+      scheme_table %>%
+      tidyr::unnest(alias, keep_empty = TRUE) %>%
+      dplyr::mutate(
+        alias = ifelse(is.na(alias), id, alias)
+      )
   } else {
     unit_cols <- c(
       variable_id = "id"
