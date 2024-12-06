@@ -56,7 +56,8 @@ prepare_metadata <- function(unit, resp_metadata, workspace) {
       dplyr::rename(any_of(c(
         item_no = "item",
         item_id = "id",
-        variable_id = "variableId"
+        variable_id = "variableId",
+        variable_ref = "variableReadOnlyId"
       )))
 
     if (tibble::has_name(items_meta, "description")) {

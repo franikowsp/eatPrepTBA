@@ -9,14 +9,30 @@
 #' @return A tibble.
 #' @export
 prepare_coding_scheme <- function(coding_scheme) {
-  prepared_scheme <-
+  scheme_table <-
     coding_scheme %>%
     purrr::pluck("variableCodings") %>%
     purrr::list_transpose() %>%
-    tibble::as_tibble() %>%
+    tibble::as_tibble()
+
+
+  # For legacy reasons, this has to be added
+  # TODO: Can this be removed at a later point in time?
+  if (tibble::has_name(scheme_table, "alias")) {
+    unit_cols <- c(
+      variable_ref = "id",
+      variable_id = "alias"
+    )
+  } else {
+    unit_cols <- c(
+      variable_id = "id"
+    )
+  }
+
+  prepared_scheme <-
+    scheme_table %>%
     dplyr::rename(any_of(c(
-      variable_id = "id",
-      variable_alias = "alias",
+      unit_cols,
       # TODO: This will replace the page identifier for marker items and derived variables
       variable_label = "label",
       source_type = "sourceType",
