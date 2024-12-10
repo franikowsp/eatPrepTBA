@@ -108,6 +108,7 @@ setMethod("get_responses",
                   responses_nest = list(responses_nest),
                   laststate_nest = list(laststate_nest)
                 ) %>%
+                dplyr::ungroup() %>%
                 dplyr::mutate(
                   responses_nest = purrr::map(responses_nest,
                                               function(x) unnest_responses(x, is_parsed = TRUE),
