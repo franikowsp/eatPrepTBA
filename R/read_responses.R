@@ -59,9 +59,23 @@ read_responses <- function(files) {
         laststate_nest = "laststate"
       ))
     ) %>%
+    dplyr::group_by(
+      dplyr::across(dplyr::any_of(c("file",
+                                    "group_id", "login_name",
+                                    "login_code", "booklet_id",
+                                    "unit_key", "unit_alias")))
+    ) %>%
+    dplyr::summarise(
+      responses_nest = list(responses_nest),
+      laststate_nest = list(laststate_nest)
+    ) %>%
     dplyr::mutate(
-      responses_nest = purrr::map(responses_nest, unnest_responses_json, .progress = "Prepare responses"),
-      laststate_nest = purrr::map(laststate_nest, unnest_laststate, .progress = "Prepare state information")
+      responses_nest = purrr::map(responses_nest,
+                                  function(x) unnest_responses(x, is_parsed = FALSE),
+                                  .progress = "Preparing responses"),
+      laststate_nest = purrr::map(laststate_nest,
+                                  function(x) unnest_laststate(x),
+                                  .progress = "Preparing last state"),
     ) %>%
     tidyr::unnest(c("responses_nest", "laststate_nest"), keep_empty = TRUE) %>%
     dplyr::group_by(
@@ -88,36 +102,4 @@ read_responses <- function(files) {
         page_count = "PAGE_COUNT"
       ))
     )
-}
-
-# Function
-unnest_responses_json <- function(json) {
-  if (json == "[]") {
-    return(tibble::tibble(
-      id = "elementCodes",
-      content = NA_character_
-    ))
-  }
-
-  json_parsed <-
-    json %>%
-    jsonlite::parse_json()
-
-  if ("lastSeenPageIndex" %in% purrr::map_chr(json_parsed, "id")) {
-    return(tibble::tibble(
-      id = "elementCodes",
-      content = json
-    ))
-  } else {
-    json_parsed %>%
-      purrr::list_transpose() %>%
-      tibble::as_tibble() %>%
-      dplyr::select(
-        dplyr::any_of(c(
-          "id",
-          "content",
-          "ts"
-        ))
-      )
-  }
 }

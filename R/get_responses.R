@@ -104,19 +104,17 @@ setMethod("get_responses",
                                                 "login_code", "booklet_id",
                                                 "unit_key", "unit_alias")))
                 ) %>%
-                # TODO: Check for robustness of this fix!
-                dplyr::filter(
-                  !is.na(laststate_nest)
-                ) %>%
                 dplyr::summarise(
-                  laststate_nest = unique(laststate_nest),
-                  responses_nest = list(purrr::reduce(list(responses_nest), c))
+                  responses_nest = list(responses_nest),
+                  laststate_nest = list(laststate_nest)
                 ) %>%
                 dplyr::mutate(
-                  responses_nest = purrr::map(responses_nest, unnest_responses_list,
-                                              .progress = "Prepare responses"),
-                  laststate_nest = purrr::map(laststate_nest, unnest_laststate,
-                                              .progress = "Prepare state information")
+                  responses_nest = purrr::map(responses_nest,
+                                              function(x) unnest_responses(x, is_parsed = TRUE),
+                                              .progress = "Preparing responses"),
+                  laststate_nest = purrr::map(laststate_nest,
+                                              function(x) unnest_laststate(x),
+                                              .progress = "Preparing last state"),
                 ) %>%
                 tidyr::unnest(c("responses_nest", "laststate_nest"), keep_empty = TRUE) %>%
                 dplyr::group_by(
@@ -147,32 +145,3 @@ setMethod("get_responses",
               tibble::tibble()
             }
           })
-
-# Function
-# TODO: Hier noch die Funktionen vereinheitlichen aus der read_responses()-Funktion
-unnest_responses_list <- function(json_parsed) {
-  if (length(json_parsed) == 0) {
-    return(tibble::tibble(
-      id = "elementCodes",
-      content = NA_character_
-    ))
-  }
-
-  if ("lastSeenPageIndex" %in% purrr::map_chr(json_parsed, "id")) {
-    return(tibble::tibble(
-      id = "elementCodes",
-      content = as.character(jsonlite::toJSON(json_parsed))
-    ))
-  } else {
-    json_parsed %>%
-      purrr::list_transpose() %>%
-      tibble::as_tibble() %>%
-      dplyr::select(
-        dplyr::any_of(c(
-          "id",
-          "content",
-          "ts"
-        ))
-      )
-  }
-}
