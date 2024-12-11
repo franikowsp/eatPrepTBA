@@ -27,6 +27,7 @@ unnest_laststate <- function(json) {
   if (nrow(laststate_tbl) == 1) {
     return(laststate_tbl)
   } else {
+    # This (hopefully) addresses the problem that there are multiple laststates around
     laststate_tbl %>%
       tidyr::fill(dplyr::everything(), .direction = "downup") %>%
       dplyr::filter(RESPONSE_PROGRESS == "complete")

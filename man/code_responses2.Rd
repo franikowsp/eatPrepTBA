@@ -8,11 +8,8 @@ code_responses2(
   responses,
   units,
   prepare = FALSE,
-  by = NULL,
   codes_manual = NULL,
-  missings = NULL,
-  parallel = FALSE,
-  n_cores = NULL
+  missings = NULL
 )
 }
 \arguments{
@@ -22,15 +19,9 @@ code_responses2(
 
 \item{prepare}{Logical. Whether to unpack the coding results and to add information from the coding schemes.}
 
-\item{by}{Character. Additional columns as subgroups for the coding (e.g., in case of duplicate unit data for a specific person that could emerge in offline settings).}
-
 \item{codes_manual}{Tibble (optional). Data frame holding the manual codes. Defaults to \code{NULL} and does only automatic coding.}
 
 \item{missings}{Tibble (optional). Provide missing meta data with \code{code_id}, \code{status}, \code{score}, and \code{code_type}. Defaults to \code{NULL} and uses default scheme.}
-
-\item{parallel}{Logical. Should the coding be conducted on multiple cores?}
-
-\item{n_cores}{Integer. Number of the cores to be used for coding (only relevant if \code{parallel = TRUE}). Will default to number of available system cores - 1.}
 }
 \value{
 A tibble.
