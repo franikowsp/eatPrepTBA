@@ -37,7 +37,8 @@ read_responses <- function(files) {
       unit_alias = "unitname"
     )
 
-    responses_raw %>%
+    responses_raw <-
+      responses_raw %>%
       dplyr::mutate(
         originalUnitId = ifelse(is.na(originalUnitId), unitname, originalUnitId)
       )
@@ -50,6 +51,7 @@ read_responses <- function(files) {
   responses_raw %>%
     dplyr::select(
       dplyr::any_of(c(
+        file = "file",
         group_id = "groupname",
         login_name = "loginname",
         login_code = "code",

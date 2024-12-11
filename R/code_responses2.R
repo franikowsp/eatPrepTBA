@@ -3,11 +3,8 @@
 #' @param responses Tibble. Response data retrieved from the IQB Testcenter with setting the argument `prepare = FALSE` for [get_responses()] or [read_responses()].
 #' @param units Tibble. Unit data retrieved from the IQB Studio after setting the argument `coding_scheme = TRUE` for [get_units()].
 #' @param prepare Logical. Whether to unpack the coding results and to add information from the coding schemes.
-#' @param by Character. Additional columns as subgroups for the coding (e.g., in case of duplicate unit data for a specific person that could emerge in offline settings).
 #' @param codes_manual Tibble (optional). Data frame holding the manual codes. Defaults to `NULL` and does only automatic coding.
 #' @param missings Tibble (optional). Provide missing meta data with `code_id`, `status`, `score`, and `code_type`. Defaults to `NULL` and uses default scheme.
-#' @param parallel Logical. Should the coding be conducted on multiple cores?
-#' @param n_cores Integer. Number of the cores to be used for coding (only relevant if `parallel = TRUE`). Will default to number of available system cores - 1.
 #'
 #' @description
 #' `r lifecycle::badge("deprecated")`
@@ -19,48 +16,10 @@
 code_responses2 <- function(responses,
                             units,
                             prepare = FALSE,
-                            by = NULL,
                             codes_manual = NULL,
-                            missings = NULL,
-                            parallel = FALSE,
-                            n_cores = NULL
+                            missings = NULL
 ) {
   cli_setting()
-  # progressr::handlers("cli")
-
-  # if (parallel) {
-  #   cli::cli_h2("Setting up parallel coding")
-  #
-  #   options <- furrr::furrr_options(seed = TRUE)
-  #
-  #   if (is.null(n_cores)) {
-  #     n_cores <- future::availableCores() - 1
-  #   }
-  #
-  #   cli::cli_text("Using {n_cores} cores")
-  #
-  #   future::plan(future::multisession, workers = n_cores)
-  #
-  #   map <- function(.x, .f, ..., .progress = .progress) {
-  #     furrr::future_map(.x = .x, .f = .f, ..., .options = options, .progress = .progress)
-  #   }
-  #   map2 <- function(.x, .y, .f, ..., .progress = .progress) {
-  #     furrr::future_map2(.x = .x, .y = .y, .f = .f, ..., .options = options, .progress = .progress)
-  #   }
-  #   map2_chr <- function(.x, .y, .f, ..., .progress = .progress) {
-  #     furrr::future_map2_chr(.x = .x, .y = .y, .f = .f, ..., .options = options, .progress = .progress)
-  #   }
-  #   pmap <- function(.l, .f, ..., .progress = .progress) {
-  #     furrr::future_pmap(.l = .l, .f = .f, ..., .options = options, .progress = .progress)
-  #   }
-  #
-  #
-  # } else {
-  #   map <- purrr::map
-  #   map2 <- purrr::map2
-  #   map2_chr <- purrr::map2_chr
-  #   pmap <- purrr::pmap
-  # }
 
   if (is.null(missings)) {
     missings <-
@@ -234,7 +193,7 @@ code_responses2 <- function(responses,
 
   responses_for_coding <-
     responses_inserted %>%
-    tidyr::nest(unit_responses = -any_of(c("unit_key", by))) %>%
+    tidyr::nest(unit_responses = -any_of(c("unit_key"))) %>%
     # Filter off units without coding scheme
     dplyr::semi_join(coding_schemes, by = dplyr::join_by("unit_key")) %>%
     dplyr::left_join(coding_schemes, by = dplyr::join_by("unit_key")) %>%
@@ -244,16 +203,12 @@ code_responses2 <- function(responses,
 
   cli::cli_h3("Start coding")
 
-  if (is.null(by)) {
-    progress_bar_format <- "Coding unit {.unit-key {cli::pb_extra$final_unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}"
+  progress_bar_format <- "Coding unit {.unit-key {cli::pb_extra$final_unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}"
 
-    progress_bar_format_done <- "Coded {cli::pb_total} unit{?s} in {cli::pb_elapsed}."
-  } else {
-    progress_bar_format <- "Coding unit {.unit-key {cli::pb_extra$final_unit_keys[cli::pb_current+1]}} for subgroup: {cli::pb_current}/{cli::pb_total} {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}"
+  progress_bar_format_done <- "Coded {cli::pb_total} unit{?s} in {cli::pb_elapsed}."
 
-    progress_bar_format_done <- "Coded {cli::pb_extra$n_units} unit{?s} in {cli::pb_total} subgroup{?s} in {cli::pb_elapsed}."
-  }
-
+  # unit_responses <- responses_for_coding$unit_responses[[1]]
+  # coding_scheme <- responses_for_coding$coding_scheme[[1]]
   responses_coded <-
     responses_for_coding %>%
     dplyr::mutate(
@@ -284,27 +239,16 @@ code_responses2 <- function(responses,
       },
       # TODO: Does not work if no code_ids are available (e.g., only coding errors)
       responses_coded %>%
-        dplyr::select(any_of(c("unit_key", by, "unit_codes"))) %>%
+        dplyr::select(-dplyr::any_of(c("unit_responses", "coding_scheme"))) %>%
         tidyr::unnest(unit_codes) %>%
-        dplyr::select(any_of(c("unit_key", by, "group_id", "login_name", "login_code",
-                               "booklet_id", "codes"))) %>%
-        tidyr::unnest(codes) %>%
         dplyr::rename(variable_id = id, code_id = code) %>%
         tidyr::unnest(value, keep_empty = TRUE) %>%
         dplyr::left_join(pcs_variables, by = dplyr::join_by("unit_key", "variable_id")) %>%
-        dplyr::left_join(pcs_codes, by = dplyr::join_by("unit_key", "variable_id", "code_id")) %>%
-        dplyr::select(any_of(c(
-          "unit_key",
-          by,
-          "variable_id",
-          "source_type",
-          "group_id",
-          "login_code",
-          "value",
-          "code_status" = "status",
-          "code_id",
-          "code_type",
-          "code_score" = "score"
+        dplyr::left_join(pcs_codes %>% dplyr::select(unit_key, variable_id, code_id, code_type),
+                         by = dplyr::join_by("unit_key", "variable_id", "code_id")) %>%
+        dplyr::rename(any_of(c(
+          "code_score" = "score",
+          "code_status" = "status"
         ))),
       finally = cli::cli_text("Time finished: {Sys.time()}")
     )
@@ -328,26 +272,41 @@ code_responses2 <- function(responses,
 #'
 #' @keywords internal
 code_unit <- function(unit_responses, coding_scheme) {
-  unit_responses %>%
-    # dplyr::mutate(
-    #   responses = purrr::map_chr(responses, "content")
-    # ) %>%
-    # dplyr::filter(responses != "[]") %>%
+  # Müssten einige Variablen nicht noch hoch?
+  eatAutoCode::code_responses_array(coding_scheme, unit_responses) %>%
     dplyr::mutate(
-      codes = purrr::map(responses, function(resp) {
-        eatAutoCode::code_responses(coding_scheme = coding_scheme,
-                                    responses = resp) %>%
-          dplyr::mutate(
-            value = purrr::map(value, function(x) {
-              if (length(x) > 1) {
-                x %>% stringr::str_c(collapse = ",")
-              } else {
-                as.character(x)
-              }
-            })
-          )
-      })
-    )
+      # Values need to be concatenated if they are still lists
+      # Identifier is [] and elements are concatenated with a ,
+      value = purrr::map(value, function(x) {
+        if (length(x) > 1) {
+          list_vals <- x %>% stringr::str_c(collapse = ",")
+          as.character(stringr::str_glue("[[{list_vals}]]"))
+        } else {
+          as.character(x)
+        }
+      })) %>%
+    tidyr::unnest(value)
+
+  # unit_responses %>%
+  #   # dplyr::mutate(
+  #   #   responses = purrr::map_chr(responses, "content")
+  #   # ) %>%
+  #   # dplyr::filter(responses != "[]") %>%
+  #   dplyr::mutate(
+  #     codes = purrr::map(responses, function(resp) {
+  #       eatAutoCode::code_responses(coding_scheme = coding_scheme,
+  #                                   responses = resp) %>%
+  #         dplyr::mutate(
+  #           value = purrr::map(value, function(x) {
+  #             if (length(x) > 1) {
+  #               x %>% stringr::str_c(collapse = ",")
+  #             } else {
+  #               as.character(x)
+  #             }
+  #           })
+  #         )
+  #     })
+  #   )
 }
 
 #' Add manual codes to unit responses

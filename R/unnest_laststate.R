@@ -24,5 +24,11 @@ unnest_laststate <- function(json) {
       dplyr::distinct()
   }
 
-  return(laststate_tbl)
+  if (nrow(laststate_tbl) == 1) {
+    return(laststate_tbl)
+  } else {
+    laststate_tbl %>%
+      tidyr::fill(dplyr::everything(), .direction = "downup") %>%
+      dplyr::filter(RESPONSE_PROGRESS == "complete")
+  }
 }

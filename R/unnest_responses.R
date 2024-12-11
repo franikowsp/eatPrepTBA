@@ -35,6 +35,7 @@ unnest_responses <- function(json, is_parsed = TRUE) {
       # TODO: Check for robustness of this new fix
       # This should remove all the duplicated entries
       dplyr::group_by(id) %>%
+      dplyr::distinct()
       dplyr::filter(ts == max(ts)) %>%
       dplyr::ungroup()
   }
