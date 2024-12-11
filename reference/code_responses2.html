@@ -9,7 +9,7 @@ This function automatically codes responses by using the eatAutoCode package. It
 
     <a class="navbar-brand me-2" href="../index.html">eatPrepTBA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.7.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.7.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,11 +45,8 @@ This function automatically codes responses by using the eatAutoCode package. It
 <span>  <span class="va">responses</span>,</span>
 <span>  <span class="va">units</span>,</span>
 <span>  prepare <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  codes_manual <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  missings <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  n_cores <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  missings <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -69,24 +66,12 @@ This function automatically codes responses by using the eatAutoCode package. It
 <dd><p>Logical. Whether to unpack the coding results and to add information from the coding schemes.</p></dd>
 
 
-<dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
-<dd><p>Character. Additional columns as subgroups for the coding (e.g., in case of duplicate unit data for a specific person that could emerge in offline settings).</p></dd>
-
-
 <dt id="arg-codes-manual">codes_manual<a class="anchor" aria-label="anchor" href="#arg-codes-manual"></a></dt>
 <dd><p>Tibble (optional). Data frame holding the manual codes. Defaults to <code>NULL</code> and does only automatic coding.</p></dd>
 
 
 <dt id="arg-missings">missings<a class="anchor" aria-label="anchor" href="#arg-missings"></a></dt>
 <dd><p>Tibble (optional). Provide missing meta data with <code>code_id</code>, <code>status</code>, <code>score</code>, and <code>code_type</code>. Defaults to <code>NULL</code> and uses default scheme.</p></dd>
-
-
-<dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
-<dd><p>Logical. Should the coding be conducted on multiple cores?</p></dd>
-
-
-<dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
-<dd><p>Integer. Number of the cores to be used for coding (only relevant if <code>parallel = TRUE</code>). Will default to number of available system cores - 1.</p></dd>
 
 </dl></div>
     <div class="section level2">
