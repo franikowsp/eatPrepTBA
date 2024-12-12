@@ -24,12 +24,28 @@ unnest_laststate <- function(json) {
       dplyr::distinct()
   }
 
+  # TODO: This is only necessary due to bugs in older TC versions (2024)
   if (nrow(laststate_tbl) == 1) {
     return(laststate_tbl)
   } else {
     # This (hopefully) addresses the problem that there are multiple laststates around
-    laststate_tbl %>%
+    laststate_tbl <-
+      laststate_tbl %>%
       tidyr::fill(dplyr::everything(), .direction = "downup") %>%
-      dplyr::filter(RESPONSE_PROGRESS == "complete")
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::any_of(c("PLAYER", "RESPONSE_PROGRESS", "PRESENTATION_PROGRESS")),
+          function(x) {
+            update_laststate(information = dplyr::cur_column(), current_states = x)
+          }),
+      ) %>%
+      dplyr::distinct()
+
+    if (nrow(laststate_tbl) == 1) {
+      return(laststate_tbl)
+    } else {
+      # If it cannot be harmonized, this error will be thrown
+      tibble::tibble(laststate_error = TRUE)
+    }
   }
 }
