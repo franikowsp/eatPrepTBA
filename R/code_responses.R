@@ -112,6 +112,7 @@ code_responses <- function(responses,
         "group_id",
         "booklet_id",
         "login_code",
+        "login_name",
         "variable_id",
         "unit_key",
         "code_id"
