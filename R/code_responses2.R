@@ -166,7 +166,7 @@ code_responses2 <- function(responses,
     responses_insert_prepared <-
       responses %>%
       dplyr::left_join(
-        codes_to_merge, by = dplyr::join_by("group_id", "login_code", "booklet_id", "unit_key")
+        codes_to_merge, by = dplyr::join_by("group_id", "login_code", "login_name", "booklet_id", "unit_key")
       )
 
     prep_unit_keys <- responses_insert_prepared$unit_key
