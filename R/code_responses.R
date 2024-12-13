@@ -266,5 +266,5 @@ code_unit <- function(unit_responses, coding_scheme) {
           as.character(x)
         }
       })) %>%
-    tidyr::unnest(value)
+    tidyr::unnest(value, keep_empty = TRUE)
 }
