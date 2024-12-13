@@ -134,14 +134,18 @@ code_responses <- function(responses,
       ) %>%
       dplyr::select(-status_miss, -code_score_miss)
 
-    manual_unit_keys <- codes_manual_nested$unit_key
-
     codes_manual_nested <-
       codes_manual_prepared %>%
       dplyr::rename(id = variable_id, code = code_id, score = code_score) %>%
       tidyr::nest(
         manual = c(id, code, score, status)
       ) %>%
+      dplyr::arrange(unit_key)
+
+    manual_unit_keys <- codes_manual_nested$unit_key
+
+    codes_manual_json <-
+      codes_manual_nested %>%
       dplyr::mutate(
         manual = purrr::map_chr(
           manual,
@@ -155,17 +159,13 @@ code_responses <- function(responses,
             format_done = "Prepared {cli::pb_total} manual code case{?s} in {cli::pb_elapsed}.",
             clear = FALSE
           ))
-      ) %>%
-      dplyr::arrange(unit_key)
-
-    # codes_manual_nested$codes_manual[[1]]
-    # manual_unit_keys <- codes_manual_nested$unit_key
+      )
 
     # TODO: Add filter for unit_keys that are only in coding_schemes, also needs to be arranged
     responses_inserted <-
       responses %>%
       dplyr::left_join(
-        codes_manual_nested,
+        codes_manual_json,
         by = dplyr::join_by("group_id", "login_code", "login_name", "booklet_id", "unit_key")
       )
 
