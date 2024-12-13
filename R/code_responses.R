@@ -108,6 +108,14 @@ code_responses <- function(responses,
 
     codes_manual_prepared <-
       codes_manual %>%
+      dplyr::select(any_of(c(
+        "group_id",
+        "booklet_id",
+        "login_code",
+        "variable_id",
+        "unit_key",
+        "code_id"
+      ))) %>%
       dplyr::filter(unit_key %in% unit_keys) %>%
       dplyr::mutate(
         code_id = as.integer(code_id)
