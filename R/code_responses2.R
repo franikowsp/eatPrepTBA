@@ -112,10 +112,11 @@ code_responses2 <- function(responses,
       codes_manual %>%
       dplyr::select(any_of(c(
         "group_id",
-        "booklet_id",
+        "login_name",
         "login_code",
-        "variable_id",
+        "booklet_id",
         "unit_key",
+        "variable_id",
         "code_id"
       ))) %>%
       dplyr::filter(unit_key %in% unit_keys) %>%
