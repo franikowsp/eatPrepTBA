@@ -31,7 +31,7 @@ prepare_responses <- function(responses) {
         } else {
           resp
         }
-      })
+      }, .progress = TRUE)
     ) %>%
     tidyr::unnest(
       c(responses)
