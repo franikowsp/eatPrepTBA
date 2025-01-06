@@ -39,6 +39,16 @@ prepare_coding_scheme <- function(coding_scheme) {
     )
   }
 
+  # Level of variable in dependency tree (makes it easier to search for dependencies)
+  sources <-
+    coding_scheme %>%
+    eatAutoCode::get_dependency_tree() %>%
+    tibble::as_tibble() %>%
+    dplyr::select(
+      variable_id = "id",
+      variable_level = "level"
+    )
+
   prepared_scheme <-
     scheme_table %>%
     dplyr::rename(any_of(c(
@@ -57,6 +67,7 @@ prepare_coding_scheme <- function(coding_scheme) {
       page = "page",
       codes = "codes"
     ))) %>%
+    dplyr::left_join(sources, by = dplyr::join_by("variable_id")) %>%
     dplyr::mutate(
       codes = purrr::map(codes, prepare_codes)
     ) %>%
