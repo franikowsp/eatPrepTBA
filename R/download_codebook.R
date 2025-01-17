@@ -4,11 +4,13 @@
 #' @param path Character. Path for the codebook file to be downloaded.
 #' @param unit_keys Character. Keys (short names) of the units in the workspace the codebook should be retrieved from. If set to `NULL` (default), the codebook will be generated for the all units.
 #' @param format Character. Either `"docx"` (default) or `json`.
-#' @param missingsProfile Missings profile. (Currently with no effect.)
+#' @param missings_profile Missings profile. (Currently without effect.)
+#' @param only_coded Logical. Should only variables with codes be shown?
 #' @param general_instructions Logical. Should the general coding instructions be printed? Defaults to `TRUE`.
-#' @param only_manual Logical. Should only items with manual coding be printed? Defaults to `TRUE`.
-#' @param closed Logical. Should items that could be automatically coded be printed? Defaults to `TRUE`.
+#' @param hide_item_var_relation Logocal. Should item-variable relations be printed? Defaults to `FALSE`.
 #' @param derived Logical. Should the derived variables be printed? Defaults to `TRUE`.
+#' @param manual Logical. Should only items with manual coding be printed? Defaults to `TRUE`.
+#' @param closed Logical. Should items that could be automatically coded be printed? Defaults to `TRUE`.
 #' @param show_score Logical. Should the score be printed? Defaults to `FALSE`.
 #' @param code_label_to_upper Logical. Should the code labels be printed in capital letters? Defaults to `TRUE`.
 #'
@@ -23,13 +25,25 @@
 setGeneric("download_codebook", function(workspace,
                                          path,
                                          unit_keys = NULL,
+                                         # Exportformat
                                          format = "docx",
-                                         missingsProfile = NULL,
+                                         # Missings-Profil
+                                         missings_profile = NULL,
+                                         # Nur Variablen mit Codes
+                                         only_coded = FALSE,
+                                         # Allgemeine Hinweise für jede Variable
                                          general_instructions = TRUE,
-                                         only_manual = TRUE,
-                                         closed = TRUE,
+                                         # Item-Variable-Relation für jede Variable
+                                         hide_item_var_relation = TRUE,
+                                         # Abgeleitete Variablen
                                          derived = TRUE,
+                                         # Manuell kodierte Variablen
+                                         manual = TRUE,
+                                         # Geschlossen kodierte Variablen
+                                         closed = TRUE,
+                                         # Bewertung anzeigen
                                          show_score = FALSE,
+                                         # Code-Label in Großbuchstaben
                                          code_label_to_upper = TRUE) {
   cli_setting()
 
@@ -43,11 +57,13 @@ setMethod("download_codebook",
                    path,
                    unit_keys = NULL,
                    format = "docx",
-                   missingsProfile = NULL,
+                   missings_profile = NULL,
+                   only_coded = FALSE,
                    general_instructions = TRUE,
-                   only_manual = TRUE,
-                   closed = TRUE,
+                   hide_item_var_relation = TRUE,
                    derived = TRUE,
+                   manual = TRUE,
+                   closed = TRUE,
                    show_score = FALSE,
                    code_label_to_upper = TRUE) {
             base_req <- workspace@login@base_req
@@ -73,10 +89,12 @@ setMethod("download_codebook",
             query_params <-
               list(
                 format = format,
+                hasOnlyVarsWithCodes = only_coded,
                 generalInstructions = general_instructions,
-                onlyManual = only_manual,
-                closed = closed,
+                hideItemVarRelation = hide_item_var_relation,
                 derived = derived,
+                onlyManual = manual,
+                closed = closed,
                 showScore = show_score,
                 codeLabelToUpper = code_label_to_upper
               ) %>%

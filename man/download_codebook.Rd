@@ -10,11 +10,13 @@ download_codebook(
   path,
   unit_keys = NULL,
   format = "docx",
-  missingsProfile = NULL,
+  missings_profile = NULL,
+  only_coded = FALSE,
   general_instructions = TRUE,
-  only_manual = TRUE,
-  closed = TRUE,
+  hide_item_var_relation = TRUE,
   derived = TRUE,
+  manual = TRUE,
+  closed = TRUE,
   show_score = FALSE,
   code_label_to_upper = TRUE
 )
@@ -24,11 +26,13 @@ download_codebook(
   path,
   unit_keys = NULL,
   format = "docx",
-  missingsProfile = NULL,
+  missings_profile = NULL,
+  only_coded = FALSE,
   general_instructions = TRUE,
-  only_manual = TRUE,
-  closed = TRUE,
+  hide_item_var_relation = TRUE,
   derived = TRUE,
+  manual = TRUE,
+  closed = TRUE,
   show_score = FALSE,
   code_label_to_upper = TRUE
 )
@@ -42,15 +46,19 @@ download_codebook(
 
 \item{format}{Character. Either \code{"docx"} (default) or \code{json}.}
 
-\item{missingsProfile}{Missings profile. (Currently with no effect.)}
+\item{missings_profile}{Missings profile. (Currently without effect.)}
+
+\item{only_coded}{Logical. Should only variables with codes be shown?}
 
 \item{general_instructions}{Logical. Should the general coding instructions be printed? Defaults to \code{TRUE}.}
 
-\item{only_manual}{Logical. Should only items with manual coding be printed? Defaults to \code{TRUE}.}
-
-\item{closed}{Logical. Should items that could be automatically coded be printed? Defaults to \code{TRUE}.}
+\item{hide_item_var_relation}{Logocal. Should item-variable relations be printed? Defaults to \code{FALSE}.}
 
 \item{derived}{Logical. Should the derived variables be printed? Defaults to \code{TRUE}.}
+
+\item{manual}{Logical. Should only items with manual coding be printed? Defaults to \code{TRUE}.}
+
+\item{closed}{Logical. Should items that could be automatically coded be printed? Defaults to \code{TRUE}.}
 
 \item{show_score}{Logical. Should the score be printed? Defaults to \code{FALSE}.}
 
