@@ -43,5 +43,7 @@ setMethod("get_states",
                   label = "",
                   .before = 1
                 )
+
+              return(states)
             }
           })
