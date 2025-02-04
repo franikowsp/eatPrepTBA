@@ -22,7 +22,7 @@ download_units(
 
 \item{path}{Character. Path for the zip file to be downloaded.}
 
-\item{unit_keys}{Character. Keys (short names) of the units in the workspace that should be downloaded. If set to \code{NULL} (default), the codebook will be generated for the all units.}
+\item{unit_keys}{Character. Keys (short names) of the units in the workspace that should be downloaded. If set to \code{NULL} (default), all units in the workspace will be downloaded.}
 
 \item{add_players}{Logical. Should the resepective Aspect Player(s) of the selected units be added? Defaults to \code{TRUE}.}
 

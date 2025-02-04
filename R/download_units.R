@@ -2,7 +2,7 @@
 #'
 #' @param workspace [WorkspaceStudio-class]. Workspace information necessary to download files via the API.
 #' @param path Character. Path for the zip file to be downloaded.
-#' @param unit_keys Character. Keys (short names) of the units in the workspace that should be downloaded. If set to `NULL` (default), the codebook will be generated for the all units.
+#' @param unit_keys Character. Keys (short names) of the units in the workspace that should be downloaded. If set to `NULL` (default), all units in the workspace will be downloaded.
 #' @param add_players Logical. Should the resepective Aspect Player(s) of the selected units be added? Defaults to `TRUE`.
 #' @param add_testtakers_review Numeric. Number of Testcenter review logins (`run-review`). Defaults to `0`.
 #' @param add_testtakers_monitor Numeric. Number of Testcenter monitor logins (`monitor-group`). Defaults to `0`.
