@@ -59,7 +59,7 @@ setMethod("download_units",
             # TODO: Keep in mind as this might become a body string in the future!
             body <-
               list(
-                unitIdList = unit_ids,
+                unitIdList = units %>% purrr::map_int("unit_id"),
                 addPlayers = add_players,
                 addTestTakersReview = add_testtakers_review,
                 addTestTakersMonitor = add_testtakers_monitor,
