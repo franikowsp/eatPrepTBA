@@ -59,14 +59,13 @@ setMethod("download_units",
             # TODO: Keep in mind as this might become a body string in the future!
             body <-
               list(
-                unitIdList = units %>% purrr::map_int("unit_id"),
+                unitIdList = units %>% purrr::map("unit_id"),
                 addPlayers = add_players,
                 addTestTakersReview = add_testtakers_review,
                 addTestTakersMonitor = add_testtakers_monitor,
                 addTestTakersHot = add_testtakers_hot,
                 passwordLess = password_less,
-                bookletSettings = booklet_settings
-              ) %>%
+                bookletSettings = booklet_settings) %>%
               jsonlite::toJSON(auto_unbox = TRUE)
 
             run_req <- function() {
@@ -74,9 +73,8 @@ setMethod("download_units",
                        endpoint = c(
                          "workspace",
                          ws_id,
-                         "download",
-                         body),
-                       query = query_params) %>%
+                         "download"),
+                       query = list(settings = body)) %>%
                 httr2::req_perform(path = path)
 
               cli::cli_alert_success("Units of
@@ -86,5 +84,4 @@ setMethod("download_units",
 
             run_safe(run_req,
                      error_message = "Units could not be downloaded.")
-            # zip::zip_list(path)
           })
