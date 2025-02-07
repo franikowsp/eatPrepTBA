@@ -44,6 +44,8 @@ reference:
   - read_system_checks
   - get_results
   - get_logs
+  - read_logs
+  - prepare_logs
   - get_reviews
 - subtitle: Functions for units
   contents: add_metadata
