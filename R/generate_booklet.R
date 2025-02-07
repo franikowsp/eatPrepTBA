@@ -16,7 +16,7 @@ generate_booklet <- function(booklet_id,
                              booklet_configuration = NULL,
                              units = NULL,
                              testlets = NULL,
-                             app_version = "15.3.0-alpha") {
+                             app_version = "15.4.0") {
   cli_setting()
 
   BookletConfig <- rlang::exec("configure_booklet", !!!booklet_configuration)

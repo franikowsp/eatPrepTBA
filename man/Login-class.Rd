@@ -15,5 +15,7 @@ A class containing the token to communicate with the API of either the IQB Studi
 \item{\code{base_req}}{Function. Base \link{httr2} request (will be handled internally).}
 
 \item{\code{ws_list}}{Named list. Returns a list of the labels and ids of the workspaces the user has access to.}
+
+\item{\code{app_version}}{Character. The version of the instance.}
 }}
 

@@ -93,11 +93,17 @@ login_testcenter <- function(base_url = "https://iqb-testcenter2.de/",
       )
     })
 
+  app_version <-
+    base_req(method = "GET", endpoint = c("version")) %>%
+    httr2::req_perform() %>%
+    httr2::resp_body_json()
+
   # Initialize Login object
   Login <- new("LoginTestcenter",
                base_url = base_url,
                base_req = base_req,
-               ws_list = ws_list
+               ws_list = ws_list,
+               app_version = app_version$version
   )
 
   cli::cli_alert_success("IQB Testcenter login was successful.")

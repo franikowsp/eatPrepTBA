@@ -11,7 +11,7 @@ generate_booklet(
   booklet_configuration = NULL,
   units = NULL,
   testlets = NULL,
-  app_version = "15.3.0-alpha"
+  app_version = "15.4.0"
 )
 }
 \arguments{

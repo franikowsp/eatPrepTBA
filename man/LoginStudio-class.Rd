@@ -24,6 +24,6 @@ A class extending the Login class with additional information for the IQB Studio
 
 \item{\code{user_label}}{Character. Long name of the user.}
 
-\item{\code{app_version}}{Character. The version of the IQB Studio.}
+\item{\code{app_version}}{Character. The version of the IQB Studio installation.}
 }}
 

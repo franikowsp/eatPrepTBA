@@ -6,6 +6,7 @@
 #' @slot base_url Character. Base URL of the instance.
 #' @slot base_req Function. Base [httr2] request (will be handled internally).
 #' @slot ws_list Named list. Returns a list of the labels and ids of the workspaces the user has access to.
+#' @slot app_version Character. The version of the instance.
 #'
 #' @name Login-class
 #' @rdname Login-class
@@ -15,7 +16,8 @@ setClass("Login",
          slots = c(
            base_url = "character",
            base_req = "function",
-           ws_list = "list"
+           ws_list = "list",
+           app_version = "character"
          ))
 
 #' Login credentials for IQB Studio
@@ -30,7 +32,7 @@ setClass("Login",
 #' @slot user_id Numeric. ID of the user.
 #' @slot user_key Character. Short name of the user (login name).
 #' @slot user_label Character. Long name of the user.
-#' @slot app_version Character. The version of the IQB Studio.
+#' @slot app_version Character. The version of the IQB Studio installation.
 #'
 #' @name LoginStudio-class
 #' @rdname LoginStudio-class
@@ -42,9 +44,8 @@ setClass("LoginStudio",
            wsg_list = "list",
            user_id = "numeric",
            user_key = "character",
-           user_label = "character",
-           app_version = "character"
-         ))
+           user_label = "character"
+           ))
 
 #' Login credentials for IQB Testcenter
 #'
@@ -54,6 +55,7 @@ setClass("LoginStudio",
 #' @slot base_url Character. Base URL of the IQB Testcenter installation.
 #' @slot base_req Function. Base [httr2] request (will be handled internally).
 #' @slot ws_list Named list. Returns a list of the labels and ids of the workspaces the user has access to.
+#' @slot app_version Character. The version of the IQB Studio installation.
 #'
 #' @name LoginTestcenter-class
 #' @rdname LoginTestcenter-class

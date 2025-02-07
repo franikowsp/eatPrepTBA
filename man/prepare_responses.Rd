@@ -7,7 +7,7 @@
 prepare_responses(responses)
 }
 \arguments{
-\item{responses}{Tibble. Responses retrieved from the IQB Testcenter via \code{\link[=read_responses]{read_responses()}} or from an extracted csv and read via \code{\link[=read_responses]{read_responses()}}.}
+\item{responses}{Tibble. Responses retrieved from the IQB Testcenter via \code{\link[=get_responses]{get_responses()}} or from an extracted csv and read via \code{\link[=read_responses]{read_responses()}}.}
 }
 \value{
 A tibble.

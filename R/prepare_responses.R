@@ -1,6 +1,6 @@
 #' Prepares responses
 #'
-#' @param responses Tibble. Responses retrieved from the IQB Testcenter via [read_responses()] or from an extracted csv and read via [read_responses()].
+#' @param responses Tibble. Responses retrieved from the IQB Testcenter via [get_responses()] or from an extracted csv and read via [read_responses()].
 #'
 #' @description
 #' `r lifecycle::badge("experimental")`
