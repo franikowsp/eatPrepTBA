@@ -63,7 +63,7 @@ prepare_logs <- function(logs, log_events = NULL) {
 
           # If the result is still a JSON-encoded string, parse again
           if (is.character(parsed)) {
-            parsed <- parse_json(parsed)
+            parsed <- jsonlite::parse_json(parsed)
           }
 
           # Convert to tibble
