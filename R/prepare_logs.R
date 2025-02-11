@@ -51,20 +51,27 @@ prepare_logs <- function(logs, log_events = NULL) {
       loadcomplete = if ("loadcomplete" %in% log_events) purrr::map(log_entry, function(x) {
         if (stringr::str_detect(log_entry, "^LOADCOMPLETE")) {
           # TODO: This routine works for both, csv and json (as these are different...)
-          log_prep <-
-            log_entry %>%
-            stringr::str_remove("LOADCOMPLETE : ") %>%   # Remove prefix if present
-            stringr::str_remove_all("^\"|\"$") %>%       # Remove outer quotes
-            stringr::str_replace_all("\\\\\"", "\"") %>% # Convert `\\\"` to `\"` (for offline logs)
-            stringr::str_replace_all('\"\"', '\"')       # Convert `""` to `"` (for online logs)
+          log_prep <- log_entry %>%
+            stringr::str_remove("^LOADCOMPLETE : ") %>%  # Prefix entfernen
+            stringr::str_remove_all("^\"|\"$")           # Äußere Quotes entfernen
 
-          # First attempt at parsing
+          # **Erkennung und Korrektur von zwei Escape-Problemen:**
+          if (stringr::str_detect(log_prep, "\\\\")) {
+            # Fall 1: JSON mit Backslashes (`\\\"`)
+            log_prep <- stringr::str_replace_all(log_prep, "\\\\\"", "\"")
+          } else if (stringr::str_detect(log_prep, "\"\"")) {
+            # Fall 2: JSON mit doppelten Quotes (`""`)
+            log_prep <- stringr::str_replace_all(log_prep, "\"\"", "\"")
+          }
+
+          # **Erster Parsing-Versuch**
           parsed <- tryCatch(jsonlite::parse_json(log_prep), error = function(e) log_prep)
 
-          # If the result is still a JSON-encoded string, parse again
+          # **Falls das Ergebnis noch ein JSON-String ist, nochmal parsen**
           if (is.character(parsed)) {
             parsed <- jsonlite::parse_json(parsed)
           }
+
 
           # Convert to tibble
           tibble::as_tibble(parsed)
