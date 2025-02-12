@@ -57,7 +57,7 @@ setMethod("download_units",
             }
 
             # TODO: Keep in mind as this might become a body string in the future!
-            body <-
+            settings <-
               list(
                 unitIdList = units %>% purrr::map("unit_id"),
                 addPlayers = add_players,
@@ -71,10 +71,9 @@ setMethod("download_units",
             run_req <- function() {
               base_req(method = "GET",
                        endpoint = c(
-                         "workspace",
-                         ws_id,
-                         "download"),
-                       query = list(settings = body)) %>%
+                         "workspaces",
+                         ws_id),
+                       query = list(download = TRUE, settings = body)) %>%
                 httr2::req_perform(path = path)
 
               cli::cli_alert_success("Units of

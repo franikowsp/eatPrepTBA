@@ -36,7 +36,7 @@ setMethod("get_settings",
             # Workspace unit groups and default settings
             run_req_ws <- function() {
               base_req(method = "GET",
-                       endpoint = c("workspace", ws_id)) %>%
+                       endpoint = c("workspaces", ws_id)) %>%
                 httr2::req_perform() %>%
                 httr2::resp_body_json()
             }

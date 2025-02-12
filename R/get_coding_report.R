@@ -26,9 +26,10 @@ setMethod("get_coding_report",
             run_req <- function() {
               base_req(method = "GET",
                        endpoint = c(
-                         "workspace",
+                         "workspaces",
                          ws_id,
-                         "coding-report"
+                         "units",
+                         "scheme"
                        )) %>%
                 httr2::req_perform() %>%
                 httr2::resp_body_json()
@@ -36,8 +37,7 @@ setMethod("get_coding_report",
 
             resp <-
               run_safe(run_req,
-                       error_message = "Codebook could not be generated. Please check if you have already,
-                     opened {.file {path}} (that migh cause the error).",
+                       error_message = "Codebook could not be generated..",
                        default = tibble::tibble())
 
             units <-
@@ -48,13 +48,15 @@ setMethod("get_coding_report",
             resp %>%
               purrr::list_transpose() %>%
               tibble::as_tibble() %>%
-              tidyr::separate(
-                unit, into = c("unit_key", "unit_label"), sep = ":"
+              tidyr::extract(
+                unit, into = c("ws_id", "unit_id", "unit_key", "unit_label"),
+                regex = "<a href=#/a/(\\d+)/(\\d+)>([^:]+): (.+)</a>"
               ) %>%
               dplyr::mutate(
-                ws_id = ws_id
+                unit_id = as.integer(unit_id)
               ) %>%
-              dplyr::left_join(units) %>%
+              # This was necessary to get the unit_ids (which are now part of the endpoint)
+              # dplyr::left_join(units, by = dplyr::join_by("unit_id", "unit_key", "unit_label")) %>%
               # Reorder and rename entries
               dplyr::select(
                 ws_id,

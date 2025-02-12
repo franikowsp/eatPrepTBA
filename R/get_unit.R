@@ -66,7 +66,7 @@ setMethod("get_unit",
 
             run_req <- function() {
               base_req(method = "GET",
-                       endpoint = c("workspace", ws_id, unit_id, "metadata")) %>%
+                       endpoint = c("workspaces", ws_id, "units", unit_id, "metadata")) %>%
                 httr2::req_perform() %>%
                 httr2::resp_body_json()
             }
@@ -109,7 +109,7 @@ setMethod("get_unit",
               if (unit_definition) {
                 run_req_definition <- function() {
                   base_req(method = "GET",
-                           endpoint = c("workspace", ws_id, unit_id, "definition")) %>%
+                           endpoint = c("workspaces", ws_id, "units", unit_id, "definition")) %>%
                     httr2::req_perform() %>%
                     httr2::resp_body_json()
                 }
@@ -126,7 +126,7 @@ setMethod("get_unit",
               if (coding_scheme) {
                 run_req_scheme <- function() {
                   base_req(method = "GET",
-                           endpoint = c("workspace", ws_id, unit_id, "scheme")) %>%
+                           endpoint = c("workspaces", ws_id, "units", unit_id, "scheme")) %>%
                     httr2::req_perform() %>%
                     httr2::resp_body_json()
                 }

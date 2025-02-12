@@ -96,19 +96,18 @@ setMethod("download_codebook",
                 onlyManual = manual,
                 closed = closed,
                 showScore = show_score,
-                codeLabelToUpper = code_label_to_upper
+                codeLabelToUpper = code_label_to_upper,
+                id = unit_ids
               ) %>%
               purrr::map(stringr::str_to_lower)
 
             run_req <- function() {
               base_req(method = "GET",
                        endpoint = c(
-                         "download",
-                         "docx",
                          "workspaces",
                          ws_id,
-                         "coding-book",
-                         stringr::str_c(unit_ids, collapse = ",")
+                         "units",
+                         "coding-book"
                        ),
                        query = query_params) %>%
                 httr2::req_perform(path = path)

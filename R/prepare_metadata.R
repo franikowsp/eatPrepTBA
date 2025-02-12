@@ -12,7 +12,8 @@ prepare_metadata <- function(unit, resp_metadata, workspace) {
           as.list() %>%
           tibble::enframe() %>%
           tidyr::unnest(value) %>%
-          tidyr::pivot_wider(values_fn = function(x) stringr::str_c(x, collapse = ";"))
+          # This must be unique
+          tidyr::pivot_wider(values_fn = function(x) stringr::str_c(x, collapse = ";.;.;"))
       }) %>%
       purrr::reduce(dplyr::bind_rows)
 
@@ -24,7 +25,7 @@ prepare_metadata <- function(unit, resp_metadata, workspace) {
       dplyr::mutate(
         value.id = if (value_id_exists) value.id else NA,
         valueAsText.value = if (value_text_exists) valueAsText.value else NA,
-        dplyr::across(c(value.id, valueAsText.value), function(x) stringr::str_split(x, ";")),
+        dplyr::across(c(value.id, valueAsText.value), function(x) stringr::str_split(x, ";.;.;")),
         profile_name = stringr::str_replace_all(label.value, str_replacements, "_")
       ) %>%
       tidyr::unnest(c(value.id, valueAsText.value)) %>%
