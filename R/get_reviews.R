@@ -87,7 +87,7 @@ setMethod("get_reviews",
                 dplyr::rename(any_of(c(
                   group_id = "groupname",
                   login_name = "loginname",
-                  code = "code",
+                  login_code = "code",
                   booklet_id = "bookletname",
                   unit_key = "originalUnitId",
                   unit_alias = "unitname",

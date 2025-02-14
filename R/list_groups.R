@@ -22,7 +22,7 @@ setMethod("list_groups",
 
             run_req <- function() {
               base_req(method = "GET",
-                       endpoint = c("workspace", ws_id, "groups")) %>%
+                       endpoint = c("workspaces", ws_id, "groups")) %>%
                 httr2::req_perform() %>%
                 httr2::resp_body_json()
             }

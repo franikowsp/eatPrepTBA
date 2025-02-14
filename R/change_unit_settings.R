@@ -56,7 +56,7 @@ setMethod("change_unit_settings",
 
             run_req <- function() {
               base_req(method = "PATCH",
-                       endpoint = c("workspace", ws_id, unit_id, "metadata")) %>%
+                       endpoint = c("workspaces", ws_id, "units", unit_id, "metadata")) %>%
                 httr2::req_body_json(data = body, auto_unbox = TRUE) %>%
                 httr2::req_perform()
             }

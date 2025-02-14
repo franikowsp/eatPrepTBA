@@ -73,7 +73,7 @@ setMethod("download_units",
                        endpoint = c(
                          "workspaces",
                          ws_id),
-                       query = list(download = TRUE, settings = body)) %>%
+                       query = list(download = TRUE, settings = settings)) %>%
                 httr2::req_perform(path = path)
 
               cli::cli_alert_success("Units of
