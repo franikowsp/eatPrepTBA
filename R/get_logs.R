@@ -1,7 +1,7 @@
 #' Get logs
 #'
 #' @param workspace [WorkspaceTestcenter-class]. Workspace information necessary to retrieve unit information and resources from the API.
-#' @param groups Character. Name of the groups to be retrieved  or all groups if not specified.
+#' @param groups Character. Name of the groups to be retrieved  or all groups if not specified. Please note, that this has to be specified in all-capital letters.
 #'
 #' @description
 #' This function returns logs from the IQB Testcenter

@@ -102,23 +102,27 @@ prepare_metadata <- function(unit, resp_metadata, workspace) {
           purrr::reduce(dplyr::bind_rows, .init = tibble::tibble())}) %>%
       tibble::enframe(name = "item") %>%
       tidyr::unnest(value) %>%
-      dplyr::select(item, label.value, value.id, valueAsText.value) %>%
+      dplyr::select(dplyr::any_of(c("item", "label.value", "value.id", "valueAsText.value"))) %>%
       dplyr::mutate(
-        dplyr::across(c(value.id, valueAsText.value),
+        dplyr::across(dplyr::any_of(c("value.id", "valueAsText.value")),
                       function(x) stringr::str_split(x, "_-_-_"))
       ) %>%
-      tidyr::unnest(c(value.id, valueAsText.value)) %>%
+      tidyr::unnest(dplyr::any_of(c("value.id", "valueAsText.value"))) %>%
       dplyr::mutate(
         profile_name = stringr::str_replace_all(label.value,
                                                 str_replacements,
                                                 "_"),
       ) %>%
       dplyr::select(
-        item_no = item,
-        profile_name,
-        # profile_label = label.value,
-        value_id = value.id,
-        value_text = valueAsText.value
+        dplyr::any_of(
+          c(
+            item_no = "item",
+            profile_name = "profile_name",
+            # profile_label = label.value,
+            value_id = "value.id",
+            value_text = "valueAsText.value"
+          )
+        )
       )
   } else {
     items_profiles <-
