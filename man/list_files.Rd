@@ -5,14 +5,16 @@
 \alias{list_files,WorkspaceTestcenter-method}
 \title{List files}
 \usage{
-list_files(workspace, type = NULL)
+list_files(workspace, type = NULL, dependencies = FALSE)
 
-\S4method{list_files}{WorkspaceTestcenter}(workspace, type = NULL)
+\S4method{list_files}{WorkspaceTestcenter}(workspace, type = NULL, dependencies = FALSE)
 }
 \arguments{
 \item{workspace}{\linkS4class{WorkspaceTestcenter}. Workspace information necessary to retrieve file list from the API.}
 
 \item{type}{Character (optional). Type of the files to retrieve from the API. If no type is specified, all files are listed.}
+
+\item{dependencies}{Logical. Should the dependencies be listed along with the resources? Defaults to \code{FALSE}.}
 }
 \value{
 A tibble.

@@ -6,7 +6,8 @@
 #' @param booklet_configuration A list that can be submitted to [configure_booklet()].
 #' @param units Tbd.
 #' @param testlets Tbd.
-#' @param app_version Version of the target Testcenter instance.
+#' @param app_version Version of the target Testcenter instance. Defaults to `"16.0.0"`.
+#' @param login Target Testcenter instance. If it is available, the `app_version` will be overwritten.
 #'
 #' @return A booklet XML.
 #' @export
@@ -16,10 +17,15 @@ generate_booklet <- function(booklet_id,
                              booklet_configuration = NULL,
                              units = NULL,
                              testlets = NULL,
-                             app_version = "15.4.0") {
+                             app_version = "16.0.0",
+                             login = NULL) {
   cli_setting()
 
   BookletConfig <- rlang::exec("configure_booklet", !!!booklet_configuration)
+
+  if (!is.null(login)) {
+    app_version <- login@app_version
+  }
 
   # Add nodes
   Metadata <-

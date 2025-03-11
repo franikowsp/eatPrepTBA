@@ -4,11 +4,7 @@
 \alias{generate_testtakers}
 \title{Generates testtakers XML from unit information}
 \usage{
-generate_testtakers(
-  testtakers,
-  custom_texts = NULL,
-  app_version = "15.3.0-alpha"
-)
+generate_testtakers(testtakers, custom_texts = NULL, app_version = "15.6.0")
 }
 \arguments{
 \item{testtakers}{Must be a data frame with the columns ...}

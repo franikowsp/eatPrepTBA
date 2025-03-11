@@ -9,7 +9,7 @@
 #' @export
 generate_testtakers <- function(testtakers,
                                 custom_texts = NULL,
-                                app_version = "15.3.0-alpha") {
+                                app_version = "15.6.0") {
   cli_setting()
 
   if (!is.null(custom_texts) & length(custom_texts) > 0) {

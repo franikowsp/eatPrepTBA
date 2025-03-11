@@ -11,7 +11,8 @@ generate_booklet(
   booklet_configuration = NULL,
   units = NULL,
   testlets = NULL,
-  app_version = "15.4.0"
+  app_version = "16.0.0",
+  login = NULL
 )
 }
 \arguments{
@@ -27,7 +28,9 @@ generate_booklet(
 
 \item{testlets}{Tbd.}
 
-\item{app_version}{Version of the target Testcenter instance.}
+\item{app_version}{Version of the target Testcenter instance. Defaults to \code{"16.0.0"}.}
+
+\item{login}{Target Testcenter instance. If it is available, the \code{app_version} will be overwritten.}
 }
 \value{
 A booklet XML.
