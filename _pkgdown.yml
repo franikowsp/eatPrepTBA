@@ -47,6 +47,7 @@ reference:
   - read_logs
   - prepare_logs
   - get_reviews
+  - compute_sizes
 - subtitle: Functions for units
   contents: add_metadata
 - title: Managing studies
