@@ -80,13 +80,13 @@ setMethod("list_files",
               resp_dependencies <-
                 tryCatch(
                   error = function(cnd) {
-                    cli::cli_alert_danger("Retrieving file dependencies was not successful.",
+                    cli::cli_alert_danger("Retrieving file dependencies was not successful. Returning data without dependencies",
                                           wrap = TRUE)
 
                     cli::cli_text("{.strong Status:}  {cnd$status} | {cnd$message}")
 
                     # Default return
-                    return(tibble::tibble())
+                    return(resp)
                   },
                   run_req_dependencies()
                 )

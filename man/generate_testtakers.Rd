@@ -4,14 +4,24 @@
 \alias{generate_testtakers}
 \title{Generates testtakers XML from unit information}
 \usage{
-generate_testtakers(testtakers, custom_texts = NULL, app_version = "15.6.0")
+generate_testtakers(
+  testtakers,
+  custom_texts = NULL,
+  profiles = NULL,
+  app_version = "16.0.0",
+  login = NULL
+)
 }
 \arguments{
 \item{testtakers}{Must be a data frame with the columns ...}
 
 \item{custom_texts}{Optional. List of custom texts to be modified.}
 
-\item{app_version}{Version of the target Testcenter instance.}
+\item{profiles}{Optional. List of profiles for the group monitor.}
+
+\item{app_version}{Version of the target Testcenter instance. Defaults to \code{"16.0.0"}.}
+
+\item{login}{Target Testcenter instance. If it is available, the \code{app_version} will be overwritten.}
 }
 \value{
 A testtakers XML.

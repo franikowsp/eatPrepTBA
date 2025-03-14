@@ -23,7 +23,10 @@ cli_setting <- function(.envir = parent.frame()) {
       ".booklet-label" = list("color" = "#8BE836"),
       # Testtaker
       ".testtaker-id" = list("color" = "#fde047"),
-      ".testtaker-label" = list("color" = "#FFC142")
+      ".testtaker-label" = list("color" = "#FFC142"),
+      # Profiles
+      ".profile-id" = list("color" = "#e2e8f0"),
+      ".profile-label" = list("color" = "#cbd5e1")
     )
   )
 }

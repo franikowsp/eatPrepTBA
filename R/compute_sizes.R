@@ -2,7 +2,7 @@
 #'
 #' @param data Tibble. Must be a tibble retrieved with `list_files()` with `dependencies = TRUE`.
 #'
-#' @return The object with estimated sizes of units, booklets, and testtakers file and adds a column `total_size` (in Bytes).
+#' @return The object with estimated sizes of units, booklets, and testtakers file and adds a column `total_size` (in Bytes). Note that this only works for objects retrieved from Testcenter 15.6.0 and higher.
 #'
 #' @export
 compute_sizes <- function(data) {

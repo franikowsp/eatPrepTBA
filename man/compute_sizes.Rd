@@ -10,7 +10,7 @@ compute_sizes(data)
 \item{data}{Tibble. Must be a tibble retrieved with \code{list_files()} with \code{dependencies = TRUE}.}
 }
 \value{
-The object with estimated sizes of units, booklets, and testtakers file and adds a column \code{total_size} (in Bytes).
+The object with estimated sizes of units, booklets, and testtakers file and adds a column \code{total_size} (in Bytes). Note that this only works for objects retrieved from Testcenter 15.6.0 and higher.
 }
 \description{
 Computes resource sizes for Testcenter instances
