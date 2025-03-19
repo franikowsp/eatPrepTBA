@@ -129,14 +129,41 @@ prepare_rule_sets <- function(rule_sets) {
         purrr::list_transpose() %>%
         tibble::as_tibble() %>%
         dplyr::rename(any_of(c(
-          rule_operator_and = "ruleOperatorAnd"
-        )))
+          rule_operator_and = "ruleOperatorAnd",
+          value_array_pos = "valueArrayPos"
+        ))) %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::any_of(c("value_array_pos", "fragmenting")),
+                        list_to_character),
+          dplyr::across(dplyr::any_of(c("page")),
+                        list_to_integer)
+        )
     }
   } else {
     if (!is.null(rule_sets$rules)) {
       tibble::tibble()
     }
   }
+}
+
+list_to_character <- function(x) {
+  purrr::map_chr(x, function(x) {
+    if (is.null(x)) {
+      return(NA_character_)
+    }
+
+    as.character(x)
+  })
+}
+
+list_to_integer <- function(x) {
+  purrr::map_chr(x, function(x) {
+    if (is.null(x)) {
+      return(NA_integer_)
+    }
+
+    as.integer(x)
+  })
 }
 
 prepare_rules <- function(rules) {
