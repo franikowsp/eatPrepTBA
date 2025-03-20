@@ -5,10 +5,11 @@
 #'
 #'
 #' @param coding_scheme Coding scheme as prepared by [get_units()] with setting the argument `coding_scheme = TRUE`.
+#' @param filter_has_codes Only returns variables that were not deactivated. Defaults to `TRUE`.
 #'
 #' @return A tibble.
 #' @export
-prepare_coding_scheme <- function(coding_scheme) {
+prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
   if (is.null(coding_scheme)) {
     return(tibble::tibble())
   }
@@ -53,7 +54,7 @@ prepare_coding_scheme <- function(coding_scheme) {
     scheme_table %>%
     dplyr::rename(any_of(c(
       unit_cols,
-      # TODO: This will replace the page identifier for marker items and derived variables
+      # TODO: This might replace the page identifier for marker items and derived variables
       variable_label = "label",
       source_type = "sourceType",
       source_parameters = "sourceParameters",
@@ -61,28 +62,26 @@ prepare_coding_scheme <- function(coding_scheme) {
       processing = "processing",
       fragmenting = "fragmenting",
       general_instruction = "manualInstruction",
-      # value_array_position = "valueArrayPos",
-      # code_model_parameters = "code_model"
       code_model = "codeModel",
       page = "page",
       codes = "codes"
     ))) %>%
+    dplyr::filter(dplyr::if_any(c("source_type"), function(x) {
+      if (filter_has_codes) {
+        x != "BASE_NO_VALUE"
+      } else TRUE
+    })) %>%
     dplyr::left_join(sources, by = dplyr::join_by("variable_id")) %>%
     dplyr::mutate(
       codes = purrr::map(codes, prepare_codes)
     ) %>%
-    tidyr::unnest(codes, keep_empty = TRUE)
-
-  # TODO: Rework page manipulation
-  if (tibble::has_name(prepared_scheme, "pages")) {
-    prepared_scheme <-
-      prepared_scheme %>%
-      dplyr::mutate(
-        page = purrr::map(page, function(page) {
-          if (is.list(page)) page else list(page)
-        })
-      )
-  }
+    tidyr::unnest(codes, keep_empty = TRUE) %>%
+    dplyr::mutate(
+      dplyr::across(dplyr::any_of(c("fragmenting")),
+                    list_to_character),
+      dplyr::across(dplyr::any_of(c("page")),
+                    list_to_integer)
+    )
 
   if (tibble::has_name(prepared_scheme, "rule_sets")) {
     prepared_rule_sets <-
@@ -126,18 +125,20 @@ prepare_rule_sets <- function(rule_sets) {
   if (!is.null(rule_sets)) {
     if (is.null(names(rule_sets)) & length(rule_sets) > 0) {
       rule_sets %>%
-        purrr::list_transpose() %>%
-        tibble::as_tibble() %>%
+        purrr::map(function(x) x %>%
+                     tibble::as_tibble() %>%
+                     dplyr::mutate(
+                       dplyr::across(dplyr::any_of(c("valueArrayPos")),
+                                     list_to_character)
+                     )
+        ) %>%
+        # purrr::list_transpose() %>%
+        # tibble::as_tibble() %>%
+        dplyr::bind_rows() %>%
         dplyr::rename(any_of(c(
           rule_operator_and = "ruleOperatorAnd",
-          value_array_pos = "valueArrayPos"
-        ))) %>%
-        dplyr::mutate(
-          dplyr::across(dplyr::any_of(c("value_array_pos", "fragmenting")),
-                        list_to_character),
-          dplyr::across(dplyr::any_of(c("page")),
-                        list_to_integer)
-        )
+          value_array_position = "valueArrayPos"
+        )))
     }
   } else {
     if (!is.null(rule_sets$rules)) {
@@ -157,13 +158,17 @@ list_to_character <- function(x) {
 }
 
 list_to_integer <- function(x) {
-  purrr::map_chr(x, function(x) {
+  purrr::map_int(x, function(x) {
     if (is.null(x)) {
       return(NA_integer_)
     }
 
     as.integer(x)
   })
+}
+
+coerce_list <- function(x) {
+  if (is.list(x)) x else list(x)
 }
 
 prepare_rules <- function(rules) {

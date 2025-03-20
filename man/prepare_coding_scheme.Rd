@@ -4,10 +4,12 @@
 \alias{prepare_coding_scheme}
 \title{Prepares a readable version of a coding scheme of one unit}
 \usage{
-prepare_coding_scheme(coding_scheme)
+prepare_coding_scheme(coding_scheme, filter_has_codes = TRUE)
 }
 \arguments{
 \item{coding_scheme}{Coding scheme as prepared by \code{\link[=get_units]{get_units()}} with setting the argument \code{coding_scheme = TRUE}.}
+
+\item{filter_has_codes}{Only returns variables that were not deactivated. Defaults to \code{TRUE}.}
 }
 \value{
 A tibble.
