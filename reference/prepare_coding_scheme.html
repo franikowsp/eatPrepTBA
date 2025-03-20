@@ -38,7 +38,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepare_coding_scheme</span><span class="op">(</span><span class="va">coding_scheme</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepare_coding_scheme</span><span class="op">(</span><span class="va">coding_scheme</span>, filter_has_codes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -47,6 +47,10 @@
 
 <dl><dt id="arg-coding-scheme">coding_scheme<a class="anchor" aria-label="anchor" href="#arg-coding-scheme"></a></dt>
 <dd><p>Coding scheme as prepared by <code><a href="get_units.html">get_units()</a></code> with setting the argument <code>coding_scheme = TRUE</code>.</p></dd>
+
+
+<dt id="arg-filter-has-codes">filter_has_codes<a class="anchor" aria-label="anchor" href="#arg-filter-has-codes"></a></dt>
+<dd><p>Only returns variables that were not deactivated. Defaults to <code>TRUE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
