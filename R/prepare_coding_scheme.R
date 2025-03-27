@@ -14,7 +14,6 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
     return(tibble::tibble())
   }
 
-  # TODO: alias fliegt hier gelegentlich raus!
   scheme_table <-
     coding_scheme %>%
     jsonlite::parse_json() %>%
@@ -22,12 +21,16 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
     purrr::list_transpose() %>%
     tibble::as_tibble()
 
+  # scheme_table %>%
+  #   tibble::enframe() %>%
+  #   tidyr::pivot_wider()
+
   # For legacy reasons, this has to be added
   # TODO: Can this be removed at a later point in time?
   if (tibble::has_name(scheme_table, "alias")) {
     unit_cols <- c(
-      variable_ref = "id",
-      variable_id = "alias"
+      variable_id = "alias",
+      variable_ref = "id"
     )
 
     scheme_table <-
@@ -54,7 +57,7 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
 
   prepared_scheme <-
     scheme_table %>%
-    dplyr::rename(any_of(c(
+    dplyr::select(any_of(c(
       unit_cols,
       # TODO: This might replace the page identifier for marker items and derived variables
       variable_label = "label",
