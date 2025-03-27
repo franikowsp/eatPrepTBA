@@ -16,6 +16,7 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
 
   scheme_table <-
     coding_scheme %>%
+    jsonlite::parse_json() %>%
     purrr::pluck("variableCodings") %>%
     purrr::list_transpose() %>%
     tibble::as_tibble()

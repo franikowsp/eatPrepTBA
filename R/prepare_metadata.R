@@ -1,10 +1,22 @@
-prepare_metadata <- function(unit, resp_metadata, workspace) {
-  str_replacements <- "[-:/ ]+"
+str_replacements <- "[-:/ ]+"
 
+prepare_metadata <- function(unit_metadata) {
   # Unit metadata
-  if (!is.null(resp_metadata$metadata$profiles)) {
+  unit_profiles <- read_unit_profiles(unit_metadata)
+  items_profiles <- read_items_profiles(unit_metadata)
+  items_list <- read_items_list(unit_metadata)
+
+  tibble::tibble(
+    unit_profiles = list(unit_profiles),
+    items_list = list(items_list),
+    items_profiles = list(items_profiles),
+  )
+}
+
+read_unit_profiles <- function(unit_metadata) {
+  if (!is.null(unit_metadata$profiles) && length(unit_metadata$profiles) > 0) {
     unit_profiles_prep <-
-      resp_metadata$metadata$profiles %>%
+      unit_metadata$profiles %>%
       purrr::keep("isCurrent") %>%
       purrr::pluck(1, "entries") %>%
       purrr::map(function(x) {
@@ -43,47 +55,13 @@ prepare_metadata <- function(unit, resp_metadata, workspace) {
       )
   }
 
-  # Item metadata
-  if (length(resp_metadata$metadata$items) != 0) {
-    items_meta <-
-      resp_metadata$metadata$items %>%
-      purrr::map(function(x) {
-        purrr::discard(x, .p = names(x) == "profiles") %>%
-          purrr::map(function(x) if (is.null(x)) NA else x) %>%
-          tibble::as_tibble()
-      }) %>%
-      tibble::enframe(name = "item") %>%
-      tidyr::unnest(value) %>%
-      dplyr::rename(any_of(c(
-        item_no = "item",
-        item_id = "id",
-        variable_id = "variableId",
-        variable_ref = "variableReadOnlyId"
-      )))
+  return(unit_profiles)
+}
 
-    if (tibble::has_name(items_meta, "description")) {
-      items_meta <-
-        items_meta %>%
-        dplyr::rename(
-          item_description = description
-        )
-    }
-  } else {
-    items_meta <-
-      tibble::tibble(
-        item_id = NA_character_,
-        variable_id = NA_character_,
-        profile_name = "Itemformat",
-        value_id = NA_character_,
-        value_text = ""
-      )
-  }
-
-  # !is.null(unit$metadata$items %>% purrr::map("profiles") %>% purrr::reduce(c)) &&
-
-  if (length(resp_metadata$metadata$items) != 0) {
+read_items_profiles <- function(unit_metadata) {
+  if (!is.null(unit_metadata$items) && length(unit_metadata$items) != 0) {
     items_profiles <-
-      resp_metadata$metadata$items %>%
+      unit_metadata$items %>%
       purrr::map(function(x) {
         x %>%
           purrr::pluck("profiles") %>%
@@ -135,21 +113,48 @@ prepare_metadata <- function(unit, resp_metadata, workspace) {
       )
   }
 
-  # TODO: Add this to the global workspace object
-  ws_info <-
-    get_settings(workspace, metadata = FALSE) %>%
-    dplyr::select(
-      ws_id, ws_label, wsg_id, wsg_label
-    )
+  return(items_profiles)
+}
 
-  unit %>%
-    dplyr::mutate(
-      ws_info = ws_info
-    ) %>%
-    tidyr::unnest(ws_info) %>%
-    dplyr::mutate(
-      unit_profiles = list(unit_profiles),
-      items_meta = list(items_meta),
-      items_profiles = list(items_profiles),
-    )
+read_items_list <- function(unit_metadata) {
+  if (!is.null(unit_metadata$items) && length(unit_metadata$items) != 0) {
+    items_list <-
+      unit_metadata$items %>%
+      purrr::map(function(x) {
+        purrr::discard(x, .p = names(x) == "profiles") %>%
+          purrr::map(function(x) if (is.null(x)) NA else x) %>%
+          tibble::as_tibble()
+      }) %>%
+      tibble::enframe(name = "item") %>%
+      tidyr::unnest(value) %>%
+      dplyr::select(any_of(c(
+        item_uuid = "uuid",
+        item_no = "item",
+        item_id = "id",
+        variable_id = "variableId",
+        variable_ref = "variableReadOnlyId",
+        item_order = "order",
+        item_locked = "locked",
+        item_position = "position",
+        item_weighting = "weighting",
+        item_created = "createdAt",
+        item_changed = "changedAt"
+      )))
+
+    if (tibble::has_name(items_list, "description")) {
+      items_list <-
+        items_list %>%
+        dplyr::rename(
+          item_description = description
+        )
+    }
+  } else {
+    items_list <-
+      tibble::tibble(
+        item_id = NA_character_,
+        variable_id = NA_character_
+      )
+  }
+
+  return(items_list)
 }
