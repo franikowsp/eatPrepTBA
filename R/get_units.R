@@ -59,7 +59,6 @@ setMethod("get_units",
               }
             }
 
-
             run_req <- function() {
               base_req(method = "GET",
                        endpoint = c("workspaces", ws_id, "units", "properties")) %>%
@@ -113,11 +112,13 @@ setMethod("get_units",
                   .after = "group_name"
                 )
 
+              # units_new %>% dplyr::mutate(no = seq_along(ws_id)) %>% dplyr::filter(unit_key == "EL_FF02") %>% .$no
+
               if (!is.null(units_old)) {
                 # Filter for units that are available (automatic update)
                 units_old <-
                   units_old %>%
-                  dplyr::semi_join(units %>% dplyr::select(unit_id), by = dplyr::join_by("unit_id"))
+                  dplyr::semi_join(units_new %>% dplyr::select(unit_id), by = dplyr::join_by("unit_id"))
 
                 units_change_old <-
                   units_old %>%
@@ -212,37 +213,41 @@ read_unit <- function(unit) {
 
   variables <-
     unit %>%
-    purrr::pluck("variables") %>%
-    purrr::list_transpose() %>%
-    tibble::as_tibble() %>%
-    dplyr::select(
-      dplyr::any_of(c(
-        "variable_id" = "alias",
-        "variable_ref" = "id",
-        "variable_page" = "page",
-        "variable_type" = "type",
-        "variable_format" = "format",
-        "variable_values" = "values",
-        "variable_multiple" = "multiple",
-        "variable_nullable" = "nullable",
-        "values_complete" = "valuesComplete",
-        "value_position_labels" = "valuePositionLabels"
-      ))
-    ) %>%
-    dplyr::mutate(
-      variable_values = purrr::map(variable_values, function(x) {
-        if (length(x) == 0) {
-          out <- tibble::tibble(value = NA, value_label = NA)
-        } else {
-          out <- x %>%
-            purrr::list_transpose() %>%
-            tibble::as_tibble() %>%
-            dplyr::rename(dplyr::any_of(c(
-              "value_label" = "label"
-            )))
-        }
-      })
-    )
+    purrr::pluck("variables")
+
+  if (length(variables) > 0) {
+    variables %>%
+      purrr::list_transpose() %>%
+      tibble::as_tibble() %>%
+      dplyr::select(
+        dplyr::any_of(c(
+          "variable_id" = "alias",
+          "variable_ref" = "id",
+          "variable_page" = "page",
+          "variable_type" = "type",
+          "variable_format" = "format",
+          "variable_values" = "values",
+          "variable_multiple" = "multiple",
+          "variable_nullable" = "nullable",
+          "values_complete" = "valuesComplete",
+          "value_position_labels" = "valuePositionLabels"
+        ))
+      ) %>%
+      dplyr::mutate(
+        variable_values = purrr::map(variable_values, function(x) {
+          if (length(x) == 0) {
+            out <- tibble::tibble(value = NA, value_label = NA)
+          } else {
+            out <- x %>%
+              purrr::list_transpose() %>%
+              tibble::as_tibble() %>%
+              dplyr::rename(dplyr::any_of(c(
+                "value_label" = "label"
+              )))
+          }
+        })
+      )
+  }
 
   unit_prepared %>%
     dplyr::mutate(

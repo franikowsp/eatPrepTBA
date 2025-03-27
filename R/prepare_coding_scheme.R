@@ -14,6 +14,7 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
     return(tibble::tibble())
   }
 
+  # TODO: alias fliegt hier gelegentlich raus!
   scheme_table <-
     coding_scheme %>%
     jsonlite::parse_json() %>%
