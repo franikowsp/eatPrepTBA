@@ -62,9 +62,8 @@ setMethod("change_unit_settings",
             }
 
             # For the error message
-            url <- glue::glue("https://www.iqb-studio.de/#/a/{ws_id}/{unit_id}/properties")
-
-            message <- glue::glue("Settings could not be changed for unit with id {unit_id} {.url {url}}.")
+            message <- glue::glue("Settings could not be changed for unit with
+                                  id {{.unit-id {unit_id}}} {{.url https://www.iqb-studio.de/#/a/{ws_id}/{unit_id}/properties}.")
 
             run_safe(run_req,
                      error_message = message)
