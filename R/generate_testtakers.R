@@ -268,7 +268,7 @@ prepare_testtaker_groups <- function(testtakers) {
   booklets <-
     testtakers %>%
     dplyr::filter(
-      dplyr::if_any(dplyr::any_of("booklet_id"), .fns = function(x) !is.na)
+      dplyr::if_any(dplyr::any_of("booklet_id"), .fns = function(x) !is.na(x))
     ) %>%
     dplyr::select(
       "name" = "login_name",
