@@ -56,14 +56,14 @@ setMethod("change_unit_settings",
 
             run_req <- function() {
               base_req(method = "PATCH",
-                       endpoint = c("workspaces", ws_id, "units", unit_id, "metadata")) %>%
+                       endpoint = c("workspaces", ws_id, "units", unit_id, "properties")) %>%
                 httr2::req_body_json(data = body, auto_unbox = TRUE) %>%
                 httr2::req_perform()
             }
 
             # For the error message
             message <- glue::glue("Settings could not be changed for unit with
-                                  id {{.unit-id {unit_id}}} {{.url https://www.iqb-studio.de/#/a/{ws_id}/{unit_id}/properties}.")
+                                  id {{.unit-id {unit_id}}} {{.url https://www.iqb-studio.de/#/a/{ws_id}/{unit_id}/properties}}.")
 
             run_safe(run_req,
                      error_message = message)
