@@ -6,41 +6,24 @@
 \alias{get_units,WorkspaceStudio-method}
 \title{Get multiple units with resources}
 \usage{
-get_units(
-  workspace,
-  unit_ids = NULL,
-  metadata = TRUE,
-  unit_definition = FALSE,
-  coding_scheme = FALSE,
-  verbose = FALSE
-)
+get_units(workspace, units = NULL, metadata = TRUE, unit_definition = FALSE)
 
-\S4method{get_units}{WorkspaceStudio}(
-  workspace,
-  unit_ids = NULL,
-  metadata = TRUE,
-  unit_definition = FALSE,
-  coding_scheme = FALSE
-)
+\S4method{get_units}{WorkspaceStudio}(workspace, units = NULL, metadata = TRUE, unit_definition = FALSE)
 }
 \arguments{
 \item{workspace}{\linkS4class{Workspace}. Workspace information necessary to retrieve unit information and resources from the API.}
 
-\item{unit_ids}{Integer (optional). Vector of the IDs of the unit to be retrieved. If no ID is given, all units files and their resources in the workspace are retrieved.}
+\item{units}{Tibble. Recently queried units of this workspace that should be updated. Please note that units that are no longer in the workspace will automatically be deleted by the procedure.}
 
 \item{metadata}{Logical. Should the metadata be added? Defaults to \code{TRUE}.}
 
-\item{unit_definition}{Logical. Should the unit definition be added? Defaults to \code{FALSE}.}
-
-\item{coding_scheme}{Logical. Should the coding scheme be added? Defaults to \code{FALSE}.}
-
-\item{verbose}{Logical. Should the function return additional messages. Defaults to \code{FALSE}.}
+\item{unit_definition}{Logical. Should the unit definition be added? Defaults to \code{FALSE}. This function also infers the pages of the variables from the unit definition.}
 }
 \value{
 A tibble.
 }
 \description{
-This function returns the unit information for multiple units by repeatedly calling \code{\link[=get_unit]{get_unit()}}.
+This function returns the unit information for multiple units.
 }
 \section{Functions}{
 \itemize{
