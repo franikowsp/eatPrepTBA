@@ -43,13 +43,15 @@ setMethod("add_metadata",
               # TODO: Remove this in 2026 (all relevant units should have updated metdata profiles)
               dplyr::rowwise() %>%
               dplyr::mutate(
-                unit_has_uuids = dplyr::if_else(
-                  "item_uuid" %in% names(.),
-                  !is.na(item_uuid),
-                  FALSE
-                )
+                unit_has_uuids = dplyr::if_any(dplyr::any_of("item_uuid"), ~ !is.na(.), .default = FALSE)
               ) %>%
-              dplyr::ungroup()
+              {
+                if ("item_uuid" %in% names(.)) {
+                  dplyr::mutate(., unit_has_uuids = !is.na(item_uuid))
+                } else {
+                  dplyr::mutate(., unit_has_uuids = FALSE)
+                }
+              }
 
             items_meta <-
               units %>%
