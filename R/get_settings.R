@@ -28,7 +28,7 @@ setMethod("get_settings",
             ws_general <-
               tibble::tibble(
                 ws_id = as.integer(ws_id),
-                ws_label = workspace@wsg_label,
+                ws_label = workspace@ws_label,
                 wsg_id = as.integer(wsg_id),
                 wsg_label = workspace@wsg_label,
               )
