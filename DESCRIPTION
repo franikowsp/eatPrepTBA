@@ -33,6 +33,7 @@ Imports:
     stringr,
     tibble,
     tidyr,
+    utils,
     xml2
 Suggests: 
     knitr,
