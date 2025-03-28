@@ -21,10 +21,6 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
     purrr::list_transpose() %>%
     tibble::as_tibble()
 
-  # scheme_table %>%
-  #   tibble::enframe() %>%
-  #   tidyr::pivot_wider()
-
   # For legacy reasons, this has to be added
   # TODO: Can this be removed at a later point in time?
   if (tibble::has_name(scheme_table, "alias")) {

@@ -1,4 +1,5 @@
 str_replacements <- "[-:/ ]+"
+str_removals <- "\\(\\)"
 
 prepare_metadata <- function(unit_metadata) {
   # Unit metadata
@@ -27,7 +28,7 @@ read_unit_profiles <- function(unit_metadata) {
           # This must be unique
           tidyr::pivot_wider(values_fn = function(x) stringr::str_c(x, collapse = ";.;.;"))
       }) %>%
-      purrr::reduce(dplyr::bind_rows)
+      purrr::reduce(dplyr::bind_rows, .init = tibble::tibble())
 
     value_id_exists <- tibble::has_name(unit_profiles_prep, "value.id")
     value_text_exists <- tibble::has_name(unit_profiles_prep, "valueAsText.value")
@@ -37,14 +38,21 @@ read_unit_profiles <- function(unit_metadata) {
       dplyr::mutate(
         value.id = if (value_id_exists) value.id else NA,
         valueAsText.value = if (value_text_exists) valueAsText.value else NA,
-        dplyr::across(c(value.id, valueAsText.value), function(x) stringr::str_split(x, ";.;.;")),
-        profile_name = stringr::str_replace_all(label.value, str_replacements, "_")
+        dplyr::across(dplyr::any_of(c("value.id", "valueAsText.value")),
+                      function(x) stringr::str_split(x, ";.;.;")),
+        dplyr::across(dplyr::any_of(c("label.value")),
+                      function(x) stringr::str_replace_all(x, str_replacements, "_") %>%
+                        stringr::str_remove_all(str_removals))
       ) %>%
       tidyr::unnest(c(value.id, valueAsText.value)) %>%
       dplyr::select(
-        profile_name,
-        value_id = value.id,
-        value_text = valueAsText.value
+        dplyr::any_of(
+          c(
+            profile_name = "label.value",
+            value_id = "value.id",
+            value_text = "valueAsText.value"
+          )
+        )
       )
   } else {
     unit_profiles <-
