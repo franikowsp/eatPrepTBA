@@ -49,8 +49,9 @@ reference:
   - get_reviews
   - compute_sizes
 - subtitle: Functions for units
-  contents: add_metadata
-  contents: add_coding_scheme
+  contents:
+  - add_metadata
+  - add_coding_scheme
 - title: Managing studies
   desc: |
     Functions to check units, prepare material for administration and coding
