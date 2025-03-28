@@ -5,16 +5,14 @@
 \alias{add_metadata,WorkspaceStudio-method}
 \title{Add metadata to units}
 \usage{
-add_metadata(workspace, units, verbose = FALSE)
+add_metadata(workspace, units)
 
-\S4method{add_metadata}{WorkspaceStudio}(workspace, units, verbose = FALSE)
+\S4method{add_metadata}{WorkspaceStudio}(workspace, units)
 }
 \arguments{
 \item{workspace}{\linkS4class{WorkspaceStudio}. Workspace information necessary to retrieve the unit and item metadata from the API.}
 
 \item{units}{Tibble holding units retrieved from \code{\link[=get_units]{get_units()}}.}
-
-\item{verbose}{Logical. If \code{TRUE}, additional information is printed. Defaults to \code{FALSE}.}
 }
 \value{
 A tibble.
