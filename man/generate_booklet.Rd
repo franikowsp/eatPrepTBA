@@ -11,7 +11,7 @@ generate_booklet(
   booklet_configuration = NULL,
   units = NULL,
   testlets = NULL,
-  app_version = "16.0.0",
+  app_version = "16.0.2",
   login = NULL
 )
 }
@@ -36,5 +36,5 @@ generate_booklet(
 A booklet XML.
 }
 \description{
-Generates booklets XML from unit information
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 }

@@ -9,6 +9,9 @@
 #' @param app_version Version of the target Testcenter instance. Defaults to `"16.0.0"`.
 #' @param login Target Testcenter instance. If it is available, the `app_version` will be overwritten.
 #'
+#' @description
+#' `r lifecycle::badge("deprecated")`
+#'
 #' @return A booklet XML.
 #' @export
 generate_booklet <- function(booklet_id,
@@ -17,7 +20,7 @@ generate_booklet <- function(booklet_id,
                              booklet_configuration = NULL,
                              units = NULL,
                              testlets = NULL,
-                             app_version = "16.0.0",
+                             app_version = "16.0.2",
                              login = NULL) {
   cli_setting()
 
