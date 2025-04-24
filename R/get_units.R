@@ -105,12 +105,17 @@ setMethod("get_units",
                 dplyr::mutate(
                   # Fresh units might not have a state
                   state_id = ifelse("state_id" %in% names(.), state_id, NA)
-                ) %>%
-                dplyr::left_join(ws_states, by = dplyr::join_by("state_id")) %>%
-                dplyr::relocate(
-                  names(ws_states),
-                  .after = "group_name"
                 )
+
+              if (!is.null(ws_states)) {
+                units_new <-
+                  units_new %>%
+                  dplyr::left_join(ws_states, by = dplyr::join_by("state_id"), copy = TRUE) %>%
+                  dplyr::relocate(
+                    names(ws_states),
+                    .after = "group_name"
+                  )
+              }
 
               # units_new %>% dplyr::mutate(no = seq_along(ws_id)) %>% dplyr::filter(unit_key == "EL_FF02") %>% .$no
 

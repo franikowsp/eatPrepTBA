@@ -134,8 +134,8 @@ generate_testtakers <- function(testtakers,
     list(
       Testtakers = list(
         c(list(Metadata = Metadata,
-               Profiles = Profiles,
-               CustomTexts = CustomTexts),
+               CustomTexts = CustomTexts,
+               Profiles = Profiles),
           TesttakerGroups),
         "xmlns:xsi" = "http://www.w3.org/2001/XMLSchema-instance",
         "xsi:noNamespaceSchemaLocation" = stringr::str_glue("https://raw.githubusercontent.com/iqb-berlin/testcenter/{app_version}/definitions/vo_Testtakers.xsd")
