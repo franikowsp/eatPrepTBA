@@ -12,7 +12,7 @@
 generate_testtakers <- function(testtakers,
                                 custom_texts = NULL,
                                 profiles = NULL,
-                                app_version = "16.0.0",
+                                app_version = "16.0.2",
                                 login = NULL) {
   cli_setting()
 

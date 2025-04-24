@@ -68,6 +68,7 @@ reference:
   contents:
   - generate_testtakers
   - generate_booklet
+  - generate_booklets
   - upload_file
 - subtitle: Work with data from IQB Testcenter
   contents:
