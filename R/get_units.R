@@ -176,12 +176,12 @@ setMethod("get_units",
               }
 
               if (unit_definition | (!is.null(units_old) && tibble::has_name(units_no_update, "unit_definition"))) {
-                units_to_update <- read_definition(units = units_to_update)
+                units_to_update <- read_definition(units = units_to_update, base_req = base_req)
 
                 if (!is.null(units_old) && !tibble::has_name(units_no_update, "unit_definition")) {
                   cli::cli_alert_info("Adding unit definitions of supplied units.")
 
-                  units_no_update <- read_definition(units = units_no_update)
+                  units_no_update <- read_definition(units = units_no_update, base_req = base_req)
                 }
               }
 
@@ -262,7 +262,7 @@ read_unit <- function(unit) {
     )
 }
 
-get_definition <- function(unit_key, ws_id, unit_id) {
+get_definition <- function(unit_key, ws_id, unit_id, base_req) {
   run_req_definition <- function() {
     base_req(method = "GET",
              endpoint = c("workspaces", ws_id, "units", unit_id, "definition")) %>%
@@ -283,7 +283,7 @@ get_definition <- function(unit_key, ws_id, unit_id) {
   }
 }
 
-read_definition <- function(units) {
+read_definition <- function(units, base_req) {
   unit_keys <- units$unit_key
 
   if (length(unit_keys) > 0) {
@@ -291,7 +291,7 @@ read_definition <- function(units) {
       dplyr::mutate(
         unit_definition = purrr::pmap(
           list(unit_key, ws_id, unit_id),
-          get_definition,
+          function(unit_key, ws_id, unit_id) get_definition(unit_key, ws_id, unit_id, base_req),
           .progress = list(
             type ="custom",
             extra = list(
