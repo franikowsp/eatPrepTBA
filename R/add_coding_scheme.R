@@ -1,4 +1,4 @@
-#' Get multiple units with resources
+#' Adds prepared coding scheme to units
 #'
 #' @param units Tibble holding units retrieved from [get_units()].
 #' @param filter_has_codes Only returns variables that were not deactivated. Defaults to `TRUE`.

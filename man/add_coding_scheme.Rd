@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_coding_scheme.R
 \name{add_coding_scheme}
 \alias{add_coding_scheme}
-\title{Get multiple units with resources}
+\title{Adds prepared coding scheme to units}
 \usage{
 add_coding_scheme(units, filter_has_codes = TRUE)
 }
