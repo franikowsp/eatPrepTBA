@@ -28,7 +28,6 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
       dplyr::mutate(
         alias = id
       )
-
   }
 
   scheme_table <-
@@ -39,9 +38,7 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
     )
 
   # Level of variable in dependency tree (makes it easier to search for dependencies)
-  source_tree <-
-    coding_scheme %>%
-    prepare_source_tree()
+  source_tree <- prepare_source_tree(coding_scheme)
 
   prepared_scheme <-
     scheme_table %>%
@@ -52,8 +49,7 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
       variable_label = "label",
       source_type = "sourceType",
       source_parameters = "sourceParameters",
-      # Removed as this is not really helpful anymore
-      # derive_sources = "deriveSources",
+      derive_sources = "deriveSources",
       processing = "processing",
       fragmenting = "fragmenting",
       general_instruction = "manualInstruction",

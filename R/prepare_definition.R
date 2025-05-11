@@ -5,22 +5,42 @@ prepare_definition <- function(resp_definition) {
 
   # TODO: If this comes directly from the IQB Studio, this
   # will no longer be necessary
+  # Marking panels should also be added to connect these with the variables for
+  # replay mode
   variable_pages <-
     unit_definition$pages %>%
-    purrr::keep(function(x) !x$alwaysVisible) %>%
-    purrr::map(function(page) {
-      get_deepest_elements(page, label = "id") %>%
+    purrr::imap(function(page, i) {
+      variable_page_always_visible <-
+        get_deepest_elements(page, label = "alwaysVisible") %>%
         purrr::list_simplify()
+
+      variable_ref <-
+        get_deepest_elements(page, label = c("id")) %>%
+        purrr::list_simplify()
+
+      # variable_marker <-
+      #   get_deepest_elements(page, label = "markingPanels") %>%
+      #   purrr::list_flatten()
+
+      list(
+        variable_page = i,
+        variable_ref = variable_ref,
+        variable_page_always_visible = variable_page_always_visible#,
+        # variable_marker = variable_marker
+      )
     }) %>%
-    tibble::enframe(name = "page",
-                    value = "variable_id") %>%
-    tidyr::unnest(variable_id) %>%
+    purrr::list_transpose() %>%
+    tibble::as_tibble() %>%
+    tidyr::unnest(variable_ref) %>%
+    dplyr::group_by(variable_page_always_visible) %>%
     dplyr::mutate(
-      page = page - 1
-    )
+      # TODO: Are these pages in order?!
+      variable_page = variable_page - min(variable_page)
+    ) %>%
+    dplyr::ungroup()
 
   tibble::tibble(
-      unit_definition = list(unit_definition),
-      variable_pages = list(variable_pages)
-    )
+    unit_definition = list(unit_definition),
+    variable_pages = list(variable_pages)
+  )
 }
