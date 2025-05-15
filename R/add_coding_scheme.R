@@ -106,7 +106,7 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
                           variable_source_page = variable_page,
                           variable_source_page_always_visible = variable_page_always_visible),
           by = dplyr::join_by("ws_id", "unit_id", "unit_key", "variable_source_ref")
-        ) %>%
+        )
         tidyr::nest(variable_sources = dplyr::starts_with("variable_source"))
     } else {
       units_st_nest <-

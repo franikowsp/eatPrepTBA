@@ -15,7 +15,7 @@ prepare_definition <- function(resp_definition) {
         purrr::list_simplify()
 
       variable_ref <-
-        get_deepest_elements(page, label = c("id")) %>%
+        get_deepest_elements(page, label = "id", no_parent = "visibilityRules") %>%
         purrr::list_simplify()
 
       # variable_marker <-
