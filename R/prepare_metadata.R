@@ -67,7 +67,7 @@ read_unit_profiles <- function(unit_metadata) {
 }
 
 read_items_profiles <- function(unit_metadata) {
-  if (!is.null(unit_metadata$items) && length(unit_metadata$items) != 0) {
+  if (!is.null(unit_metadata$items) && length(purrr::compact(unit_metadata$items)) != 0) {
     items_profiles <-
       unit_metadata$items %>%
       purrr::map(function(x) {
@@ -125,7 +125,7 @@ read_items_profiles <- function(unit_metadata) {
 }
 
 read_items_list <- function(unit_metadata) {
-  if (!is.null(unit_metadata$items) && length(unit_metadata$items) != 0) {
+  if (!is.null(unit_metadata$items) && length(purrr::compact(unit_metadata$items)) != 0) {
     items_list <-
       unit_metadata$items %>%
       purrr::map(function(x) {
@@ -154,6 +154,14 @@ read_items_list <- function(unit_metadata) {
         items_list %>%
         dplyr::rename(
           item_description = description
+        )
+    }
+
+    if (nrow(items_list) == 0) {
+      items_list <-
+        tibble::tibble(
+          item_id = NA_character_,
+          variable_id = NA_character_
         )
     }
   } else {
