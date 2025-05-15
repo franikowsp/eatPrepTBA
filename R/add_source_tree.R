@@ -31,11 +31,22 @@ add_source_tree <- function(units, filter_has_codes = TRUE) {
       variable_source_ref = variable_ref
     )
 
+  units_cs_unnest <-
+    units_cs %>%
+    tidyr::unnest(variable_sources, keep_empty = TRUE)
+
+  if (tibble::has_name(units_cs, "variable_source_ref")) {
+    units_cs_unnest %>%
+      dplyr::left_join(source_ids,
+                       by = dplyr::join_by(
+                         "unit_key",
+                         "variable_source_ref"))
+  } else {
+    units_cs_unnest %>%
+      dplyr::mutate(
+        variable_source_id = NA_character_,
+        variable_source_ref = NA_character_
+      )
+  }
   # Add ids
-  units_cs %>%
-    tidyr::unnest(variable_sources, keep_empty = TRUE) %>%
-    dplyr::left_join(source_ids,
-                     by = dplyr::join_by(
-                       "unit_key",
-                       "variable_source_ref"))
 }

@@ -63,7 +63,7 @@ setMethod("get_units",
               base_req(method = "GET",
                        endpoint = c("workspaces", ws_id, "units", "properties")) %>%
                 httr2::req_perform() %>%
-                httr2::resp_body_json()
+                httr2::resp_body_json(check_type = TRUE)
             }
 
             resp_metadata <-
@@ -240,6 +240,9 @@ read_unit <- function(unit) {
         ))
       ) %>%
       dplyr::mutate(
+        # This could be a bug when calling units
+        dplyr::across(dplyr::any_of(c("variable_multiple", "variable_nullable", "values_complete")),
+                      function(x) if (is.character(x)) stringr::str_to_upper(x) %>% as.logical() else x),
         variable_values = purrr::map(variable_values, function(x) {
           if (length(x) == 0) {
             out <- tibble::tibble(value = NA, value_label = NA)
