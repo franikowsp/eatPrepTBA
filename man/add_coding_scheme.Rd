@@ -15,5 +15,5 @@ add_coding_scheme(units, filter_has_codes = TRUE)
 A tibble.
 }
 \description{
-This function is called within \code{\link[=add_coding_scheme]{add_coding_scheme()}} to extend the \code{variable_sources}.
+This function is called within \code{\link[=add_coding_scheme]{add_coding_scheme()}} to extend the \code{variable_sources}. The function can also propose variable pages if \code{\link[=get_units]{get_units()}} was called with \code{unit_definition = TRUE}.
 }

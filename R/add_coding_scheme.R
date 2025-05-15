@@ -26,12 +26,16 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
             "ws_id",
             "ws_label",
             "unit_id",
-            "unit_key",
             "unit_label",
-            "schemer",
-            "scheme_type",
+            "unit_key",
             "coding_scheme",
             "unit_variables"
+          )
+        ),
+        dplyr::any_of(
+          c(
+            "schemer",
+            "scheme_type"
           )
         )
       ) %>%
@@ -106,7 +110,7 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
                           variable_source_page = variable_page,
                           variable_source_page_always_visible = variable_page_always_visible),
           by = dplyr::join_by("ws_id", "unit_id", "unit_key", "variable_source_ref")
-        )
+        ) %>%
         tidyr::nest(variable_sources = dplyr::starts_with("variable_source"))
     } else {
       units_st_nest <-
@@ -157,7 +161,13 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
         variable_type = dplyr::coalesce(variable_type, "derived"),
       )
 
-    units_cs
+    units_cs %>%
+      tidyr::nest(
+        variable_codes = dplyr::any_of(c("code_id", "code_label", "code_score",
+                                         "rule_set_operator_and", "rule_operator_and",
+                                         "method", "parameters", "code_manual_instruction", "code_type",
+                                         "value_array_position"))
+      )
   } else {
     units
   }
