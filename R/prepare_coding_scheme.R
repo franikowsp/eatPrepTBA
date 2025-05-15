@@ -21,40 +21,30 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
     purrr::list_transpose() %>%
     tibble::as_tibble()
 
-  # For legacy reasons, this has to be added
-  # TODO: Can this be removed at a later point in time?
-  if (tibble::has_name(scheme_table, "alias")) {
-    unit_cols <- c(
-      variable_id = "alias",
-      variable_ref = "id"
-    )
-
+  # For legacy reasons
+  if (!tibble::has_name(scheme_table, "alias")) {
     scheme_table <-
       scheme_table %>%
-      tidyr::unnest(alias, keep_empty = TRUE) %>%
       dplyr::mutate(
-        alias = ifelse(is.na(alias), id, alias)
+        alias = id
       )
-  } else {
-    unit_cols <- c(
-      variable_id = "id"
-    )
   }
 
-  # Level of variable in dependency tree (makes it easier to search for dependencies)
-  sources <-
-    coding_scheme %>%
-    eatAutoCode::get_dependency_tree() %>%
-    tibble::as_tibble() %>%
-    dplyr::select(
-      variable_id = "id",
-      variable_level = "level"
+  scheme_table <-
+    scheme_table %>%
+    tidyr::unnest(alias, keep_empty = TRUE) %>%
+    dplyr::mutate(
+      alias = ifelse(is.na(alias), id, alias)
     )
+
+  # Level of variable in dependency tree (makes it easier to search for dependencies)
+  source_tree <- prepare_source_tree(coding_scheme)
 
   prepared_scheme <-
     scheme_table %>%
     dplyr::select(any_of(c(
-      unit_cols,
+      variable_id = "alias",
+      variable_ref = "id",
       # TODO: This might replace the page identifier for marker items and derived variables
       variable_label = "label",
       source_type = "sourceType",
@@ -72,7 +62,7 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
         x != "BASE_NO_VALUE"
       } else TRUE
     })) %>%
-    dplyr::left_join(sources, by = dplyr::join_by("variable_id")) %>%
+    dplyr::left_join(source_tree, by = dplyr::join_by("variable_ref")) %>%
     dplyr::mutate(
       codes = purrr::map(codes, prepare_codes)
     ) %>%
