@@ -46,7 +46,8 @@ configure_booklet <- function(
     allow_player_to_terminate_test = c("on", "last_unit", "off"),
     lock_test_on_termination = c("off", "on"),
     ask_for_fullscreen = c("on", "off"),
-    show_fullscreen_button = c("on", "off")
+    show_fullscreen_button = c("on", "off"),
+    show_reload_button = c("on", "off")
 ) {
   ..configuration <-
     list(
@@ -68,7 +69,8 @@ configure_booklet <- function(
       allow_player_to_terminate_test = stringr::str_to_upper(match.arg(allow_player_to_terminate_test)),
       lock_test_on_termination = stringr::str_to_upper(match.arg(lock_test_on_termination)),
       ask_for_fullscreen = stringr::str_to_upper(match.arg(ask_for_fullscreen)),
-      show_fullscreen_button = stringr::str_to_upper(match.arg(show_fullscreen_button))
+      show_fullscreen_button = stringr::str_to_upper(match.arg(show_fullscreen_button)),
+      show_reload_button = stringr::str_to_upper(match.arg(show_reload_button))
     )
 
   ..configuration %>%
