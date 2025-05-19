@@ -53,7 +53,13 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
           clear = FALSE
         ))
       ) %>%
-      tidyr::unnest(coding_scheme)
+      tidyr::unnest(coding_scheme) %>%
+      tidyr::nest(
+        variable_codes = dplyr::any_of(c("code_id", "code_label", "code_score",
+                                         "rule_set_operator_and", "rule_operator_and",
+                                         "method", "parameters", "code_manual_instruction", "code_type",
+                                         "value_array_position"))
+      )
 
     # Derive sources from coding scheme
     units_ds <-
@@ -138,8 +144,7 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
         dplyr::select(-variable_page)
     }
 
-    units_cs <-
-      units_coding %>%
+    units_coding %>%
       dplyr::select(-c(
         # Information is collapsed into the new variable_sources column
         "variable_sources", "derive_sources",
@@ -161,14 +166,6 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
         dplyr::across(c("variable_format"),
                       function(x) dplyr::coalesce(x, "")),
         variable_type = dplyr::coalesce(variable_type, "derived"),
-      )
-
-    units_cs %>%
-      tidyr::nest(
-        variable_codes = dplyr::any_of(c("code_id", "code_label", "code_score",
-                                         "rule_set_operator_and", "rule_operator_and",
-                                         "method", "parameters", "code_manual_instruction", "code_type",
-                                         "value_array_position"))
       )
   } else {
     units
