@@ -35,7 +35,7 @@ add_source_tree <- function(units, filter_has_codes = TRUE) {
     units_cs %>%
     tidyr::unnest(variable_sources, keep_empty = TRUE)
 
-  if (tibble::has_name(units_cs, "variable_source_ref")) {
+  if (tibble::has_name(units_cs_unnest, "variable_source_ref")) {
     units_cs_unnest %>%
       dplyr::left_join(source_ids,
                        by = dplyr::join_by(

@@ -53,7 +53,13 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
           clear = FALSE
         ))
       ) %>%
-      tidyr::unnest(coding_scheme)
+      tidyr::unnest(coding_scheme) %>%
+      tidyr::nest(
+        variable_codes = dplyr::any_of(c("code_id", "code_label", "code_score",
+                                         "rule_set_operator_and", "rule_operator_and",
+                                         "method", "parameters", "code_manual_instruction", "code_type",
+                                         "value_array_position"))
+      )
 
     # Derive sources from coding scheme
     units_ds <-
@@ -98,7 +104,6 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
         ) %>%
         tidyr::unnest(variable_pages)
 
-
       units_st_nest <-
         units_st %>%
         dplyr::left_join(
@@ -113,6 +118,24 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
               variable_source_page_always_visible = "variable_page_always_visible"),
           by = dplyr::join_by("ws_id", "unit_id", "unit_key", "variable_source_ref")
         ) %>%
+        # Infer variable page
+        dplyr::group_by(ws_id, unit_id, unit_key, variable_ref) %>%
+        # dplyr::filter(variable_ref == "01") %>% View()
+        dplyr::mutate(
+          variable_page = dplyr::case_when(
+            !is.na(variable_page) ~ as.character(variable_page),
+            .default = variable_source_page %>% na.omit() %>% unique() %>% stringr::str_c(collapse = ",")
+          ),
+          # If NA, the user would have to take a closer look
+          variable_page_always_visible = dplyr::case_when(
+            !is.na(variable_page_always_visible) ~ variable_page_always_visible,
+            # In case of no 1:1 relatiionship, this should be omitted
+            all(is.na(variable_source_page_always_visible)) ~ NA,
+            all(na.omit(variable_source_page_always_visible)) | all(!na.omit(variable_source_page_always_visible)) ~ any(variable_source_page_always_visible),
+            .default = NA
+          ),
+        ) %>%
+        dplyr::ungroup() %>%
         tidyr::nest(variable_sources = dplyr::starts_with("variable_source"))
     } else {
       units_st_nest <-
@@ -138,8 +161,7 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
         dplyr::select(-variable_page)
     }
 
-    units_cs <-
-      units_coding %>%
+    units_coding %>%
       dplyr::select(-c(
         # Information is collapsed into the new variable_sources column
         "variable_sources", "derive_sources",
@@ -162,16 +184,12 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
                       function(x) dplyr::coalesce(x, "")),
         variable_type = dplyr::coalesce(variable_type, "derived"),
       )
-
-    units_cs %>%
-      tidyr::nest(
-        variable_codes = dplyr::any_of(c("code_id", "code_label", "code_score",
-                                         "rule_set_operator_and", "rule_operator_and",
-                                         "method", "parameters", "code_manual_instruction", "code_type",
-                                         "value_array_position"))
-      )
   } else {
     units
   }
 }
-
+#
+# get_unique <- function(values) {
+#   val <- unique(na.omit(values))
+#   if (length(val) > 0) val else NA
+# }
