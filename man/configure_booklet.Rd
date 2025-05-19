@@ -24,7 +24,8 @@ configure_booklet(
   allow_player_to_terminate_test = c("on", "last_unit", "off"),
   lock_test_on_termination = c("off", "on"),
   ask_for_fullscreen = c("on", "off"),
-  show_fullscreen_button = c("on", "off")
+  show_fullscreen_button = c("on", "off"),
+  show_reload_button = c("on", "off")
 )
 }
 \arguments{
@@ -65,6 +66,8 @@ configure_booklet(
 \item{ask_for_fullscreen}{Tbd.}
 
 \item{show_fullscreen_button}{Tbd.}
+
+\item{show_reload_button}{Tbd.}
 }
 \value{
 A list with a valid booklet configuration.

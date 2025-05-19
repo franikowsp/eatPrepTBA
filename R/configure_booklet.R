@@ -19,6 +19,7 @@
 #' @param lock_test_on_termination Tbd.
 #' @param ask_for_fullscreen Tbd.
 #' @param show_fullscreen_button Tbd.
+#' @param show_reload_button Tbd.
 #'
 #' @return A list with a valid booklet configuration.
 #'
