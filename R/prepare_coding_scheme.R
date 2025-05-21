@@ -99,7 +99,11 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
         dplyr::mutate(
           rules = purrr::map(rules, prepare_rules)
         ) %>%
-        tidyr::unnest(rules, keep_empty = TRUE)
+        tidyr::unnest(rules, keep_empty = TRUE) %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::any_of(c("rule_parameter")),
+                        list_to_character)
+        )
     } else {
       prepared_rule_sets
     }
@@ -199,11 +203,9 @@ prepare_rules <- function(rules) {
 
   if (tibble::has_name(rules, "parameters")) {
     prepared_rules %>%
-      dplyr::rename("rule_parameter" = "parameters")
-      dplyr::mutate(
-        dplyr::across(dplyr::any_of(c("rule_parameter")),
-                      list_to_character)
-      )
+      dplyr::rename(
+        "rule_parameter" = "parameters",
+        "rule_method = method")
   } else {
     prepared_rules
   }
