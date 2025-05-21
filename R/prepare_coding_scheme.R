@@ -126,7 +126,7 @@ prepare_rule_sets <- function(rule_sets) {
         # purrr::list_transpose() %>%
         # tibble::as_tibble() %>%
         dplyr::bind_rows() %>%
-        dplyr::rename(any_of(c(
+        dplyr::rename(dplyr::any_of(c(
           rule_operator_and = "ruleOperatorAnd",
           value_array_position = "valueArrayPos"
         )))
@@ -176,6 +176,12 @@ prepare_rules <- function(rules) {
       rules %>%
       tibble::as_tibble()
   }
+
+  prepared_rules <-
+    prepared_rules %>%
+    dplyr::rename(dplyr::any_of(c(
+      rule_fragment = "fragment"
+    )))
 
   if (tibble::has_name(rules, "parameter")) {
     prepared_rules %>%

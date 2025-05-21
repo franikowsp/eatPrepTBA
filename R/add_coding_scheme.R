@@ -57,6 +57,7 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
       tidyr::nest(
         variable_codes = dplyr::any_of(c("code_id", "code_label", "code_score",
                                          "rule_set_operator_and", "rule_operator_and",
+                                         "rule_fragment",
                                          "method", "parameters", "code_manual_instruction", "code_type",
                                          "value_array_position"))
       )
