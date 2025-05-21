@@ -198,14 +198,13 @@ prepare_rules <- function(rules) {
   prepared_rules <-
     prepared_rules %>%
     dplyr::rename(dplyr::any_of(c(
+      rule_method = "method",
       rule_fragment_position = "fragment"
     )))
 
   if (tibble::has_name(rules, "parameters")) {
     prepared_rules %>%
-      dplyr::rename(
-        "rule_parameter" = "parameters",
-        "rule_method = method")
+      dplyr::rename("rule_parameter" = "parameters")
   } else {
     prepared_rules
   }
