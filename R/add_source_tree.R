@@ -19,7 +19,7 @@ add_source_tree <- function(units, filter_has_codes = TRUE) {
       variable_id,
       variable_ref,
       variable_level,
-      source_type,
+      variable_source_type,
       variable_sources
     )
 

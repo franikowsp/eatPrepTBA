@@ -27,20 +27,27 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
             "ws_label",
             "unit_id",
             "unit_label",
-            "unit_key",
-            "coding_scheme",
-            "unit_variables"
+            "unit_key"
           )
         ),
         dplyr::any_of(
           c(
             "schemer",
-            "scheme_type"
+            "scheme_type",
+            "last_change_scheme"
+          )
+        ),
+        dplyr::all_of(
+          c(
+            "coding_scheme",
+            "unit_variables"
           )
         )
       ) %>%
+      # dplyr::slice(9) %>%  #%>% .$coding_scheme %>% .[[1]] -> coding_scheme
       dplyr::mutate(
-        coding_scheme = purrr::map(coding_scheme, function(coding_scheme) {
+        coding_scheme = purrr::imap(coding_scheme, function(coding_scheme, i) {
+          # print(i)
           prepare_coding_scheme(coding_scheme, filter_has_codes = filter_has_codes)
         },
         .progress = list(
@@ -55,11 +62,11 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
       ) %>%
       tidyr::unnest(coding_scheme) %>%
       tidyr::nest(
-        variable_codes = dplyr::any_of(c("code_id", "code_label", "code_score",
-                                         "rule_set_operator_and", "rule_operator_and",
-                                         "rule_fragment",
-                                         "method", "parameters", "code_manual_instruction", "code_type",
-                                         "value_array_position"))
+        variable_codes = dplyr::any_of(c(
+          "code_id", "code_type", "code_label", "code_score",
+          "code_manual_instruction",
+          "rule_set_no", "rule_set_operator", "rule_set_array_position",
+          "rule_operator", "rule_fragment_position", "rule_method", "rule_parameter"))
       )
 
     # Derive sources from coding scheme
@@ -132,16 +139,23 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
             !is.na(variable_page_always_visible) ~ variable_page_always_visible,
             # In case of no 1:1 relatiionship, this should be omitted
             all(is.na(variable_source_page_always_visible)) ~ NA,
-            all(na.omit(variable_source_page_always_visible)) | all(!na.omit(variable_source_page_always_visible)) ~ any(variable_source_page_always_visible),
+            all(na.omit(variable_source_page_always_visible)) | all(!na.omit(variable_source_page_always_visible)) ~
+              any(variable_source_page_always_visible),
             .default = NA
           ),
         ) %>%
         dplyr::ungroup() %>%
-        tidyr::nest(variable_sources = dplyr::starts_with("variable_source"))
+        tidyr::nest(variable_sources = dplyr::any_of(c(
+          "variable_source_id", "variable_source_ref",
+          "variable_source_level", "variable_source_direct",
+          "variable_source_page", "variable_source_page_always_visible")))
     } else {
       units_st_nest <-
         units_st %>%
-        tidyr::nest(variable_sources = dplyr::starts_with("variable_source"))
+        tidyr::nest(variable_sources = dplyr::any_of(c(
+          "variable_source_id", "variable_source_ref",
+          "variable_source_level", "variable_source_direct",
+          "variable_source_page", "variable_source_page_always_visible")))
     }
 
     # Add unit variables
@@ -173,7 +187,7 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
         units_st_nest,
         by = dplyr::join_by("ws_id", "unit_id",
                             "unit_key", "variable_id", "variable_ref", "variable_level",
-                            "source_type")
+                            "variable_source_type")
       ) %>%
       dplyr::left_join(
         units_uv,
