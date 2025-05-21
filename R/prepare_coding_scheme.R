@@ -47,30 +47,37 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
       variable_ref = "id",
       # TODO: This might replace the page identifier for marker items and derived variables
       variable_label = "label",
-      source_type = "sourceType",
-      source_parameters = "sourceParameters",
+      variable_source_type = "sourceType",
+      variable_source_parameters = "sourceParameters",
       derive_sources = "deriveSources",
-      processing = "processing",
-      fragmenting = "fragmenting",
-      general_instruction = "manualInstruction",
-      code_model = "codeModel",
-      page = "page",
+      variable_processing = "processing",
+      variable_fragmenting = "fragmenting",
+      variable_general_instruction = "manualInstruction",
+      variable_code_model = "codeModel",
+      # TODO: This is the page identifier, but it is still buggy
+      variable_page_ref = "page",
       codes = "codes"
     ))) %>%
-    dplyr::filter(dplyr::if_any(c("source_type"), function(x) {
+    dplyr::filter(dplyr::if_any(c("variable_source_type"), function(x) {
       if (filter_has_codes) {
         x != "BASE_NO_VALUE"
       } else TRUE
     })) %>%
     dplyr::left_join(source_tree, by = dplyr::join_by("variable_ref")) %>%
     dplyr::mutate(
+      variable_source_parameters = purrr::map(variable_source_parameters, function(source_parameters) {
+        tibble::tibble(
+          variable_source_processing = list(source_parameters$processing),
+          variable_source_solver_expression = source_parameters$solverExpression,
+        )
+      }),
       codes = purrr::map(codes, prepare_codes)
     ) %>%
-    tidyr::unnest(codes, keep_empty = TRUE) %>%
+    tidyr::unnest(c(codes, variable_source_parameters), keep_empty = TRUE) %>%
     dplyr::mutate(
-      dplyr::across(dplyr::any_of(c("fragmenting")),
+      dplyr::across(dplyr::any_of(c("variable_fragmenting")),
                     list_to_character),
-      dplyr::across(dplyr::any_of(c("page")),
+      dplyr::across(dplyr::any_of(c("variable_page_ref")),
                     list_to_integer)
     )
 
@@ -80,7 +87,12 @@ prepare_coding_scheme <- function(coding_scheme, filter_has_codes = TRUE) {
       dplyr::mutate(
         rule_sets = purrr::map(rule_sets, prepare_rule_sets)
       ) %>%
-      tidyr::unnest(rule_sets, keep_empty = TRUE)
+      tidyr::unnest(rule_sets, keep_empty = TRUE) %>%
+      dplyr::mutate(
+        # ruleOperatorAnd and ruleSetOpertorAnd will be recoded
+        dplyr::across(dplyr::any_of(c("rule_set_operator", "rule_operator")),
+                      function(x) ifelse(x, "AND", "OR")),
+      )
 
     if (tibble::has_name(prepared_rule_sets, "rules")) {
       prepared_rule_sets %>%
@@ -100,14 +112,14 @@ prepare_codes <- function(codes) {
   codes %>%
     purrr::list_transpose() %>%
     tibble::as_tibble() %>%
-    dplyr::rename(any_of(c(
+    dplyr::select(any_of(c(
       code_id = "id",
+      code_type = "type",
       code_label = "label",
       code_score = "score",
-      rule_set_operator_and = "ruleSetOperatorAnd",
-      rule_sets = "ruleSets",
       code_manual_instruction = "manualInstruction",
-      code_type = "type"
+      rule_set_operator = "ruleSetOperatorAnd",
+      rule_sets = "ruleSets"
     ))
     )
 }
@@ -116,19 +128,21 @@ prepare_rule_sets <- function(rule_sets) {
   if (!is.null(rule_sets)) {
     if (is.null(names(rule_sets)) & length(rule_sets) > 0) {
       rule_sets %>%
-        purrr::map(function(x) x %>%
-                     tibble::as_tibble() %>%
-                     dplyr::mutate(
-                       dplyr::across(dplyr::any_of(c("valueArrayPos")),
-                                     list_to_character)
-                     )
-        ) %>%
+        purrr::imap(function(x, i) {
+          x %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(
+              rule_set_no = i,
+              dplyr::across(dplyr::any_of(c("valueArrayPos")),
+                            list_to_character)
+            )
+        }) %>%
         # purrr::list_transpose() %>%
         # tibble::as_tibble() %>%
         dplyr::bind_rows() %>%
         dplyr::rename(dplyr::any_of(c(
-          rule_operator_and = "ruleOperatorAnd",
-          value_array_position = "valueArrayPos"
+          rule_operator = "ruleOperatorAnd",
+          rule_set_array_position = "valueArrayPos"
         )))
     }
   } else {
@@ -180,12 +194,16 @@ prepare_rules <- function(rules) {
   prepared_rules <-
     prepared_rules %>%
     dplyr::rename(dplyr::any_of(c(
-      rule_fragment = "fragment"
+      rule_fragment_position = "fragment"
     )))
 
-  if (tibble::has_name(rules, "parameter")) {
+  if (tibble::has_name(rules, "parameters")) {
     prepared_rules %>%
-      tidyr::unnest(parameters, keep_empty = TRUE)
+      dplyr::rename("rule_parameter" = "parameters")
+      dplyr::mutate(
+        dplyr::across(dplyr::any_of(c("rule_parameter")),
+                      list_to_character)
+      )
   } else {
     prepared_rules
   }
