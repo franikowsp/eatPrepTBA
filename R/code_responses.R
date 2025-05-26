@@ -188,6 +188,11 @@ code_responses <- function(responses,
 
   progress_bar_format_done <- "Coded {cli::pb_total} unit{?s} in {cli::pb_elapsed}."
 
+  # unit_responses <- responses_for_coding %>% dplyr::slice(123) %>% purrr::pluck("unit_responses", 1)
+  # coding_scheme <- responses_for_coding %>% dplyr::slice(123) %>% purrr::pluck("coding_scheme")
+
+  # save(unit_responses, coding_scheme, file = "D:/data/test-p25.RData")
+
   responses_coded <-
     responses_for_coding %>%
     dplyr::mutate(
@@ -271,9 +276,9 @@ code_unit <- function(unit_responses, coding_scheme) {
       value = purrr::map(value, function(x) {
         if (length(x) > 1) {
           list_vals <- x %>% stringr::str_c(collapse = ",")
-          as.character(stringr::str_glue("[[{list_vals}]]"))
+          stringr::str_glue("[[{list_vals}]]")
         } else {
-          as.character(x)
+          x
         }
       })) %>%
     tidyr::unnest(value, keep_empty = TRUE)
