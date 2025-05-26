@@ -38,19 +38,34 @@ code_responses <- function(responses,
 
   cli::cli_text("Time started: {start_time}")
 
-  cli::cli_h3("Prepare responses")
+  # cli::cli_h3("Prepare responses")
 
-  coding_schemes <-
+  units_prep <-
     units %>%
     dplyr::filter(
       unit_key %in% responses$unit_key
     ) %>%
-    dplyr::select(unit_key, coding_scheme)
+    dplyr::select(ws_id, ws_label, unit_key, unit_id, unit_label, coding_scheme, unit_variables)
+
+  no_coding_schemes <-
+    units_prep %>%
+    dplyr::filter(is.na(coding_scheme))
+
+  coding_schemes <-
+    units_prep %>%
+    dplyr::filter(!is.na(coding_scheme))
+
+  unit_keys_no_cs <- no_coding_schemes$unit_key
+  n_units_no_cs <- length(unique(unit_keys_no_cs))
+
+  if (n_units_no_cs > 0) {
+    cli::cli_alert_info("Identified {n_units_no_cs} units with no coding scheme:")
+    cli::cli_alert("{.unit-key {unit_keys_no_cs}}")
+  }
 
   unit_keys <- coding_schemes$unit_key
   n_units <- length(unique(unit_keys))
-
-  cli::cli_text("Identified {n_units} units that can be coded.")
+  cli::cli_alert_success("Identified {n_units} units that can be coded.")
 
   # Insert manual codes
   if (!is.null(codes_manual) || prepare) {
@@ -58,40 +73,19 @@ code_responses <- function(responses,
 
     coding_schemes_prepared <-
       coding_schemes %>%
-      dplyr::mutate(
-        prepared_coding_schemes = purrr::map(coding_scheme,
-                                             function(cs) {
-                                               cs %>%
-                                                 prepare_coding_scheme() %>%
-                                                 # ... could otherwise not be unpacked
-                                                 dplyr::select(-any_of(c("page",
-                                                                         "fragmenting",
-                                                                         "valueArrayPos",
-                                                                         # TODO: Must urgently be reactivated and integrated!!
-                                                                         "variable_alias")))
-                                             },
-                                             .progress = list(
-                                               type ="custom",
-                                               show_after = 0,
-                                               extra = list(
-                                                 unit_keys = unit_keys
-                                               ),
-                                               format = "Preparing {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
-                                               format_done = "Prepared {cli::pb_total} coding scheme{?s} in {cli::pb_elapsed}.",
-                                               clear = FALSE
-                                             ))
-      ) %>%
-      tidyr::unnest(prepared_coding_schemes) %>%
-      dplyr::select(unit_key, variable_id, source_type, code_id, code_type, code_score, derive_sources)
+      add_coding_scheme() %>%
+      dplyr::select(unit_key, variable_id, variable_source_type, variable_codes)
 
     pcs_variables <-
       coding_schemes_prepared %>%
-      dplyr::distinct(unit_key, variable_id, source_type)
+      dplyr::distinct(unit_key, variable_id, variable_source_type)
 
     pcs_codes <-
       coding_schemes_prepared %>%
-      dplyr::distinct(unit_key, variable_id, code_id, code_type, code_score, derive_sources) %>%
-      dplyr::filter(!is.na(code_id))
+      tidyr::unnest(variable_codes) %>%
+      dplyr::distinct(unit_key, variable_id,
+                      code_id, code_type, code_score) #%>%
+    # dplyr::filter(!is.na(code_id))
   }
 
   if (!is.null(codes_manual)) {
@@ -104,7 +98,7 @@ code_responses <- function(responses,
     pcs_codes_insert <-
       pcs_codes %>%
       dplyr::mutate(status = "CODING_COMPLETE") %>%
-      dplyr::select(-derive_sources, -code_type)
+      dplyr::select(-code_type)
 
     codes_manual_prepared <-
       codes_manual %>%
@@ -174,12 +168,16 @@ code_responses <- function(responses,
     responses_inserted <- responses
   }
 
+  coding_schemes_merge <-
+    coding_schemes %>%
+    dplyr::select(unit_key, coding_scheme)
+
   responses_for_coding <-
     responses_inserted %>%
     tidyr::nest(unit_responses = -any_of(c("unit_key"))) %>%
     # Filter off units without coding scheme
-    dplyr::semi_join(coding_schemes, by = dplyr::join_by("unit_key")) %>%
-    dplyr::left_join(coding_schemes, by = dplyr::join_by("unit_key")) %>%
+    dplyr::semi_join(coding_schemes_merge, by = dplyr::join_by("unit_key")) %>%
+    dplyr::left_join(coding_schemes_merge, by = dplyr::join_by("unit_key")) %>%
     dplyr::arrange(unit_key)
 
   final_unit_keys <- responses_for_coding$unit_key
@@ -207,7 +205,15 @@ code_responses <- function(responses,
           format_done = progress_bar_format_done,
           clear = FALSE
         ))
-    )
+    ) %>%
+    dplyr::select(-dplyr::any_of(c("unit_responses", "coding_scheme"))) %>%
+    tidyr::unnest(unit_codes) %>%
+    dplyr::rename(any_of(c(
+      "variable_id" = "id",
+      "code_id" = "code",
+      "code_score" = "score",
+      "code_status" = "status"
+    )))
 
   if (prepare) {
     tryCatch(
@@ -220,17 +226,21 @@ code_responses <- function(responses,
       },
       # TODO: Does not work if no code_ids are available (e.g., only coding errors)
       responses_coded %>%
-        dplyr::select(-dplyr::any_of(c("unit_responses", "coding_scheme"))) %>%
-        tidyr::unnest(unit_codes) %>%
-        dplyr::rename(variable_id = id, code_id = code) %>%
         tidyr::unnest(value, keep_empty = TRUE) %>%
         dplyr::left_join(pcs_variables, by = dplyr::join_by("unit_key", "variable_id")) %>%
         dplyr::left_join(pcs_codes %>% dplyr::select(unit_key, variable_id, code_id, code_type),
                          by = dplyr::join_by("unit_key", "variable_id", "code_id")) %>%
-        dplyr::rename(any_of(c(
-          "code_score" = "score",
-          "code_status" = "status"
-        ))),
+        dplyr::relocate(
+          dplyr::any_of(c("variable_source_type")),
+          .after = c("variable_id")
+        ) %>%
+        dplyr::relocate(
+          dplyr::any_of(c("code_id",
+                          "code_score",
+                          "code_status",
+                          "code_type")),
+          .after = c("value")
+        ),
       finally = cli::cli_text("Time finished: {Sys.time()}")
     )
   } else {
