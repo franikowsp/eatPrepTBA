@@ -191,10 +191,13 @@ code_responses <- function(responses,
   # unit_responses <- responses_for_coding %>% dplyr::slice(123) %>% purrr::pluck("unit_responses", 1)
   # coding_scheme <- responses_for_coding %>% dplyr::slice(123) %>% purrr::pluck("coding_scheme")
 
-  # save(unit_responses, coding_scheme, file = "D:/data/test-p25.RData")
+  # save(unit_responses, coding_scheme, file = "D:/data/test-vera.RData")
+
+  unit_responses <- test$unit_responses[[1]]
+  coding_scheme <- test$coding_scheme[[1]]
 
   responses_coded <-
-    responses_for_coding %>%
+    responses_for_coding %>% dplyr::slice(2) ->test
     dplyr::mutate(
       unit_codes = purrr::pmap(
         .l = list(unit_responses, coding_scheme),
