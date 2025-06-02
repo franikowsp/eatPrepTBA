@@ -200,8 +200,8 @@ code_responses <- function(responses,
     responses_for_coding %>% #dplyr::slice(2) ->test
     dplyr::mutate(
       unit_codes = purrr::pmap(
-        .l = list(unit_responses, coding_scheme),
-        .f = code_unit,
+        .l = list(coding_scheme, unit_responses),
+        .f = eatAutoCode:::code_responses_array,
         .progress = list(
           type ="custom",
           show_after = 0,
@@ -272,17 +272,17 @@ code_responses <- function(responses,
 #' @keywords internal
 code_unit <- function(unit_responses, coding_scheme) {
   # Müssten einige Variablen nicht noch hoch?
-  eatAutoCode::code_responses_array(coding_scheme, unit_responses) %>%
-    dplyr::mutate(
-      # Values need to be concatenated if they are still lists
-      # Identifier is [] and elements are concatenated with a ,
-      value = purrr::map(value, function(x) {
-        if (length(x) > 1) {
-          list_vals <- x %>% stringr::str_c(collapse = ",")
-          stringr::str_glue("[[{list_vals}]]")
-        } else {
-          x
-        }
-      })) %>%
-    tidyr::unnest(value, keep_empty = TRUE)
+  eatAutoCode::code_responses_array(coding_scheme, unit_responses) #%>%
+    # # dplyr::mutate(
+    # #   # Values need to be concatenated if they are still lists
+    # #   # Identifier is [] and elements are concatenated with a ,
+    # #   value = purrr::map(value, function(x) {
+    # #     if (length(x) > 1) {
+    # #       list_vals <- x %>% stringr::str_c(collapse = ",")
+    # #       stringr::str_glue("[[{list_vals}]]")
+    # #     } else {
+    # #       as.character(x)
+    # #     }
+    # #   })) %>%
+    # tidyr::unnest(value, keep_empty = TRUE)
 }
