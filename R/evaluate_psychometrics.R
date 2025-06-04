@@ -6,6 +6,7 @@
 #' @param max_n_category Tibble. Maximum number of categories to check for category frequencies for list values, e.g., `[[01_1,01_2]]`. Defaults to `10`.
 #' @param overwrite Logical. Should column `unit_codes` be overwritten if they exist on `units`. Defaults to `FALSE`, i.e., `unit_codes` will be used if they were added to `units` beforehand by applying `add_coding_schemes()`.
 #'
+#' @details
 #' This function estimates item, code and category frequencies for a set of coded responses.
 #'
 #' @return A tibble.
@@ -20,8 +21,9 @@ evaluate_psychometrics <- function(
   # TODO: Missing routine and design completion should come first!
 
   cli_setting()
-  responses <- readr::read_rds("Q:/BiStaTest/SekI_Sprachen/2_Pilotierung/50_Datenaufbereitung/data/responses.RData")
-  units <- readr::read_rds("Q:/BiStaTest/SekI_Sprachen/2_Pilotierung/50_Datenaufbereitung/db/units.RData")
+  # responses <- readr::read_rds("Q:/BiStaTest/SekI_Sprachen/2_Pilotierung/50_Datenaufbereitung/data/responses.RData")
+  # units <- readr::read_rds("Q:/BiStaTest/SekI_Sprachen/2_Pilotierung/50_Datenaufbereitung/db/units.RData")
+  # coded <- code_responses(responses, units_cs, prepare = TRUE)
 
   units_cs <-
     add_coding_scheme(
@@ -29,8 +31,6 @@ evaluate_psychometrics <- function(
       overwrite = overwrite,
       filter_has_codes = TRUE
     )
-
-  # coded <- code_responses(responses, units_cs, prepare = TRUE)
 
   units_final_variables <-
     units_cs %>%
@@ -51,7 +51,7 @@ evaluate_psychometrics <- function(
                     stringr::str_pad(width = 2, side = "left", pad = "0")) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
-      item_source = "coding_scheme"
+      item_id_source = "coding_scheme"
     )
 
   if (tibble::has_name(units_cs, "items_list")) {
