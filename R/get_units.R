@@ -7,7 +7,7 @@
 #'
 #' @description
 #' This function returns the unit information for multiple units.
-#'
+#'git
 #' @return A tibble.
 #' @export
 #'

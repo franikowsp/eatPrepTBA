@@ -5,6 +5,7 @@
 #' @param domains Tibble. Contains columns `domain` and `unit_key`. Currently, the routine only works for one-dimensional `domain`, i.e., there is only one `domain` for each `unit_key`. If not specified, the `workspace_label` is regarded as the unit domain.
 #' @param max_n_category Tibble. Maximum number of categories to check for category frequencies for list values, e.g., `[[01_1,01_2]]`. Defaults to `10`.
 #' @param overwrite Logical. Should column `unit_codes` be overwritten if they exist on `units`. Defaults to `FALSE`, i.e., `unit_codes` will be used if they were added to `units` beforehand by applying `add_coding_schemes()`.
+#' @param identifiers Character. Contains person identifiers of the dataset `coded`.
 #'
 #' @details
 #' This function estimates item, code and category frequencies for a set of coded responses.
@@ -16,9 +17,12 @@ evaluate_psychometrics <- function(
     units,
     domains = NULL,
     max_n_categories = 10,
-    overwrite = FALSE
+    overwrite = FALSE,
+    identifiers = c("group_id", "login_name", "login_code")
 ) {
-  # TODO: Missing routine and design completion should come first!
+  # TODO:
+  # - Missing routine and design completion should come first!
+  # - Double entries per person would also provide problems here as the correlation could not be estimated in that case! (double cases should be removed)
 
   cli_setting()
   # responses <- readr::read_rds("Q:/BiStaTest/SekI_Sprachen/2_Pilotierung/50_Datenaufbereitung/data/responses.RData")
@@ -84,25 +88,7 @@ evaluate_psychometrics <- function(
     }
   }
 
-  # units_test <-
-  #   units_cs %>%
-  #   dplyr::select(unit_key, items_list) %>%
-  #   tidyr::unnest(items_list) %>%
-  #   dplyr::select(unit_key, variable_id, item_id) %>%
-  #   dplyr::filter(!is.na(item_id)) %>%
-  #   dplyr::mutate(
-  #     item_source = "metadata"
-  #   )
-  # units_test %>%
-  #   dplyr::anti_join(units_final_variables %>% dplyr::select(unit_key, variable_id)) %>%
-  #   print(n = Inf)
-  #
-  # units_final_variables %>%
-  #   dplyr::anti_join(units_test %>% dplyr::select(unit_key, variable_id)) %>%
-  #   print(n = Inf)
 
-
-  # coded %>% dplyr::filter(unit_key == "AV_GF01") %>% dplyr::count(variable_id)
 
 
   # TODO: variable_multiple contains a bug (should become FALSE if only one value is allowed)
@@ -116,8 +102,7 @@ evaluate_psychometrics <- function(
   variables_multiple <-
     coded %>%
     dplyr::group_by(unit_key, variable_id) %>%
-    dplyr::summarise(category_is_list = any(stringr::str_detect(value, "^\\[\\[.+\\]\\]$"), na.rm = TRUE)) %>%
-    dplyr::ungroup()
+    dplyr::summarise(category_is_list = any(stringr::str_detect(value, "^\\[\\[.+\\]\\]$"), na.rm = TRUE), .groups = "drop")
 
   # Reconstruct variable labels
   variable_labels <-
@@ -148,7 +133,8 @@ evaluate_psychometrics <- function(
       code_n_valid = sum(code_n * !is.na(code_score)),
       code_p_total = code_n / code_n_total,
       code_p_valid = ifelse(!is.na(code_score), code_n / code_n_valid, NA)
-    )
+    ) %>%
+    dplyr::ungroup()
 
   # Category frequencies
   category_frequencies <-
@@ -302,6 +288,8 @@ evaluate_psychometrics <- function(
 
       domains <- domains_ws
     }
+  } else {
+    domains <- domains_ws
   }
 
   # Scores
@@ -318,7 +306,7 @@ evaluate_psychometrics <- function(
     dplyr::left_join(units_items, by = dplyr::join_by("unit_key", "variable_id")) %>%
     dplyr::filter(!is.na(item_id)) %>%
     dplyr::group_by(
-      dplyr::across(dplyr::any_of(c("domain", "group_id", "login_name", "login_code")))
+      dplyr::across(dplyr::any_of(c("domain", identifiers)))
     ) %>%
     dplyr::summarise(
       domain_score = sum(code_score, na.rm = TRUE),
@@ -331,10 +319,10 @@ evaluate_psychometrics <- function(
   code_discriminations <-
     coded_domains %>%
     dplyr::left_join(coded_domain_scores,
-                     by = dplyr::join_by("domain", "group_id", "login_name", "login_code")) %>%
-    dplyr::select(dplyr::any_of(c("domain", "group_id", "login_name", "login_code",
+                     by = dplyr::join_by("domain", identifiers)) %>%
+    dplyr::select(dplyr::any_of(c("domain", identifiers,
                                   "unit_key", "variable_id", "code_id", "domain_score"))) %>%
-    tidyr::nest(data = dplyr::any_of(c("group_id", "login_name", "login_code", "code_id", "domain_score"))) %>%
+    tidyr::nest(data = dplyr::any_of(c(identifiers, "code_id", "domain_score"))) %>%
     dplyr::mutate(
       data = purrr::map(data, function(x) category_corralation(x,
                                                                input_name = "code_id",
@@ -352,8 +340,8 @@ evaluate_psychometrics <- function(
     coded_domains %>%
     dplyr::semi_join(variable_labels, by = dplyr::join_by("unit_key", "variable_id")) %>%
     dplyr::left_join(coded_domain_scores,
-                     by = dplyr::join_by("domain", "group_id", "login_name", "login_code")) %>%
-    dplyr::select(dplyr::any_of(c("domain", "group_id", "login_name", "login_code", "unit_key", "variable_id", "value", "domain_score"))) %>%
+                     by = dplyr::join_by("domain", identifiers)) %>%
+    dplyr::select(dplyr::any_of(c("domain", identifiers, "unit_key", "variable_id", "value", "domain_score"))) %>%
     dplyr::filter(!is.na(value)) %>%
     dplyr::group_by(unit_key, variable_id) %>%
     dplyr::mutate(
@@ -362,7 +350,7 @@ evaluate_psychometrics <- function(
     dplyr::left_join(variables_multiple, by = dplyr::join_by("unit_key", "variable_id")) %>%
     dplyr::filter(! category_is_list | (category_is_list & category_n_categories_valid <= max_n_categories)) %>%
     dplyr::select(-dplyr::any_of(c("category_is_list", "category_n_categories_valid"))) %>%
-    tidyr::nest(data = dplyr::any_of(c("group_id", "login_name", "login_code", "value", "domain_score"))) %>%
+    tidyr::nest(data = dplyr::any_of(c(identifiers, "value", "domain_score"))) %>%
     dplyr::mutate(
       data = purrr::map(data, function(x) category_corralation(x,
                                                                input_name = "value",
@@ -373,7 +361,8 @@ evaluate_psychometrics <- function(
     tidyr::unnest(data) %>%
     dplyr::mutate(
       category_id = ifelse(category_id == "NA", NA_character_, category_id)
-    )
+    ) %>%
+    dplyr::ungroup()
 
   frequencies %>%
     dplyr::left_join(code_discriminations, by = dplyr::join_by("unit_key", "variable_id", "code_id")) %>%
@@ -412,7 +401,7 @@ category_corralation <- function(data, input_name = "code_id", output_name = "co
     ) %>%
     tidyr::pivot_wider(names_from = input_name, values_from = "code_dummy", values_fill = 0) %>%
     dplyr::summarise(
-      dplyr::across(-dplyr::any_of(c("group_id", "login_name", "login_code", "domain_score")),
+      dplyr::across(-dplyr::any_of(c(identifiers, "domain_score")),
                     function(x) suppressWarnings(cor(x, domain_score, use = "complete.obs")))
     ) %>%
     tidyr::pivot_longer(dplyr::everything(), names_to = output_name, values_to = output_value)
