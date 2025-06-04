@@ -138,7 +138,7 @@ code_responses_legacy <- function(responses,
                                                type ="custom",
                                                show_after = 0,
                                                extra = list(
-                                                 unit_keys = unit_keys
+                                                 unit_keys = pad_ids(unit_keys)
                                                ),
                                                format = "Preparing {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
                                                format_done = "Prepared {cli::pb_total} coding scheme{?s} in {cli::pb_elapsed}.",
@@ -215,7 +215,7 @@ code_responses_legacy <- function(responses,
           type ="custom",
           show_after = 0,
           extra = list(
-            unit_keys = manual_unit_keys
+            unit_keys = pad_ids(manual_unit_keys)
           ),
           format = "Preparing manual code cases for {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
           format_done = "Prepared {cli::pb_total} manual code case{?s} in {cli::pb_elapsed}.",
@@ -240,7 +240,7 @@ code_responses_legacy <- function(responses,
                                       type ="custom",
                                       show_after = 0,
                                       extra = list(
-                                        unit_keys = prep_unit_keys
+                                        unit_keys = pad_ids(prep_unit_keys)
                                       ),
                                       format = "Inserting manual code cases for {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
                                       format_done = "Inserted {cli::pb_total} manual code case{?s} in {cli::pb_elapsed}.",
@@ -289,7 +289,7 @@ code_responses_legacy <- function(responses,
           type ="custom",
           show_after = 0,
           extra = list(
-            final_unit_keys = final_unit_keys,
+            final_unit_keys = pad_ids(final_unit_keys),
             n_units = n_units
           ),
           format = progress_bar_format,

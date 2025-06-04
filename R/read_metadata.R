@@ -10,7 +10,7 @@ read_metadata <- function(units) {
                                    .progress = list(
                                      type ="custom",
                                      extra = list(
-                                       unit_keys = unit_keys
+                                       unit_keys = pad_ids(unit_keys)
                                      ),
                                      format = "Preparing metadata for {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
                                      format_done = "Prepared {cli::pb_total} unit metadata in {cli::pb_elapsed}.",

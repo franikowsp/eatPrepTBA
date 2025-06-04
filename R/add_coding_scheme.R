@@ -1,15 +1,23 @@
 #' Adds prepared coding scheme to units
 #'
-#' @param units Tibble holding units retrieved from [get_units()].
-#' @param filter_has_codes Only returns variables that were not deactivated. Defaults to `TRUE`.
+#' @param units Tibble. Contains units retrieved from [get_units()].
+#' @param filter_has_codes Logical. Only returns variables that were not deactivated. Defaults to `TRUE`.
+#' @param overwrite Logical. Should potentially existing `unit_codes` be overwritten? Defaults to `FALSE`.
 #'
 #' @description
-#' This function is called within [add_coding_scheme()] to extend the `variable_sources`. The function can also propose variable pages if [get_units()] was called with `unit_definition = TRUE`.
+#' Returns the `units` object with added column `unit_codes`. The routine can also propose variable pages if [get_units()] was called with `unit_definition = TRUE`.
 #'
 #' @return A tibble.
 #' @export
-add_coding_scheme <- function(units, filter_has_codes = TRUE) {
+add_coding_scheme <- function(units, filter_has_codes = TRUE, overwrite = FALSE) {
   cli_setting()
+
+  if (tibble::has_name(units, "unit_codes") && !overwrite) {
+    cli::cli_alert_info("Column {.field unit_codes} has already been added to {.field units} and will be used.
+                        Consider setting {.field overwrite} to TRUE.")
+
+    return(units)
+  }
 
   unit_keys <- units$unit_key
 
@@ -24,21 +32,8 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
         dplyr::all_of(
           c(
             "ws_id",
-            "ws_label",
             "unit_id",
-            "unit_label",
-            "unit_key"
-          )
-        ),
-        dplyr::any_of(
-          c(
-            "schemer",
-            "scheme_type",
-            "last_change_scheme"
-          )
-        ),
-        dplyr::all_of(
-          c(
+            "unit_key",
             "coding_scheme",
             "unit_variables"
           )
@@ -53,7 +48,7 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
         .progress = list(
           type ="custom",
           extra = list(
-            unit_keys = unit_keys
+            unit_keys = pad_ids(unit_keys)
           ),
           format = "Preparing coding scheme for {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
           format_done = "Prepared {cli::pb_total} coding scheme{?s} in {cli::pb_elapsed}.",
@@ -176,7 +171,8 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
         dplyr::select(-variable_page)
     }
 
-    units_coding %>%
+    units_coding_nest <-
+      units_coding %>%
       dplyr::select(-c(
         # Information is collapsed into the new variable_sources column
         "variable_sources", "derive_sources",
@@ -198,6 +194,20 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE) {
         dplyr::across(c("variable_format"),
                       function(x) dplyr::coalesce(x, "")),
         variable_type = dplyr::coalesce(variable_type, "derived"),
+      ) %>%
+      tidyr::nest(
+        unit_codes = -dplyr::all_of(c(
+          "ws_id",
+          "unit_id",
+          "unit_key"
+        ))
+      )
+
+    units %>%
+      dplyr::select(-any_of("unit_codes")) %>%
+      dplyr::left_join(
+        units_coding_nest,
+        by = dplyr::join_by("ws_id", "unit_id", "unit_key")
       )
   } else {
     units

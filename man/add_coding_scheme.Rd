@@ -4,16 +4,18 @@
 \alias{add_coding_scheme}
 \title{Adds prepared coding scheme to units}
 \usage{
-add_coding_scheme(units, filter_has_codes = TRUE)
+add_coding_scheme(units, filter_has_codes = TRUE, overwrite = FALSE)
 }
 \arguments{
-\item{units}{Tibble holding units retrieved from \code{\link[=get_units]{get_units()}}.}
+\item{units}{Tibble. Contains units retrieved from \code{\link[=get_units]{get_units()}}.}
 
-\item{filter_has_codes}{Only returns variables that were not deactivated. Defaults to \code{TRUE}.}
+\item{filter_has_codes}{Logical. Only returns variables that were not deactivated. Defaults to \code{TRUE}.}
+
+\item{overwrite}{Logical. Should potentially existing \code{unit_codes} be overwritten? Defaults to \code{FALSE}.}
 }
 \value{
 A tibble.
 }
 \description{
-This function is called within \code{\link[=add_coding_scheme]{add_coding_scheme()}} to extend the \code{variable_sources}. The function can also propose variable pages if \code{\link[=get_units]{get_units()}} was called with \code{unit_definition = TRUE}.
+Returns the \code{units} object with added column \code{unit_codes}. The routine can also propose variable pages if \code{\link[=get_units]{get_units()}} was called with \code{unit_definition = TRUE}.
 }

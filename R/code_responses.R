@@ -4,10 +4,8 @@
 #' @param units Tibble. Unit data retrieved from the IQB Studio after setting the argument `coding_scheme = TRUE` for [get_units()].
 #' @param prepare Logical. Whether to unpack the coding results and to add information from the coding schemes.
 #' @param codes_manual Tibble (optional). Data frame holding the manual codes. Defaults to `NULL` and does only automatic coding.
+#' @param overwrite Logical. Should column `unit_codes` be overwritten if they exist on `units`. Defaults to `FALSE`, i.e., `unit_codes` will be used if they were added to `units` beforehand by applying `add_coding_schemes()`.
 #' @param missings Tibble (optional). Provide missing meta data with `code_id`, `status`, `score`, and `code_type`. Defaults to `NULL` and uses default scheme.
-#'
-#' @description
-#' `r lifecycle::badge("deprecated")`
 #'
 #' This function automatically codes responses by using the `eatAutoCode` package. It is already prepared for the new data format of the responses received from the [get_responses()] and [read_responses()] routines. This function will soon be deleted and be part of [code_responses()].
 #'
@@ -16,6 +14,7 @@
 code_responses <- function(responses,
                            units,
                            prepare = FALSE,
+                           overwrite = FALSE,
                            codes_manual = NULL,
                            missings = NULL
 ) {
@@ -38,14 +37,15 @@ code_responses <- function(responses,
 
   cli::cli_text("Time started: {start_time}")
 
-  # cli::cli_h3("Prepare responses")
-
   units_prep <-
     units %>%
     dplyr::filter(
       unit_key %in% responses$unit_key
     ) %>%
-    dplyr::select(ws_id, ws_label, unit_key, unit_id, unit_label, coding_scheme, unit_variables)
+    dplyr::select(
+      dplyr::all_of(c("ws_id", "ws_label", "unit_key", "unit_id", "unit_label", "coding_scheme", "unit_variables")),
+      dplyr::any_of(c("unit_codes"))
+    )
 
   no_coding_schemes <-
     units_prep %>%
@@ -70,10 +70,11 @@ code_responses <- function(responses,
   # Insert manual codes
   if (!is.null(codes_manual) || prepare) {
     cli::cli_h3("Prepare coding schemes")
-
     coding_schemes_prepared <-
       coding_schemes %>%
-      add_coding_scheme() %>%
+      add_coding_scheme(filter_has_codes = TRUE, overwrite = overwrite) %>%
+      dplyr::select(unit_key, unit_codes) %>%
+      tidyr::unnest(unit_codes) %>%
       dplyr::select(unit_key, variable_id, variable_source_type, variable_codes)
 
     pcs_variables <-
@@ -148,7 +149,7 @@ code_responses <- function(responses,
           .progress = list(
             type ="custom",
             extra = list(
-              unit_keys = manual_unit_keys
+              unit_keys = pad_ids(manual_unit_keys)
             ),
             format = "Preparing manual code cases for {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
             format_done = "Prepared {cli::pb_total} manual code case{?s} in {cli::pb_elapsed}.",
@@ -206,7 +207,7 @@ code_responses <- function(responses,
           type ="custom",
           show_after = 0,
           extra = list(
-            final_unit_keys = final_unit_keys,
+            final_unit_keys = pad_ids(final_unit_keys),
             n_units = n_units
           ),
           format = progress_bar_format,
@@ -235,6 +236,7 @@ code_responses <- function(responses,
       # TODO: Does not work if no code_ids are available (e.g., only coding errors)
       responses_coded %>%
         tidyr::unnest(value, keep_empty = TRUE) %>%
+        dplyr::semi_join(pcs_variables, by = dplyr::join_by("unit_key", "variable_id")) %>%
         dplyr::left_join(pcs_variables, by = dplyr::join_by("unit_key", "variable_id")) %>%
         dplyr::left_join(pcs_codes %>% dplyr::select(unit_key, variable_id, code_id, code_type),
                          by = dplyr::join_by("unit_key", "variable_id", "code_id")) %>%
@@ -257,32 +259,4 @@ code_responses <- function(responses,
 
     return(responses_coded)
   }
-}
-
-#' Code the responses of one unit responses with its coding scheme
-#'
-#' @param unit_responses Character. Response data of one unit retrieved from the IQB Testcenter in JSON format.
-#' @param coding_scheme Character. Coding scheme of the unit retrieved from the IQB Studio after setting the argument `coding_scheme = TRUE` for [get_units()].
-#'
-#' @description
-#' This function automatically codes responses of one unit by using the `eatAutoCode` package.
-#'
-#' @return A tibble.
-#'
-#' @keywords internal
-code_unit <- function(unit_responses, coding_scheme) {
-  # Müssten einige Variablen nicht noch hoch?
-  eatAutoCode::code_responses_array(coding_scheme, unit_responses) #%>%
-    # # dplyr::mutate(
-    # #   # Values need to be concatenated if they are still lists
-    # #   # Identifier is [] and elements are concatenated with a ,
-    # #   value = purrr::map(value, function(x) {
-    # #     if (length(x) > 1) {
-    # #       list_vals <- x %>% stringr::str_c(collapse = ",")
-    # #       stringr::str_glue("[[{list_vals}]]")
-    # #     } else {
-    # #       as.character(x)
-    # #     }
-    # #   })) %>%
-    # tidyr::unnest(value, keep_empty = TRUE)
 }

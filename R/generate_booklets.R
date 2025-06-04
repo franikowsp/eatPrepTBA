@@ -48,7 +48,7 @@ generate_booklets <- function(
         .progress = list(
           type ="custom",
           extra = list(
-            booklet_ids = booklet_ids
+            booklet_ids = pad_ids(booklet_ids)
           ),
           format = "Preparing booklet metadata for {.booklet-id {cli::pb_extra$booklet_ids[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
           format_done = "Prepared {cli::pb_total} booklet metadata in {cli::pb_elapsed}.",
@@ -61,7 +61,7 @@ generate_booklets <- function(
         .progress = list(
           type ="custom",
           extra = list(
-            booklet_ids = booklet_ids
+            booklet_ids = pad_ids(booklet_ids)
           ),
           format = "Preparing booklet configuration for {.booklet-id {cli::pb_extra$booklet_ids[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
           format_done = "Prepared {cli::pb_total} booklet configurations in {cli::pb_elapsed}.",
@@ -74,7 +74,7 @@ generate_booklets <- function(
         .progress = list(
           type ="custom",
           extra = list(
-            booklet_ids = booklet_ids
+            booklet_ids = pad_ids(booklet_ids)
           ),
           format = "Preparing booklet units and testlets for {.booklet-id {cli::pb_extra$booklet_ids[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
           format_done = "Prepared {cli::pb_total} booklet units / testlets in {cli::pb_elapsed}.",
@@ -93,7 +93,7 @@ generate_booklets <- function(
         .progress = list(
           type ="custom",
           extra = list(
-            booklet_ids = booklet_ids
+            booklet_ids = pad_ids(booklet_ids)
           ),
           format = "Preparing booklet xmls for {.booklet-id {cli::pb_extra$booklet_ids[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
           format_done = "Prepared {cli::pb_total} booklet xmls in {cli::pb_elapsed}.",
