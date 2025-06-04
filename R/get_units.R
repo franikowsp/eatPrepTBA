@@ -221,10 +221,25 @@ read_unit <- function(unit) {
     purrr::pluck("variables")
 
   if (length(variables) > 0) {
-    variables <-
+    variables_prep <-
       variables %>%
       purrr::list_transpose() %>%
-      tibble::as_tibble() %>%
+      tibble::as_tibble()
+
+    # For legacy reasons
+    if (!tibble::has_name(variables_prep, "alias")) {
+      variables_prep <-
+        variables_prep %>%
+        dplyr::mutate(
+          alias = id
+        )
+    }
+
+    variables <-
+      variables_prep %>%
+      dplyr::mutate(
+        alias = ifelse(is.na(alias), id, alias)
+      ) %>%
       dplyr::select(
         dplyr::any_of(c(
           "variable_id" = "alias",
