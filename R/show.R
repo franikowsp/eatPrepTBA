@@ -40,8 +40,15 @@ setMethod(f = "show",
           definition = function(object) {
             cli_setting()
 
-            cli::cli_text("You have access to the workspace {.ws-label {object@ws_label}} (id {.ws-id {object@ws_id}}) that is part of the workspace group {.wsg-label {object@wsg_label}} (id {.wsg-id {object@wsg_id}}).")
+            cli::cli_text("You have access to the following workspaces ({.ws-id ws_id}: {.ws ws_label}):")
 
+            ul <- cli::cli_ul()
+            list(ws_id = object@ws_id, ws_label = object@ws_label) %>%
+              purrr::list_transpose() %>%
+              purrr::map(function(ws) {
+                cli::cli_li(items = glue::glue("{{.ws-id {ws$ws_id}}}: {{.ws-label {ws$ws_label}}}"))
+              })
+            cli::cli_end(ul)
           })
 
 setMethod(f = "show",

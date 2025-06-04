@@ -1,7 +1,7 @@
 #' Get workspace settings
 #'
 #' @param workspace [WorkspaceStudio-class]. Workspace information necessary to retrieve unit information and resources from the API.
-#' @param metadata Logical. Should the workspace metadata, i.e., the item and unit metadata profiles, be prepared? Defaults to `TRUE`.
+#' @param metadata Logical. Should the unit and item metadata profiles be retrieved. Defaults to `TRUE`.
 #'
 #' @description
 #' This function returns the workspace settings for a single workspace.
@@ -34,109 +34,144 @@ setMethod("get_settings",
               )
 
             # Workspace unit groups and default settings
-            run_req_ws <- function() {
-              base_req(method = "GET",
-                       endpoint = c("workspaces", ws_id)) %>%
-                httr2::req_perform() %>%
-                httr2::resp_body_json()
+            run_req_ws <- function(ws_id) {
+              req <- function() {
+                base_req(method = "GET",
+                         endpoint = c("workspaces", ws_id)) %>%
+                  httr2::req_perform() %>%
+                  httr2::resp_body_json()
+              }
+
+              return(req)
             }
 
             resp_ws <-
-              run_safe(run_req_ws,
-                       error_message = "Workspace settings could not be retrieved.",
-                       default = list())
+              purrr::map(
+                ws_id,
+                function(ws_id) {
+                  run_safe(run_req_ws(ws_id),
+                           error_message = "Workspace settings could not be retrieved.",
+                           default = list())
+                }
+              )
 
-            if (!is.null(resp_ws$settings)) {
-              # Default settings
-              ws_defaults <-
-                resp_ws$settings %>%
-                purrr::discard(names(.) %in% c("unitGroups", "states")) %>%
-                purrr::compact() %>%
-                tibble::as_tibble() %>%
-                dplyr::rename(
-                  # TODO: Add other entries to this list
-                  dplyr::any_of(c(
-                    default_editor = "defaultEditor",
-                    default_player = "defaultPlayer",
-                    item_md_profile = "itemMDProfile",
-                    unit_md_profile = "unitMDProfile",
-                    stable_modules_only = "stableModulesOnly"
-                  ))
-                )
-
-              ws_general <-
-                ws_general %>%
-                dplyr::bind_cols(ws_defaults)
-
-              # Unit groups
-              if (!is.null(resp_ws$settings$unitGroups)) {
-                ws_groups <-
-                  resp_ws$settings$unitGroups %>%
-                  unlist() %>%
-                  sort()
-
-                ws_general <-
-                  ws_general %>%
-                  dplyr::mutate(groups = list(ws_groups))
-              }
-            }
+            # Default settings
+            ws_prep <-
+              resp_ws %>%
+              purrr::map(function(ws) prepare_ws_settings(ws = ws, metadata = metadata)) %>%
+              dplyr::bind_rows()
 
             # Workspace group settings for states
-            run_req_wsg <- function() {
-              base_req(method = "GET",
-                       endpoint = c("workspace-groups", wsg_id)) %>%
-                httr2::req_perform() %>%
-                httr2::resp_body_json()
+            run_req_wsg <- function(wsg_id) {
+              req <- function() {
+                base_req(method = "GET",
+                         endpoint = c("workspace-groups", wsg_id)) %>%
+                  httr2::req_perform() %>%
+                  httr2::resp_body_json()
+              }
+
+              return(req)
             }
 
             resp_wsg <-
-              run_safe(run_req_wsg,
-                       error_message = "Workspace group settings could not be retrieved.",
-                       default = list())
+              purrr::map(
+                unique(wsg_id),
+                function(wsg_id) {
+                  run_safe(run_req_wsg(wsg_id),
+                           error_message = "Workspace group settings could not be retrieved.",
+                           default = list())
+                }
+              )
 
-            if (!is.null(resp_wsg$settings)) {
-              wsg_settings <- resp_wsg$settings
+            wsg_prep <-
+              resp_wsg %>%
+              purrr::map(
+                function(wsg) prepare_wsg_settings(wsg)
+              ) %>%
+              dplyr::bind_rows()
 
-              # States
-              if (!is.null(wsg_settings$states) & length(wsg_settings$states) != 0) {
-                wsg_states <-
-                  wsg_settings$states %>%
-                  purrr::map(function(x) unlist(x) %>% tibble::enframe() %>% tidyr::pivot_wider()) %>%
-                  purrr::reduce(dplyr::bind_rows) %>%
-                  dplyr::rename(
-                    state_id = id,
-                    state_label = label,
-                    state_color = color
-                  )
-
-                ws_general <-
-                  ws_general %>%
-                  dplyr::mutate(
-                    states = list(wsg_states)
-                  )
-              }
-            }
-
-            # Add metadata profiles
-            if (metadata) {
-              if (!is.null(resp_ws$settings$itemMDProfile)) {
-                item_metadata <- get_metadata_profile(resp_ws$settings$itemMDProfile)
-              } else {
-                item_metadata <- tibble::tibble()
-              }
-              if (!is.null(resp_ws$settings$itemMDProfile)) {
-                unit_metadata <- get_metadata_profile(resp_ws$settings$unitMDProfile)
-              } else {
-                unit_metadata <- tibble::tibble()
-              }
-
-              ws_general <-
-                ws_general %>%
-                dplyr::mutate(
-                  item_metadata = list(item_metadata),
-                  unit_metadata = list(unit_metadata),
-                )
-            }
-
-            return(ws_general)
+            ws_general %>%
+              dplyr::left_join(ws_prep, by = dplyr::join_by("ws_id")) %>%
+              dplyr::left_join(wsg_prep, by = dplyr::join_by("wsg_id"))
           })
+
+prepare_ws_settings <- function(ws, metadata) {
+  if (!is.null(ws$settings)) {
+    ws_defaults <-
+      ws$settings %>%
+      purrr::discard(names(.) %in% c("unitGroups", "states")) %>%
+      purrr::compact() %>%
+      tibble::as_tibble() %>%
+      dplyr::rename(
+        # TODO: Add other entries to this list
+        dplyr::any_of(c(
+          default_editor = "defaultEditor",
+          default_player = "defaultPlayer",
+          default_schemer = "defaultSchemer",
+          item_md_profile = "itemMDProfile",
+          unit_md_profile = "unitMDProfile",
+          stable_modules_only = "stableModulesOnly"
+        ))
+      ) %>%
+      dplyr::mutate(
+        ws_id = ws$id
+      )
+
+    # Unit groups
+    if (!is.null(ws$settings$unitGroups)) {
+      ws_groups <-
+        ws$settings$unitGroups %>%
+        unlist() %>%
+        sort()
+
+      ws_defaults <-
+        ws_defaults %>%
+        dplyr::mutate(groups = list(ws_groups))
+    }
+
+    # Metadata profiles
+    if (metadata) {
+      if (!is.null(ws$settings$itemMDProfile)) {
+        item_metadata <- get_metadata_profile(ws$settings$itemMDProfile)
+      } else {
+        item_metadata <- tibble::tibble()
+      }
+      if (!is.null(ws$settings$itemMDProfile)) {
+        unit_metadata <- get_metadata_profile(ws$settings$unitMDProfile)
+      } else {
+        unit_metadata <- tibble::tibble()
+      }
+
+      ws_defaults <-
+        ws_defaults %>%
+        dplyr::mutate(
+          unit_metadata = list(unit_metadata),
+          item_metadata = list(item_metadata),
+        )
+    }
+    ws_defaults
+  } else {
+    tibble::tibble(ws_id = ws$id)
+  }
+}
+
+prepare_wsg_settings <- function(wsg) {
+  if (!is.null(wsg$settings$states) & length(wsg$settings$states) != 0) {
+    wsg$settings$states %>%
+      purrr::map(function(x) unlist(x) %>% tibble::enframe() %>% tidyr::pivot_wider()) %>%
+      purrr::reduce(dplyr::bind_rows) %>%
+      dplyr::rename(
+        state_id = id,
+        state_label = label,
+        state_color = color
+      ) %>%
+      tidyr::nest(states = dplyr::any_of(c("state_id", "state_color", "state_label"))) %>%
+      dplyr::mutate(
+        wsg_id = wsg$id
+      )
+  } else {
+    tibble::tibble(
+      wsg_id = wsg$id
+    )
+  }
+}

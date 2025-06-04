@@ -33,9 +33,10 @@ setMethod("get_units",
             ws_id <- workspace@ws_id
             ws_label <- workspace@ws_label
 
-            # Workspace information
+            cli::cli_h2("Retrieving workspace information")
+
             ws_settings <- get_settings(workspace)
-            ws_states <- ws_settings$states[[1]]
+            ws_states <- ws_settings %>% dplyr::select(ws_id, states) %>% tidyr::unnest(states)
 
             ws_info <-
               ws_settings %>%
@@ -45,85 +46,89 @@ setMethod("get_units",
 
             units_old <- units
 
-            if (!is.null(units_old)) {
-              units_ws_id <- unique(units_old$ws_id)
+            # if (!is.null(units_old)) {
+            #   units_ws_id <- unique(units_old$ws_id)
+            #
+            #   if (length(units_ws_id) != 1 || ws_id != units_ws_id) {
+            #     not_in_ws <- setdiff(units_ws_id, ws_id)
+            #     n_not_in_ws <- length(not_in_ws)
+            #
+            #     cli::cli_abort("Units to should only be retrieved from workspace {.ws-id {ws_id}} {.ws-label {ws_label}}.
+            #                    There are units from {n_not_in_ws} other workspace{?s}: {.ws-id {not_in_ws}}.
+            #                    Please remove these units from these workspaces before updating or retrieve the units afresh",
+            #                    wrap = TRUE)
+            #   }
+            # }
 
-              if (length(units_ws_id) != 1 || ws_id != units_ws_id) {
-                not_in_ws <- setdiff(units_ws_id, ws_id)
-                n_not_in_ws <- length(not_in_ws)
-
-                cli::cli_abort("Units to should only be retrieved from workspace {.ws-id {ws_id}} {.ws-label {ws_label}}.
-                               There are units from {n_not_in_ws} other workspace{?s}: {.ws-id {not_in_ws}}.
-                               Please remove these units from these workspaces before updating or retrieve the units afresh",
-                               wrap = TRUE)
+            run_req <- function(ws_id) {
+              req <- function() {
+                base_req(method = "GET",
+                         endpoint = c("workspaces", ws_id, "units", "properties")) %>%
+                  httr2::req_perform() %>%
+                  httr2::resp_body_json(check_type = TRUE)
               }
+
+              return(req)
             }
 
-            run_req <- function() {
-              base_req(method = "GET",
-                       endpoint = c("workspaces", ws_id, "units", "properties")) %>%
-                httr2::req_perform() %>%
-                httr2::resp_body_json(check_type = TRUE)
-            }
+            cli::cli_h2("Retrieving units")
 
             resp_metadata <-
-              run_safe(run_req,
-                       error_message = "Units could not be retrieved.",
-                       default = tibble::tibble())
+              purrr::map(ws_id,
+                         function(ws_id) {
+                           run_safe(run_req(ws_id),
+                                    error_message = "Units could not be retrieved.",
+                                    default = list()) %>%
+                             read_units(ws_id = ws_id)
+                         }) %>%
+              dplyr::bind_rows()
 
+            units_new <-
+              resp_metadata %>%
+              dplyr::left_join(ws_info, by = c("ws_id")) %>%
+              dplyr::relocate(
+                names(ws_info),
+                .before = "unit_id"
+              ) %>%
+              dplyr::mutate(
+                # Fresh units might not have a state
+                state_id = ifelse("state_id" %in% names(.), state_id, NA)
+              )
+
+            # TODO: Dieser Check muss in die Funktion genestet werden! (ist bereits erfolgt, muss hier raus!)
             if (length(resp_metadata) != 0) {
-              units_new <-
-                resp_metadata %>%
-                purrr::map(read_unit, .progress = "Reading units") %>%
-                dplyr::bind_rows() %>%
-                dplyr::select(any_of(c(
-                  unit_id = "id",
-                  unit_key = "key",
-                  unit_label = "name",
-                  group_name = "groupName",
-                  state_id = "state",
-                  description = "description",
-                  unit_variables = "variables",
-                  unit_metadata = "metadata",
-                  coding_scheme = "scheme",
-                  player = "player",
-                  editor = "editor",
-                  schemer = "schemer",
-                  scheme_type = "schemeType",
-                  last_change_definition = "lastChangedDefinition",
-                  last_change_definition_user = "lastChangedDefinitionUser",
-                  last_change_scheme = "lastChangedScheme",
-                  last_change_scheme_user = "lastChangedSchemeUser",
-                  last_change_metadata = "lastChangedMetadata",
-                  last_change_metadata_user = "lastChangedMetadataUser"
-                ))) %>%
-                dplyr::bind_cols(ws_info) %>%
-                dplyr::relocate(
-                  names(ws_info),
-                  .before = "unit_id"
-                ) %>%
-                dplyr::mutate(
-                  # Fresh units might not have a state
-                  state_id = ifelse("state_id" %in% names(.), state_id, NA)
-                )
+              # units_new <-
+              #   resp_metadata %>%
+              #   purrr::map(read_units) %>%
+              #   dplyr::bind_rows()
+              #
+              # units_new %>%
+              #   dplyr::left_join(ws_info, by = c("ws_id")) %>%
+              #   dplyr::relocate(
+              #     names(ws_info),
+              #     .before = "unit_id"
+              #   ) %>%
+              #   dplyr::mutate(
+              #     # Fresh units might not have a state
+              #     state_id = ifelse("state_id" %in% names(.), state_id, NA)
+              #   )
 
-              if (!is.null(ws_states)) {
+              if (nrow(ws_states) > 0) {
                 units_new <-
                   units_new %>%
-                  dplyr::left_join(ws_states, by = dplyr::join_by("state_id"), copy = TRUE) %>%
+                  dplyr::left_join(ws_states, by = dplyr::join_by("ws_id", "state_id")) %>%
                   dplyr::relocate(
                     names(ws_states),
                     .after = "group_name"
                   )
               }
 
-              # units_new %>% dplyr::mutate(no = seq_along(ws_id)) %>% dplyr::filter(unit_key == "EL_FF02") %>% .$no
-
               if (!is.null(units_old)) {
                 # Filter for units that are available (automatic update)
                 units_old <-
                   units_old %>%
-                  dplyr::semi_join(units_new %>% dplyr::select(unit_id), by = dplyr::join_by("unit_id"))
+                  dplyr::semi_join(units_new %>% dplyr::select(ws_id, unit_id),
+                                   by = dplyr::join_by("ws_id", "unit_id"))
 
                 units_change_old <-
                   units_old %>%
@@ -205,6 +210,38 @@ setMethod("get_units",
             return(units_final)
           })
 
+read_units <- function(ws, ws_id) {
+  if (length(ws) == 0) {
+    return(tibble::tibble(ws_id = ws_id))
+  }
+
+  ws %>%
+    purrr::map(read_unit, .progress = "Reading units") %>%
+    dplyr::bind_rows() %>%
+    dplyr::select(any_of(c(
+      unit_id = "id",
+      unit_key = "key",
+      unit_label = "name",
+      group_name = "groupName",
+      state_id = "state",
+      description = "description",
+      unit_variables = "variables",
+      unit_metadata = "metadata",
+      coding_scheme = "scheme",
+      player = "player",
+      editor = "editor",
+      schemer = "schemer",
+      scheme_type = "schemeType",
+      last_change_definition = "lastChangedDefinition",
+      last_change_definition_user = "lastChangedDefinitionUser",
+      last_change_scheme = "lastChangedScheme",
+      last_change_scheme_user = "lastChangedSchemeUser",
+      last_change_metadata = "lastChangedMetadata",
+      last_change_metadata_user = "lastChangedMetadataUser"
+    ))) %>%
+    dplyr::mutate(ws_id)
+}
+
 read_unit <- function(unit) {
   unit_prepared <-
     unit %>%
@@ -221,10 +258,25 @@ read_unit <- function(unit) {
     purrr::pluck("variables")
 
   if (length(variables) > 0) {
-    variables <-
+    variables_prep <-
       variables %>%
       purrr::list_transpose() %>%
-      tibble::as_tibble() %>%
+      tibble::as_tibble()
+
+    # For legacy reasons
+    if (!tibble::has_name(variables_prep, "alias")) {
+      variables_prep <-
+        variables_prep %>%
+        dplyr::mutate(
+          alias = id
+        )
+    }
+
+    variables <-
+      variables_prep %>%
+      dplyr::mutate(
+        alias = ifelse(is.na(alias), id, alias)
+      ) %>%
       dplyr::select(
         dplyr::any_of(c(
           "variable_id" = "alias",
@@ -298,7 +350,7 @@ read_definition <- function(units, base_req) {
           .progress = list(
             type ="custom",
             extra = list(
-              unit_keys = unit_keys
+              unit_keys = pad_ids(unit_keys)
             ),
             format = "Preparing unit definition for {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
             format_done = "Prepared {cli::pb_total} unit definition{?s} in {cli::pb_elapsed}.",
