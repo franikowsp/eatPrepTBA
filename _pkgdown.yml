@@ -71,7 +71,8 @@ reference:
   - generate_booklet
   - generate_booklets
   - upload_file
-- subtitle: Work with data from IQB Testcenter
+- subtitle: Code responses and work with coded responses and logs from IQB Testcenter
   contents:
   - code_responses
   - estimate_unit_times
+  - evalute_psychometrics
