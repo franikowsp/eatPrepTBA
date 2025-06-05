@@ -10,8 +10,8 @@ A class containing the token to communicate with the Testcenter API. Objects of 
 \section{Slots}{
 
 \describe{
-\item{\code{ws_id}}{ID of the workspace. The workspace ID can also be found in the workspace URL.}
+\item{\code{ws_id}}{IDs of the workspaces. The workspaces IDs can also be found in the workspace URL.}
 
-\item{\code{ws_label}}{Label of the workspace.}
+\item{\code{ws_label}}{Labels of the workspaces.}
 }}
 

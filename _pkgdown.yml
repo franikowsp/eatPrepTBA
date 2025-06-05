@@ -63,6 +63,7 @@ reference:
   - get_coding_report
   - prepare_coding_scheme
   - download_codebook
+  - prepare_codebook
   - download_units
 - subtitle: Prepare studies on IQB Testcenter
   contents:

@@ -20,7 +20,7 @@ download_units(
 \arguments{
 \item{workspace}{\linkS4class{WorkspaceStudio}. Workspace information necessary to download files via the API.}
 
-\item{path}{Character. Path for the zip file to be downloaded.}
+\item{path}{Character. Path for the zip files of the workspaces to be downloaded.}
 
 \item{unit_keys}{Character. Keys (short names) of the units in the workspace that should be downloaded. If set to \code{NULL} (default), all units in the workspace will be downloaded.}
 

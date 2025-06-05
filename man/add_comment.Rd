@@ -2,17 +2,21 @@
 % Please edit documentation in R/add_comment.R
 \name{add_comment}
 \alias{add_comment}
-\alias{add_comment,WorkspaceStudio-method}
+\alias{add_comment,LoginStudio-method}
 \title{Add a comment for a unit}
 \usage{
-add_comment(workspace, unit_id, comment = NULL)
+add_comment(login, ws_id, unit_id, parent_id = NULL, comment = NULL)
 
-\S4method{add_comment}{WorkspaceStudio}(workspace, unit_id, comment = NULL)
+\S4method{add_comment}{LoginStudio}(login, ws_id, unit_id, parent_id = NULL, comment = NULL)
 }
 \arguments{
-\item{workspace}{\linkS4class{WorkspaceStudio}. Workspace information necessary to retrieve unit information and resources from the API.}
+\item{login}{\linkS4class{LoginStudio}. Login information necessary to add comments.}
 
-\item{unit_id}{Unit ID to be changed.}
+\item{ws_id}{Workspace id of the unit.}
+
+\item{unit_id}{Unit id for the comment to add.}
+
+\item{parent_id}{Comment id in case of responding to another comment.}
 
 \item{comment}{Comment to be added to the unit. Should contain html markup.}
 }
@@ -21,7 +25,7 @@ This function adds an entry in the comment tab of the Studio of a single unit.
 }
 \section{Functions}{
 \itemize{
-\item \code{add_comment(WorkspaceStudio)}: Add a comment in a defined workspace
+\item \code{add_comment(LoginStudio)}: Add a comment in a defined workspace
 
 }}
 \keyword{internal}
