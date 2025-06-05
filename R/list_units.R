@@ -19,25 +19,37 @@ setMethod("list_units",
           function(workspace) {
             base_req <- workspace@login@base_req
             ws_id <- workspace@ws_id
+            ws_label <- workspace@ws_label
 
-            run_req <- function() {
-              base_req(method = "GET",
-                       endpoint = c("workspaces", ws_id, "units")) %>%
-                httr2::req_perform() %>%
-                httr2::resp_body_json()
+            run_req <- function(ws_id) {
+              req <- function() {
+                base_req(method = "GET",
+                         endpoint = c("workspaces", ws_id, "units")) %>%
+                  httr2::req_perform() %>%
+                  httr2::resp_body_json()
+              }
+
+              return(req)
             }
 
-            resp <-
-              run_safe(run_req,
-                       error_message = "Unit listing was not successful.",
-                       default = tibble::tibble())
+            list(ws_id = ws_id, ws_label = ws_label) %>%
+              purrr::list_transpose() %>%
+              purrr::map(function(ws) {
+                ws_units <-
+                  run_safe(run_req(ws$ws_id),
+                           error_message = "Unit listing was not successful.",
+                           default = list()) %>%
+                  purrr::map(function(unit) {
+                    list(
+                      unit_id = unit[["id"]],
+                      unit_key = unit[["key"]],
+                      unit_label = unit[["name"]]
+                    )
+                  })
 
-            resp %>%
-              purrr::map(function(unit) {
-                list(
-                  unit_id = unit[["id"]],
-                  unit_key = unit[["key"]],
-                  unit_label = unit[["name"]]
+                c(
+                  ws,
+                  list(units = ws_units)
                 )
               })
           })

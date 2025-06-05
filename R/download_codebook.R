@@ -1,9 +1,10 @@
 #' Download codebook
 #'
 #' @param workspace [WorkspaceStudio-class]. Workspace information necessary to download codebook via the API.
-#' @param path Character. Path for the codebook file to be downloaded.
+#' @param path Character. Path of the directory for the codebook files to be downloaded to. The default filename is determined by the id and the label of the IQB Studio workspace.
+#' @param file_prefix Character (optional). Path prefix, e.g., a date to keep track of different versions of the codebook.
 #' @param unit_keys Character. Keys (short names) of the units in the workspace the codebook should be retrieved from. If set to `NULL` (default), the codebook will be generated for the all units.
-#' @param format Character. Either `"docx"` (default) or `json`.
+#' @param format Character. Either `"docx"` (default) or `"json"`.
 #' @param missings_profile Missings profile. (Currently without effect.)
 #' @param only_coded Logical. Should only variables with codes be shown?
 #' @param general_instructions Logical. Should the general coding instructions be printed? Defaults to `TRUE`.
@@ -24,9 +25,10 @@
 #' download_codebook,WorkspaceStudio-method
 setGeneric("download_codebook", function(workspace,
                                          path,
+                                         file_prefix = "",
                                          unit_keys = NULL,
                                          # Exportformat
-                                         format = "docx",
+                                         format = c("docx", "json"),
                                          # Missings-Profil
                                          missings_profile = NULL,
                                          # Nur Variablen mit Codes
@@ -55,8 +57,9 @@ setMethod("download_codebook",
           signature = signature(workspace = "WorkspaceStudio"),
           function(workspace,
                    path,
+                   file_prefix = "",
                    unit_keys = NULL,
-                   format = "docx",
+                   format = c("docx", "json"),
                    missings_profile = NULL,
                    only_coded = FALSE,
                    general_instructions = TRUE,
@@ -66,6 +69,8 @@ setMethod("download_codebook",
                    closed = TRUE,
                    show_score = FALSE,
                    code_label_to_upper = TRUE) {
+            format <- match.arg(format)
+
             base_req <- workspace@login@base_req
             ws_id <- workspace@ws_id
             ws_label <- workspace@ws_label
@@ -77,47 +82,73 @@ setMethod("download_codebook",
             if (!is.null(unit_keys)) {
               units <-
                 units %>%
-                purrr::keep(function(x) x$unit_key %in% unit_keys)
+                purrr::map(
+                  function(ws) {
+                    ws$units <-
+                      ws$units %>%
+                      purrr::keep(function(x) x$unit_key %in% unit_keys)
+
+                    return(ws)
+                  }
+                )
             }
 
             unit_ids <-
               units %>%
-              purrr::map("unit_id") %>%
-              purrr::list_simplify()
+              purrr::discard(function(ws) length(ws$units) == 0) %>%
+              purrr::map(
+                function(ws) {
+                  ws$units <-
+                    ws$units %>%
+                    purrr::map_int("unit_id")
+
+                  return(ws)
+                }
+              )
 
             # Normalize query params
-            query_params <-
-              list(
-                format = format,
-                hasOnlyVarsWithCodes = only_coded,
-                generalInstructions = general_instructions,
-                hideItemVarRelation = hide_item_var_relation,
-                derived = derived,
-                onlyManual = manual,
-                closed = closed,
-                showScore = show_score,
-                codeLabelToUpper = code_label_to_upper,
-                id = unit_ids
-              ) %>%
-              purrr::map(stringr::str_to_lower)
+            run_req <- function(ws) {
+              query_params <-
+                list(
+                  format = format,
+                  hasOnlyVarsWithCodes = only_coded,
+                  generalInstructions = general_instructions,
+                  hideItemVarRelation = hide_item_var_relation,
+                  derived = derived,
+                  onlyManual = manual,
+                  closed = closed,
+                  showScore = show_score,
+                  codeLabelToUpper = code_label_to_upper,
+                  id = ws$units
+                ) %>%
+                purrr::map(stringr::str_to_lower)
 
-            run_req <- function() {
-              base_req(method = "GET",
-                       endpoint = c(
-                         "workspaces",
-                         ws_id,
-                         "units",
-                         "coding-book"
-                       ),
-                       query = query_params) %>%
-                httr2::req_perform(path = path)
+              final_path <- stringr::str_glue("{path}/{file_prefix}{ws$ws_label}.{format}")
 
-              cli::cli_alert_success("Codebook of
-              workspace {.ws-id {ws_id}}: {.ws-label {ws_label}}
-              was successfully downloaded to {.file {path}}", wrap = TRUE)
+              req <- function() {
+                base_req(method = "GET",
+                         endpoint = c(
+                           "workspaces",
+                           ws$ws_id,
+                           "units",
+                           "coding-book"
+                         ),
+                         query = query_params) %>%
+                  httr2::req_perform(path = final_path)
+
+                cli::cli_alert_success("Codebook of workspace {.ws-id {ws$ws_id}}: {.ws-label {ws$ws_label}} was successfully downloaded to {.file {final_path}}", wrap = TRUE)
+              }
+
+              return(req)
             }
 
-            run_safe(run_req,
-                     error_message = "Codebook could not be generated. Please check if you have already,
-                     opened {.file {path}} (that migh cause the error).")
+            unit_ids %>%
+              purrr::map(
+                function(ws) {
+                  final_path <-stringr::str_glue("{path}/{file_prefix}{ws$ws_label}.{format}")
+                  run_safe(run_req(ws),
+                           error_message = "Codebook could not be generated. Please check if you have already,
+                     opened {.file {final_path}} (that migh cause the error).")
+
+                })
           })

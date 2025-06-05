@@ -3,18 +3,22 @@
 #' @description
 #' This function adds an entry in the comment tab of the Studio of a single unit.
 #'
-#' @param workspace [WorkspaceStudio-class]. Workspace information necessary to retrieve unit information and resources from the API.
-#' @param unit_id Unit ID to be changed.
+#' @param login [LoginStudio-class]. Login information necessary to add comments.
+#' @param ws_id Workspace id of the unit.
+#' @param unit_id Unit id for the comment to add.
+#' @param parent_id Comment id in case of responding to another comment.
 #' @param comment Comment to be added to the unit. Should contain html markup.
 #'
 #' @return NULL
 #'
 #' @aliases
-#' add_comment,WorkspaceStudio-method
+#' add_comment,LoginStudio-method
 #'
 #' @keywords internal
-setGeneric("add_comment", function(workspace,
+setGeneric("add_comment", function(login,
+                                   ws_id,
                                    unit_id,
+                                   parent_id = NULL,
                                    comment = NULL) {
   cli_setting()
 
@@ -24,28 +28,29 @@ setGeneric("add_comment", function(workspace,
 
 #' @describeIn add_comment Add a comment in a defined workspace
 setMethod("add_comment",
-          signature = signature(workspace = "WorkspaceStudio"),
-          function(workspace,
+          signature = signature(login = "LoginStudio"),
+          function(login,
+                   ws_id,
                    unit_id,
+                   parent_id = NULL,
                    comment = NULL) {
-            base_req <- workspace@login@base_req
-            ws_id <- workspace@ws_id
+            base_req <- login@base_req
 
-            user_id <- workspace@login@user_id
-            user_label <- workspace@login@user_label
+            user_id <- login@user_id
+            user_label <- login@user_label
 
             body <-
               list(
                 body = comment,
                 userName = user_label,
                 userId = user_id,
-                parentId = NULL,
+                parentId = parent_id,
                 unitId = unit_id
               )
 
             run_req <- function() {
               base_req(method = "POST",
-                       endpoint = c("workspace", ws_id, unit_id, "comments")) %>%
+                       endpoint = c("workspaces", ws_id, "units", unit_id, "comments")) %>%
                 httr2::req_body_json(data = body, auto_unbox = TRUE) %>%
                 httr2::req_perform()
             }
