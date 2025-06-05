@@ -1,6 +1,5 @@
 #' Add metadata to units
 #'
-#' @param workspace [WorkspaceStudio-class]. Workspace information necessary to retrieve the unit and item metadata from the API.
 #' @param units Tibble holding units retrieved from [get_units()].
 #'
 #' @description
@@ -8,71 +7,61 @@
 #'
 #' @return A tibble.
 #' @export
-#'
-#' @aliases
-#' add_metadata,WorkspaceStudio-method
-setGeneric("add_metadata", function(workspace, units) {
-  cli_setting()
+add_metadata <- function(units) {
+  ws_settings <- attr(units, "ws_settings")
+  items_profile <- ws_settings %>% dplyr::select(ws_id, "item_metadata") %>% tidyr::unnest(item_metadata)
+  unit_profile <- ws_settings %>% dplyr::select(ws_id, "unit_metadata") %>% tidyr::unnest(unit_metadata)
 
-  standardGeneric("add_metadata")
-})
+  if (tibble::has_name(units, "unit_metadata")) {
+    units <- read_metadata(units = units)
+  }
 
-#' @describeIn add_metadata Get multiple unit information and coding schemes in a defined workspace
-setMethod("add_metadata",
-          signature = signature(workspace = "WorkspaceStudio"),
-          function(workspace, units) {
-            ws_settings <- get_settings(workspace, metadata = TRUE)
-            items_profile <- ws_settings %>% purrr::pluck("item_metadata", 1)
-            unit_profile <- ws_settings %>% purrr::pluck("unit_metadata", 1)
+  unit_start <-
+    units %>%
+    dplyr::select(
+      -c(unit_profiles, items_profiles)
+    ) %>%
+    tidyr::unnest(
+      items_list
+    ) %>%
+    dplyr::mutate(
+      unit_has_items = is.na(item_no)
+    ) %>%
+    # TODO: Remove this in 2026 (all relevant units should have updated metdata profiles)
+    dplyr::rowwise() %>%
+    dplyr::mutate(
+      unit_has_uuids = dplyr::if_any(dplyr::any_of("item_uuid"), ~ !is.na(.), .default = FALSE)
+    ) %>%
+    {
+      if ("item_uuid" %in% names(.)) {
+        dplyr::mutate(., unit_has_uuids = !is.na(item_uuid))
+      } else {
+        dplyr::mutate(., unit_has_uuids = FALSE)
+      }
+    } %>%
+    dplyr::ungroup()
 
-            if (tibble::has_name(units, "unit_metadata")) {
-              units <- read_metadata(units = units)
-            }
+  items_meta <-
+    units %>%
+    dplyr::select(ws_id, unit_id, items_profiles) %>%
+    tidyr::unnest(items_profiles, keep_empty = TRUE) %>%
+    add_profile(id = c("unit_id", "item_no"), profile = items_profile, check = item_has_profile)
 
-            unit_start <-
-              units %>%
-              dplyr::select(
-                -c(unit_profiles, items_profiles)
-              ) %>%
-              tidyr::unnest(
-                items_list
-              ) %>%
-              dplyr::mutate(
-                unit_has_items = is.na(item_no)
-              ) %>%
-              # TODO: Remove this in 2026 (all relevant units should have updated metdata profiles)
-              dplyr::rowwise() %>%
-              dplyr::mutate(
-                unit_has_uuids = dplyr::if_any(dplyr::any_of("item_uuid"), ~ !is.na(.), .default = FALSE)
-              ) %>%
-              {
-                if ("item_uuid" %in% names(.)) {
-                  dplyr::mutate(., unit_has_uuids = !is.na(item_uuid))
-                } else {
-                  dplyr::mutate(., unit_has_uuids = FALSE)
-                }
-              }
+  unit_meta <-
+    units %>%
+    dplyr::select(ws_id, unit_id, unit_profiles) %>%
+    tidyr::unnest(unit_profiles, keep_empty = TRUE) %>%
+    add_profile(id = "unit_id", profile = unit_profile, check = unit_has_profile) %>%
+    # Fix for SFB; TODO: should be adjusted for more flexibility
+    dplyr::rename(dplyr::any_of(c(
+      "Konstruktbereich" = "Konstrukt"
+    )))
 
-            items_meta <-
-              units %>%
-              dplyr::select(unit_id, items_profiles) %>%
-              tidyr::unnest(items_profiles, keep_empty = TRUE) %>%
-              add_profile(id = c(unit_id, item_no), profile = items_profile, check = item_has_profile)
-
-            unit_meta <-
-              units %>%
-              dplyr::select(unit_id, unit_profiles) %>%
-              tidyr::unnest(unit_profiles, keep_empty = TRUE) %>%
-              add_profile(id = unit_id, profile = unit_profile, check = unit_has_profile) %>%
-              dplyr::rename(dplyr::any_of(c(
-                "Konstruktbereich" = "Konstrukt"
-              )))
-
-            unit_start %>%
-              dplyr::left_join(unit_meta, by = dplyr::join_by("unit_id")) %>%
-              # TODO: Better switch to item_uuid?
-              dplyr::left_join(items_meta, by = dplyr::join_by("unit_id", "item_no"))
-          })
+  unit_start %>%
+    dplyr::left_join(unit_meta, by = dplyr::join_by("ws_id", "unit_id")) %>%
+    # TODO: Better switch to item_uuid?
+    dplyr::left_join(items_meta, by = dplyr::join_by("ws_id", "unit_id", "item_no"))
+}
 
 
 # Adds profiles to all columns if possible
@@ -97,7 +86,7 @@ add_profile <- function(metadata, id, profile, check) {
         value = ifelse(is.na(value_id), value_text, value_id)
       ) %>%
       dplyr::select(
-        {{ id }}, profile_name, value
+        ws_id, dplyr::all_of(id), profile_name, value
       ) %>%
       tidyr::pivot_wider(
         names_from = profile_name,
@@ -105,7 +94,7 @@ add_profile <- function(metadata, id, profile, check) {
         values_fn = list
       ) %>%
       tidyr::unnest(!tidyr::any_of(profile_multiples)) %>%
-      dplyr::select({{ id }}, dplyr::any_of(profile_names)) %>%
+      dplyr::select(ws_id, dplyr::all_of(id), dplyr::any_of(profile_names)) %>%
       dplyr::mutate(
         dplyr::across(everything(), function(x) {
           col_name <- dplyr::cur_column()

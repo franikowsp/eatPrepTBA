@@ -1,5 +1,5 @@
 str_replacements <- "[-:/ ]+"
-str_removals <- "\\(\\)"
+str_removals <- "[\\(\\)]"
 
 prepare_metadata <- function(unit_metadata) {
   # Unit metadata
