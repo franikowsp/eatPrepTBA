@@ -1,7 +1,7 @@
 #' Download units
 #'
 #' @param workspace [WorkspaceStudio-class]. Workspace information necessary to download files via the API.
-#' @param path Character. Path for the zip file to be downloaded.
+#' @param path Character. Path for the zip files of the workspaces to be downloaded.
 #' @param unit_keys Character. Keys (short names) of the units in the workspace that should be downloaded. If set to `NULL` (default), all units in the workspace will be downloaded.
 #' @param add_players Logical. Should the resepective Aspect Player(s) of the selected units be added? Defaults to `TRUE`.
 #' @param add_testtakers_review Numeric. Number of Testcenter review logins (`run-review`). Defaults to `0`.
@@ -53,34 +53,66 @@ setMethod("download_units",
             if (!is.null(unit_keys)) {
               units <-
                 units %>%
-                purrr::keep(function(x) x$unit_key %in% unit_keys)
+                purrr::map(
+                  function(ws) {
+                    ws$units <-
+                      ws$units %>%
+                      purrr::keep(function(x) x$unit_key %in% unit_keys)
+
+                    return(ws)
+                  }
+                )
             }
+
+            unit_ids <-
+              units %>%
+              purrr::discard(function(ws) length(ws$units) == 0) %>%
+              purrr::map(
+                function(ws) {
+                  ws$units <-
+                    ws$units %>%
+                    purrr::map_int("unit_id")
+
+                  return(ws)
+                }
+              )
 
             # TODO: Keep in mind as this might become a body string in the future!
-            settings <-
-              list(
-                unitIdList = units %>% purrr::map("unit_id"),
-                addPlayers = add_players,
-                addTestTakersReview = add_testtakers_review,
-                addTestTakersMonitor = add_testtakers_monitor,
-                addTestTakersHot = add_testtakers_hot,
-                passwordLess = password_less,
-                bookletSettings = booklet_settings) %>%
-              jsonlite::toJSON(auto_unbox = TRUE)
 
-            run_req <- function() {
-              base_req(method = "GET",
-                       endpoint = c(
-                         "workspaces",
-                         ws_id),
-                       query = list(download = TRUE, settings = settings)) %>%
-                httr2::req_perform(path = path)
+            run_req <- function(ws) {
+              settings <-
+                list(
+                  unitIdList = ws$units,
+                  addPlayers = add_players,
+                  addTestTakersReview = add_testtakers_review,
+                  addTestTakersMonitor = add_testtakers_monitor,
+                  addTestTakersHot = add_testtakers_hot,
+                  passwordLess = password_less,
+                  bookletSettings = booklet_settings) %>%
+                jsonlite::toJSON(auto_unbox = TRUE)
 
-              cli::cli_alert_success("Units of
-              workspace {.ws-id {ws_id}}: {.ws-label {ws_label}}
-              were successfully downloaded to {.file {path}}", wrap = TRUE)
+              final_path <- stringr::str_glue("{path}/{ws$ws_id}.zip")
+
+              req <- function() {
+                base_req(method = "GET",
+                         endpoint = c(
+                           "workspaces",
+                           ws$ws_id),
+                         query = list(download = TRUE, settings = settings)) %>%
+                  httr2::req_perform(path = final_path)
+
+                cli::cli_alert_success("Units of workspace {.ws-id {ws$ws_id}}:
+                {.ws-label {ws$ws_label}} were successfully downloaded to {.file {final_path}}", wrap = TRUE)
+              }
+
+              return(req)
             }
 
-            run_safe(run_req,
-                     error_message = "Units could not be downloaded.")
+            unit_ids %>%
+              purrr::map(
+                function(ws) {
+                  run_safe(run_req(ws),
+                           error_message = "Units could not be downloaded.")
+                })
+
           })
