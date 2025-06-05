@@ -61,6 +61,48 @@ setMethod("get_settings",
               purrr::map(function(ws) prepare_ws_settings(ws = ws, metadata = metadata)) %>%
               dplyr::bind_rows()
 
+            if (metadata) {
+
+              item_metadata <- tibble::tibble(unit_md_profile = NA_character_)
+
+              if (tibble::has_name(ws_prep, "unit_md_profile")) {
+                unit_profiles <-
+                  ws_prep %>%
+                  dplyr::distinct(unit_md_profile) %>%
+                  dplyr::filter(!is.na(unit_md_profile))
+
+                if (nrow(unit_profiles) > 0) {
+                  unit_metadata <-
+                    unit_profiles %>%
+                    dplyr::mutate(
+                      unit_metadata = purrr::map(unit_md_profile, get_metadata_profile)
+                    )
+                }
+              }
+
+              item_metadata <- tibble::tibble(item_md_profile = NA_character_)
+
+              if (tibble::has_name(ws_prep, "item_md_profile")) {
+                item_profiles <-
+                  ws_prep %>%
+                  dplyr::distinct(item_md_profile) %>%
+                  dplyr::filter(!is.na(item_md_profile))
+
+                if (nrow(item_profiles) > 0) {
+                  item_metadata <-
+                    item_profiles %>%
+                    dplyr::mutate(
+                      item_metadata = purrr::map(item_md_profile, get_metadata_profile)
+                    )
+                }
+              }
+
+              ws_prep <-
+                ws_prep %>%
+                dplyr::left_join(unit_metadata, by = dplyr::join_by("unit_md_profile")) %>%
+                dplyr::left_join(item_metadata, by = dplyr::join_by("item_md_profile"))
+            }
+
             # Workspace group settings for states
             run_req_wsg <- function(wsg_id) {
               req <- function() {
@@ -129,26 +171,6 @@ prepare_ws_settings <- function(ws, metadata) {
         dplyr::mutate(groups = list(ws_groups))
     }
 
-    # Metadata profiles
-    if (metadata) {
-      if (!is.null(ws$settings$itemMDProfile)) {
-        item_metadata <- get_metadata_profile(ws$settings$itemMDProfile)
-      } else {
-        item_metadata <- tibble::tibble()
-      }
-      if (!is.null(ws$settings$itemMDProfile)) {
-        unit_metadata <- get_metadata_profile(ws$settings$unitMDProfile)
-      } else {
-        unit_metadata <- tibble::tibble()
-      }
-
-      ws_defaults <-
-        ws_defaults %>%
-        dplyr::mutate(
-          unit_metadata = list(unit_metadata),
-          item_metadata = list(item_metadata),
-        )
-    }
     ws_defaults
   } else {
     tibble::tibble(ws_id = ws$id)

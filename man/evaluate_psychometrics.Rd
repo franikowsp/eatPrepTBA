@@ -4,22 +4,34 @@
 \alias{evaluate_psychometrics}
 \title{Evaluates frequencies and discrimination parameters of codes and categories}
 \usage{
-evaluate_psychometrics(coded, units, max_n_categories = 10, overwrite = FALSE)
+evaluate_psychometrics(
+  coded,
+  units,
+  domains = NULL,
+  max_n_categories = 10,
+  overwrite = FALSE,
+  identifiers = c("group_id", "login_name", "login_code")
+)
 }
 \arguments{
 \item{coded}{Tibble. Response data coded with \code{\link[=code_responses]{code_responses()}}. The argument \code{prepare} must be \code{TRUE}.}
 
 \item{units}{Tibble. Unit data retrieved from the IQB Studio after setting the argument \code{metadata = TRUE} for \code{\link[=get_units]{get_units()}} -- otherwise the item values could only be inferred from the variable source tree, i.e., item scores are taken from variable scores that are no source variables for other derived variables. Could optionally also contain \code{unit_codes} prepared by \code{add_coding_scheme()} (saves some time).}
 
-\item{overwrite}{Logical. Should column \code{unit_codes} be overwritten if they exist on \code{units}. Defaults to \code{FALSE}, i.e., \code{unit_codes} will be used if they were added to \code{units} beforehand by applying \code{add_coding_schemes()}.
+\item{domains}{Tibble. Contains columns \code{domain} and \code{unit_key}. Currently, the routine only works for one-dimensional \code{domain}, i.e., there is only one \code{domain} for each \code{unit_key}. If not specified, the \code{workspace_label} is regarded as the unit domain.}
 
-This function estimates item, code and category frequencies for a set of coded responses.}
+\item{overwrite}{Logical. Should column \code{unit_codes} be overwritten if they exist on \code{units}. Defaults to \code{FALSE}, i.e., \code{unit_codes} will be used if they were added to \code{units} beforehand by applying \code{add_coding_schemes()}.}
 
-\item{max_n_category}{Tibble. Maximum number of categories to check for category frequencies for list values, e.g., \verb{[[01_1,01_2]]}.}
+\item{identifiers}{Character. Contains person identifiers of the dataset \code{coded}.}
+
+\item{max_n_category}{Tibble. Maximum number of categories to check for category frequencies for list values, e.g., \verb{[[01_1,01_2]]}. Defaults to \code{10}.}
 }
 \value{
 A tibble.
 }
 \description{
 Evaluates frequencies and discrimination parameters of codes and categories
+}
+\details{
+This function estimates item, code and category frequencies for a set of coded responses.
 }

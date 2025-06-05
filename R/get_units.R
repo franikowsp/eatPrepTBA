@@ -182,11 +182,11 @@ read_units <- function(ws, ws_id) {
   if (length(ws) == 0) {
     return(tibble::tibble(ws_id = ws_id))
 
-    cli::cli_alert_info("No units to be retrieved from {.ws-id {workspace@ws_id}}: {.ws {workspace@ws_label}}")
+    # cli::cli_alert_info("No units to be retrieved from {.ws-id {ws_id}}: {.ws {workspace@ws_label}}")
   }
 
   ws %>%
-    purrr::map(read_unit, .progress = "Reading units") %>%
+    purrr::map(read_unit, .progress = "Reading units of {.ws-id {ws_id}}") %>%
     dplyr::bind_rows() %>%
     dplyr::select(any_of(c(
       unit_id = "id",

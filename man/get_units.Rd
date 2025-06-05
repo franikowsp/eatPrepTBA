@@ -24,6 +24,7 @@ A tibble.
 }
 \description{
 This function returns the unit information for multiple units.
+git
 }
 \section{Functions}{
 \itemize{
