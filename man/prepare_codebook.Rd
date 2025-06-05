@@ -19,6 +19,21 @@ prepare_codebook(
   show_score = FALSE,
   code_label_to_upper = TRUE
 )
+
+\S4method{prepare_codebook}{WorkspaceStudio}(
+  workspace,
+  unit_keys = NULL,
+  missings = NULL,
+  missings_profile = NULL,
+  only_coded = FALSE,
+  general_instructions = TRUE,
+  hide_item_var_relation = TRUE,
+  derived = TRUE,
+  manual = TRUE,
+  closed = TRUE,
+  show_score = FALSE,
+  code_label_to_upper = TRUE
+)
 }
 \arguments{
 \item{workspace}{\linkS4class{WorkspaceStudio}. Workspace information necessary to download codebook via the API.}
@@ -51,3 +66,8 @@ A tibble.
 \description{
 This function is a wrapper around \code{\link[=download_units]{download_units()}} that provides a rectangular codebook.
 }
+\section{Functions}{
+\itemize{
+\item \code{prepare_codebook(WorkspaceStudio)}: Download a file of a defined workspace
+
+}}

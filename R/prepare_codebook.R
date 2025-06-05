@@ -47,7 +47,7 @@ setGeneric("prepare_codebook", function(workspace,
   standardGeneric("prepare_codebook")
 })
 
-#' @describeIn download_codebook Upload a file in a defined workspace
+#' @describeIn prepare_codebook Download a file of a defined workspace
 setMethod("prepare_codebook",
           signature = signature(workspace = "WorkspaceStudio"),
           function(workspace,
