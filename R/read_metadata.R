@@ -13,7 +13,7 @@ read_metadata <- function(units) {
                                    .progress = list(
                                      type ="custom",
                                      extra = list(
-                                       unit_keys = unit_keys,
+                                       unit_keys = pad_ids(unit_keys)
                                        ws_ids = ws_ids,
                                        n_ws_ids = n_ws_ids
                                      ),

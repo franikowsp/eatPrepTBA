@@ -8,6 +8,7 @@ code_responses(
   responses,
   units,
   prepare = FALSE,
+  overwrite = FALSE,
   codes_manual = NULL,
   missings = NULL
 )
@@ -19,15 +20,17 @@ code_responses(
 
 \item{prepare}{Logical. Whether to unpack the coding results and to add information from the coding schemes.}
 
+\item{overwrite}{Logical. Should column \code{unit_codes} be overwritten if they exist on \code{units}. Defaults to \code{FALSE}, i.e., \code{unit_codes} will be used if they were added to \code{units} beforehand by applying \code{add_coding_schemes()}.}
+
 \item{codes_manual}{Tibble (optional). Data frame holding the manual codes. Defaults to \code{NULL} and does only automatic coding.}
 
-\item{missings}{Tibble (optional). Provide missing meta data with \code{code_id}, \code{status}, \code{score}, and \code{code_type}. Defaults to \code{NULL} and uses default scheme.}
+\item{missings}{Tibble (optional). Provide missing meta data with \code{code_id}, \code{status}, \code{score}, and \code{code_type}. Defaults to \code{NULL} and uses default scheme.
+
+This function automatically codes responses by using the \code{eatAutoCode} package. It is already prepared for the new data format of the responses received from the \code{\link[=get_responses]{get_responses()}} and \code{\link[=read_responses]{read_responses()}} routines. This function will soon be deleted and be part of \code{\link[=code_responses]{code_responses()}}.}
 }
 \value{
 A tibble.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
-
-This function automatically codes responses by using the \code{eatAutoCode} package. It is already prepared for the new data format of the responses received from the \code{\link[=get_responses]{get_responses()}} and \code{\link[=read_responses]{read_responses()}} routines. This function will soon be deleted and be part of \code{\link[=code_responses]{code_responses()}}.
+Code unit responses with coding schemes
 }
