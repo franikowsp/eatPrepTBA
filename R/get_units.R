@@ -193,7 +193,7 @@ read_units <- function(ws, ws_id) {
                    ws_id = ws_id
                  ),
                  format = "Reading {.unit-label units} for {.ws-label workspace} {.ws-id {cli::pb_extra$ws_id}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
-                 format_done = "Read {cli::pb_total} {.unit-label unit{?s}} of {.ws-label workspace} in {.ws-id {cli::pb_extra$ws_id}} {cli::pb_elapsed}.",
+                 format_done = "Read {cli::pb_total} {.unit-label unit{?s}} of {.ws-label workspace} {.ws-id {cli::pb_extra$ws_id}} in {cli::pb_elapsed}.",
                  format_failed = "Failed to read {.ws-label workspace} {.ws-id {cli::pb_extra$ws_id}}",
                  show_after = 0,
                  clear = FALSE
