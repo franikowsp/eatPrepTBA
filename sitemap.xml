@@ -21,13 +21,14 @@
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/change_units_settings.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/code_responses.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/code_responses_legacy.html</loc></url>
-<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/code_unit.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/code_unit_legacy.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/compute_sizes.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/configure_booklet.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/download_codebook.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/download_units.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/estimate_unit_times.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/evaluate_psychometrics.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/extract_metadata.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/generate_base_req.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/generate_booklet.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/generate_booklets.html</loc></url>
@@ -55,6 +56,7 @@
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/login_studio.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/login_testcenter.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/pipe.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/prepare_codebook.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/prepare_coding_scheme.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/prepare_logs.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/prepare_responses.html</loc></url>

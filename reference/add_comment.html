@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">eatPrepTBA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.3.9103</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.5.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,22 +38,30 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_comment</span><span class="op">(</span><span class="va">workspace</span>, <span class="va">unit_id</span>, comment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_comment</span><span class="op">(</span><span class="va">login</span>, <span class="va">ws_id</span>, <span class="va">unit_id</span>, parent_id <span class="op">=</span> <span class="cn">NULL</span>, comment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for class 'WorkspaceStudio'</span></span>
-<span><span class="fu">add_comment</span><span class="op">(</span><span class="va">workspace</span>, <span class="va">unit_id</span>, comment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># S4 method for class 'LoginStudio'</span></span>
+<span><span class="fu">add_comment</span><span class="op">(</span><span class="va">login</span>, <span class="va">ws_id</span>, <span class="va">unit_id</span>, parent_id <span class="op">=</span> <span class="cn">NULL</span>, comment <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-workspace">workspace<a class="anchor" aria-label="anchor" href="#arg-workspace"></a></dt>
-<dd><p><a href="WorkspaceStudio-class.html">WorkspaceStudio</a>. Workspace information necessary to retrieve unit information and resources from the API.</p></dd>
+<dl><dt id="arg-login">login<a class="anchor" aria-label="anchor" href="#arg-login"></a></dt>
+<dd><p><a href="LoginStudio-class.html">LoginStudio</a>. Login information necessary to add comments.</p></dd>
+
+
+<dt id="arg-ws-id">ws_id<a class="anchor" aria-label="anchor" href="#arg-ws-id"></a></dt>
+<dd><p>Workspace id of the unit.</p></dd>
 
 
 <dt id="arg-unit-id">unit_id<a class="anchor" aria-label="anchor" href="#arg-unit-id"></a></dt>
-<dd><p>Unit ID to be changed.</p></dd>
+<dd><p>Unit id for the comment to add.</p></dd>
+
+
+<dt id="arg-parent-id">parent_id<a class="anchor" aria-label="anchor" href="#arg-parent-id"></a></dt>
+<dd><p>Comment id in case of responding to another comment.</p></dd>
 
 
 <dt id="arg-comment">comment<a class="anchor" aria-label="anchor" href="#arg-comment"></a></dt>
@@ -63,7 +71,7 @@
     <div class="section level2">
     <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
 
-<ul><li><p><code>add_comment(WorkspaceStudio)</code>: Add a comment in a defined workspace</p></li>
+<ul><li><p><code>add_comment(LoginStudio)</code>: Add a comment in a defined workspace</p></li>
 </ul></div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
