@@ -5,12 +5,15 @@
 #' @param overwrite Logical. Should potentially existing `unit_codes` be overwritten? Defaults to `FALSE`.
 #'
 #' @description
-#' Returns the `units` object with added column `unit_codes`. The routine can also propose variable pages if [get_units()] was called with `unit_definition = TRUE`.
+#' Returns the `units` object with added column `unit_codes`. The routine can also propose variable pages if [get_units()] was called with `unit_definition = TRUE`. Please note that no other operation except for filtering or `add_metadata()` should be applied to the `units`.
 #'
 #' @return A tibble.
 #' @export
 add_coding_scheme <- function(units, filter_has_codes = TRUE, overwrite = FALSE) {
   cli_setting()
+
+  # Conserve attributes
+  unit_attributes <- attributes(units)
 
   if (tibble::has_name(units, "unit_codes") && !overwrite) {
     cli::cli_alert_info("Column {.field unit_codes} has already been added to {.field units} and will be used.
@@ -203,12 +206,18 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE, overwrite = FALSE)
         ))
       )
 
-    units %>%
+    units_return <-
+      units %>%
       dplyr::select(-any_of("unit_codes")) %>%
       dplyr::left_join(
         units_coding_nest,
         by = dplyr::join_by("ws_id", "unit_id", "unit_key")
       )
+
+    add_attributes <- setdiff(names(unit_attributes), names(attributes(units_return)))
+    attributes(units_return) <- c(attributes(units_return), unit_attributes[add_attributes])
+
+    return(units_return)
   } else {
     units
   }

@@ -52,6 +52,7 @@ reference:
   contents:
   - add_metadata
   - add_coding_scheme
+  - extract_metadata
 - title: Managing studies
   desc: |
     Functions to check units, prepare material for administration and coding
@@ -75,4 +76,4 @@ reference:
   contents:
   - code_responses
   - estimate_unit_times
-  - evalute_psychometrics
+  - evaluate_psychometrics

@@ -9,17 +9,20 @@
 #'
 #' @keywords internal
 get_metadata_profile <- function(url) {
-  str_replacements <- "[-:/ ]+"
+  str_replacements <- "[-:/ \\*]+"
+  str_removals <- "[\\(\\)]"
 
   profile <- jsonlite::read_json(url)
 
   profile_prepared <-
     profile %>%
-    purrr::pluck("groups", 1, "entries") %>%
+    get_deepest_elements("entries") %>%
+    purrr::list_flatten() %>%
     purrr::map(function(x) unlist(x) %>% as.list() %>% tibble::as_tibble()) %>%
-    purrr::reduce(dplyr::bind_rows) %>%
+    dplyr::bind_rows() %>%
     dplyr::mutate(
-      profile_name = stringr::str_replace_all(label.value, str_replacements, "_")
+      profile_name = stringr::str_replace_all(label.value, str_replacements, "_") %>%
+        stringr::str_remove_all(str_removals)
     )
 
   profile_read <-
