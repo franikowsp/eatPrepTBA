@@ -67,59 +67,70 @@ read_unit_profiles <- function(unit_metadata) {
 }
 
 read_items_profiles <- function(unit_metadata) {
-  if (!is.null(unit_metadata$items) && length(purrr::compact(unit_metadata$items)) != 0) {
-    items_profiles <-
-      unit_metadata$items %>%
-      purrr::map(function(x) {
-        x %>%
-          purrr::pluck("profiles") %>%
-          purrr::keep("isCurrent")
-      }) %>%
-      purrr::map(function(x) {
-        entries <- x %>%
-          purrr::pluck(1, "entries") %>%
-          purrr::map(function(x) {
-            unlist(x) %>%
-              as.list() %>%
-              tibble::enframe() %>%
-              tidyr::unnest(value) %>%
-              tidyr::pivot_wider(values_fn = function(x) stringr::str_c(x, collapse = "_-_-_"))
-          }) %>%
-          purrr::reduce(dplyr::bind_rows, .init = tibble::tibble())}) %>%
-      tibble::enframe(name = "item") %>%
-      tidyr::unnest(value) %>%
-      dplyr::select(dplyr::any_of(c("item", "label.value", "value.id", "valueAsText.value"))) %>%
-      dplyr::mutate(
-        dplyr::across(dplyr::any_of(c("value.id", "valueAsText.value")),
-                      function(x) stringr::str_split(x, "_-_-_"))
-      ) %>%
-      tidyr::unnest(dplyr::any_of(c("value.id", "valueAsText.value"))) %>%
-      dplyr::mutate(
-        profile_name = stringr::str_replace_all(label.value,
-                                                str_replacements,
-                                                "_"),
-      ) %>%
-      dplyr::select(
-        dplyr::any_of(
-          c(
-            item_no = "item",
-            profile_name = "profile_name",
-            # profile_label = label.value,
-            value_id = "value.id",
-            value_text = "valueAsText.value"
-          )
+  items_profiles <-
+    tibble::tibble(
+      item_no = NA_integer_,
+      profile_name = NA_character_,
+      # profile_label = label.value,
+      value_id = NA_character_,
+      value_text = ""
+    )
+
+  if (is.null(unit_metadata$items) || length(purrr::compact(unit_metadata$items)) == 0) {
+    return(items_profiles)
+  }
+
+  items_profiles_prep <-
+    unit_metadata$items %>%
+    purrr::map(function(x) {
+      x %>%
+        purrr::pluck("profiles") %>%
+        purrr::keep("isCurrent")
+    }) %>%
+    purrr::map(function(x) {
+      entries <- x %>%
+        purrr::pluck(1, "entries") %>%
+        purrr::map(function(x) {
+          unlist(x) %>%
+            as.list() %>%
+            tibble::enframe() %>%
+            tidyr::unnest(value) %>%
+            tidyr::pivot_wider(values_fn = function(x) stringr::str_c(x, collapse = "_-_-_"))
+        }) %>%
+        purrr::reduce(dplyr::bind_rows, .init = tibble::tibble())}) %>%
+    tibble::enframe(name = "item") %>%
+    tidyr::unnest(value)
+
+
+  if (nrow(items_profiles_prep) == 0) {
+    return(items_profiles)
+  }
+
+  items_profiles_prep %>%
+    dplyr::select(dplyr::any_of(c("item", "label.value", "value.id", "valueAsText.value"))) %>%
+    dplyr::mutate(
+      dplyr::across(dplyr::any_of(c("value.id", "valueAsText.value")),
+                    function(x) stringr::str_split(x, "_-_-_"))
+    ) %>%
+    tidyr::unnest(dplyr::any_of(c("value.id", "valueAsText.value"))) %>%
+    dplyr::mutate(
+      dplyr::across(dplyr::any_of("label.value"),
+                    function(x) {
+                      stringr::str_replace_all(x, str_replacements, "_")
+                    },
+                    .names = "profile_name")
+    ) %>%
+    dplyr::select(
+      dplyr::any_of(
+        c(
+          item_no = "item",
+          profile_name = "profile_name",
+          # profile_label = label.value,
+          value_id = "value.id",
+          value_text = "valueAsText.value"
         )
       )
-  } else {
-    items_profiles <-
-      tibble::tibble(
-        item_no = NA_integer_,
-        profile_name = NA_character_,
-        # profile_label = label.value,
-        value_id = NA_character_,
-        value_text = ""
-      )
-  }
+    )
 
   return(items_profiles)
 }

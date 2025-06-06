@@ -68,9 +68,10 @@ add_profile <- function(unit_items, units, md_profile, profiles, extra_columns =
     if (profiles == "items_profiles") {
       nest_cols <- setdiff(names(units_final), c(names(units), "unit_has_uuids", "unit_has_items"))
 
-      unit_items %>%
-        tidyr::nest(item_metadata = dplyr::any_of(nest_cols)) %>%
-        return()
+      unit_return <- unit_items %>%
+        tidyr::nest(item_metadata = dplyr::any_of(nest_cols))
+
+      return(unit_return)
     } else {
       return(unit_items)
     }
@@ -79,20 +80,30 @@ add_profile <- function(unit_items, units, md_profile, profiles, extra_columns =
   md_profiles <-
     ws_settings %>%
     dplyr::distinct(dplyr::across(dplyr::any_of(md_profile))) %>%
-    dplyr::filter(dplyr::if_any(dplyr::all_of(md_profile), function(x) !is.na(x)))
-
-  if (nrow(md_profiles) == 0) {
-    return(units)
-  }
+    dplyr::filter(dplyr::if_any(dplyr::any_of(md_profile), function(x) !is.na(x)))
 
   metadata <-
     md_profiles %>%
     dplyr::mutate(
-      dplyr::across(md_profile, function(x) purrr::map(x, get_metadata_profile),
-                    .names = "metadata")
+      dplyr::across(
+        dplyr::any_of(md_profile),
+        function(x) purrr::map(x, get_metadata_profile),
+        .names = "metadata")
     ) %>%
-    tidyr::unnest(metadata) %>%
-    tidyr::unnest(data)
+    tidyr::unnest(dplyr::any_of("metadata")) %>%
+    tidyr::unnest(dplyr::any_of("data"))
+
+  if (nrow(metadata) == 0) {
+    if (profiles == "items_profiles") {
+      nest_cols <- setdiff(names(units_final), c(names(units), "unit_has_uuids", "unit_has_items"))
+
+      unit_items %>%
+        tidyr::nest(item_metadata = dplyr::any_of(nest_cols)) %>%
+        return()
+    } else {
+      return(unit_items)
+    }
+  }
 
   profiles_meta <-
     metadata %>%
