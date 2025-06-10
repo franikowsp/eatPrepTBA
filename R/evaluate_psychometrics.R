@@ -5,7 +5,7 @@
 #' @param domains Tibble. Contains columns `domain` and `unit_key`. Currently, the routine only works for one-dimensional `domain`, i.e., there is only one `domain` for each `unit_key`. If not specified, the `workspace_label` is regarded as the unit domain.
 #' @param max_n_categories Tibble. Maximum number of categories to check for category frequencies for list values, e.g., `[[01_1,01_2]]`. Defaults to `10`.
 #' @param overwrite Logical. Should column `unit_codes` be overwritten if they exist on `units`. Defaults to `FALSE`, i.e., `unit_codes` will be used if they were added to `units` beforehand by applying `add_coding_schemes()`.
-#' @param identifiers Character. Contains person identifiers of the dataset `coded`.
+#' @param identifiers Character. Contains person identifiers of the dataset `coded`. Defaults to `c("group_id", "login_name", "login_code")` which corresponds to the identifiers of the IQB Testcenter.
 #'
 #' @details
 #' This function estimates item, code and category frequencies for a set of coded responses.
@@ -89,8 +89,6 @@ evaluate_psychometrics <- function(
   }
 
 
-
-
   # TODO: variable_multiple contains a bug (should become FALSE if only one value is allowed)
   # variable_multiples <-
   #   units_cs_unnest %>%
@@ -102,7 +100,8 @@ evaluate_psychometrics <- function(
   variables_multiple <-
     coded %>%
     dplyr::group_by(unit_key, variable_id) %>%
-    dplyr::summarise(category_is_list = any(stringr::str_detect(value, "^\\[\\[.+\\]\\]$"), na.rm = TRUE), .groups = "drop")
+    dplyr::summarise(category_is_list = any(stringr::str_detect(value, "^\\[\\[.+\\]\\]$"), na.rm = TRUE), .groups = "drop") %>%
+    dplyr::ungroup()
 
   # Reconstruct variable labels
   variable_labels <-
@@ -116,7 +115,7 @@ evaluate_psychometrics <- function(
     ) %>%
     dplyr::mutate(
       # Could be a picture (add later; requires unit definition)
-      value_label = ifelse(value_label == "", stringr::str_glue("Platzhalter Medium {value}"), value_label)
+      value_label = ifelse(value_label == "", stringr::str_glue("Placeholder Medium {value}"), value_label)
     )
 
   # Frequencies
@@ -141,15 +140,14 @@ evaluate_psychometrics <- function(
     coded %>%
     dplyr::semi_join(variable_labels, by = dplyr::join_by("unit_key", "variable_id")) %>%
     dplyr::filter(!is.na(value)) %>%
+
+    # TODO: Consistent missing filter!
+    dplyr::filter(code_id >= 0) %>%
+
     dplyr::count(unit_key, variable_source_type, variable_id, code_id, code_score, code_type, code_status, value,
                  name = "category_n") %>%
     dplyr::group_by(unit_key, variable_source_type, variable_id) %>%
     dplyr::mutate(
-      # TODO: Add a column with information "valid" vs. "missing" in the missing routine
-      category_n_total = sum(category_n),
-      category_n_valid = sum(category_n * !is.na(code_score)),
-      category_p_total = category_n / category_n_total,
-      category_p_valid = ifelse(!is.na(code_score), category_n / category_n_valid, NA),
       category_n_categories_valid = length(!is.na(code_score))
     ) %>%
     dplyr::left_join(variables_multiple, by = dplyr::join_by("unit_key", "variable_id")) %>%
@@ -200,33 +198,34 @@ evaluate_psychometrics <- function(
       responses = c(id, status, value)
     )
 
-  cli::cli_alert_info("Adding missing category codes")
-  lost_frequency_coding <-
-    code_responses(
-      responses = lost_frequency_responses,
-      units = units_cs,
-      prepare = TRUE,
-      overwrite = FALSE
-    )
+  if (nrow(lost_frequency_responses) > 0) {
 
-  lost_category_frequencies <-
-    lost_frequency_coding %>%
-    dplyr::select(-code_chunk) %>%
-    dplyr::filter(code_status != "UNSET",
-                  variable_source_type == "BASE") %>%
-    dplyr::left_join(variable_labels, by = dplyr::join_by("unit_key", "variable_id", "value")) %>%
-    dplyr::rename(
-      category_id = value,
-      category_label = value_label
-    ) %>%
-    dplyr::mutate(
-      category_n = 0L,
-      category_n_total = 0L,
-      category_n_valid = 0L,
-      category_p_total = 0,
-      category_p_valid = 0,
-      category_is_list = FALSE
-    )
+    cli::cli_alert_info("Adding missing category codes")
+    lost_frequency_coding <-
+      code_responses(
+        responses = lost_frequency_responses,
+        units = units_cs,
+        prepare = TRUE,
+        overwrite = FALSE
+      )
+
+    lost_category_frequencies <-
+      lost_frequency_coding %>%
+      dplyr::select(-code_chunk) %>%
+      dplyr::filter(code_status != "UNSET",
+                    variable_source_type == "BASE") %>%
+      dplyr::left_join(variable_labels, by = dplyr::join_by("unit_key", "variable_id", "value")) %>%
+      dplyr::rename(
+        category_id = value,
+        category_label = value_label
+      ) %>%
+      dplyr::mutate(
+        category_n = 0L,
+        category_is_list = FALSE
+      )
+  } else {
+    lost_category_frequencies <- tibble::tibble()
+  }
 
   # Merge categories
   all_category_frequencies <-
@@ -268,7 +267,13 @@ evaluate_psychometrics <- function(
     all_code_frequencies %>%
     dplyr::left_join(all_category_frequencies,
                      by = dplyr::join_by("unit_key", "variable_source_type", "variable_id",
-                                         "code_id", "code_score", "code_type", "code_status"))
+                                         "code_id", "code_score", "code_type", "code_status")) %>%
+    dplyr::mutate(
+      # category_n_total = sum(category_n),
+      # category_n_valid = sum(category_n * !is.na(code_score)),
+      category_p_total = category_n / code_n_total,
+      category_p_valid = category_n / code_n_valid,
+    )
 
   # Discrimination
   domains_ws <-
@@ -309,7 +314,7 @@ evaluate_psychometrics <- function(
       dplyr::across(dplyr::any_of(c("domain", identifiers)))
     ) %>%
     dplyr::summarise(
-      domain_score = sum(code_score, na.rm = TRUE),
+      domain_score = mean(code_score, na.rm = TRUE),
       # TODO: For part-whole-correction?
       # domain_score_pw = domain_score - code_score
       .groups = "drop"
@@ -319,12 +324,13 @@ evaluate_psychometrics <- function(
   code_discriminations <-
     coded_domains %>%
     dplyr::left_join(coded_domain_scores,
-                     by = dplyr::join_by("domain", identifiers)) %>%
+                     by = dplyr::join_by("domain", !!! identifiers)) %>%
     dplyr::select(dplyr::any_of(c("domain", identifiers,
                                   "unit_key", "variable_id", "code_id", "domain_score"))) %>%
     tidyr::nest(data = dplyr::any_of(c(identifiers, "code_id", "domain_score"))) %>%
     dplyr::mutate(
-      data = purrr::map(data, function(x) category_corralation(x,
+      data = purrr::map(data, function(x) category_correlation(x,
+                                                               identifiers = identifiers,
                                                                input_name = "code_id",
                                                                output_name = "code_id",
                                                                output_value = "code_pbc"),
@@ -340,7 +346,7 @@ evaluate_psychometrics <- function(
     coded_domains %>%
     dplyr::semi_join(variable_labels, by = dplyr::join_by("unit_key", "variable_id")) %>%
     dplyr::left_join(coded_domain_scores,
-                     by = dplyr::join_by("domain", identifiers)) %>%
+                     by = dplyr::join_by("domain", !!! identifiers)) %>%
     dplyr::select(dplyr::any_of(c("domain", identifiers, "unit_key", "variable_id", "value", "domain_score"))) %>%
     dplyr::filter(!is.na(value)) %>%
     dplyr::group_by(unit_key, variable_id) %>%
@@ -352,7 +358,8 @@ evaluate_psychometrics <- function(
     dplyr::select(-dplyr::any_of(c("category_is_list", "category_n_categories_valid"))) %>%
     tidyr::nest(data = dplyr::any_of(c(identifiers, "value", "domain_score"))) %>%
     dplyr::mutate(
-      data = purrr::map(data, function(x) category_corralation(x,
+      data = purrr::map(data, function(x) category_correlation(x,
+                                                               identifiers = identifiers,
                                                                input_name = "value",
                                                                output_name = "category_id",
                                                                output_value = "category_pbc"),
@@ -375,10 +382,11 @@ evaluate_psychometrics <- function(
         "code_n", "code_n_total", "code_n_valid", "code_p_total", "code_p_valid",
         "domain", "code_pbc",
         "category_id", "category_label", "catagory_is_list",
-        "category_n", "category_n_total", "category_n_valid", "category_p_total", "category_p_valid",
+        "category_n", "category_p_total", "category_p_valid",
         "category_pbc"
       ))
-    )
+    ) #%>%
+    # readr::write_rds("Q:/BiStaTest/Primar/2_Pilotierung/51b_Einlesekontrolle/data/new-category.RData")
 }
 
 concatenate_character <- function(value) {
@@ -394,7 +402,7 @@ concatenate_character <- function(value) {
   })
 }
 
-category_corralation <- function(data, input_name = "code_id", output_name = "code_id", output_value = "code_pbc") {
+category_correlation <- function(data, identifiers, input_name = "code_id", output_name = "code_id", output_value = "code_pbc") {
   data %>%
     dplyr::mutate(
       code_dummy = 1

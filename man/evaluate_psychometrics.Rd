@@ -24,7 +24,7 @@ evaluate_psychometrics(
 
 \item{overwrite}{Logical. Should column \code{unit_codes} be overwritten if they exist on \code{units}. Defaults to \code{FALSE}, i.e., \code{unit_codes} will be used if they were added to \code{units} beforehand by applying \code{add_coding_schemes()}.}
 
-\item{identifiers}{Character. Contains person identifiers of the dataset \code{coded}.}
+\item{identifiers}{Character. Contains person identifiers of the dataset \code{coded}. Defaults to \code{c("group_id", "login_name", "login_code")} which corresponds to the identifiers of the IQB Testcenter.}
 }
 \value{
 A tibble.
