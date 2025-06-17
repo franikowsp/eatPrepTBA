@@ -389,15 +389,15 @@ evaluate_psychometrics <- function(
     # readr::write_rds("Q:/BiStaTest/Primar/2_Pilotierung/51b_Einlesekontrolle/data/new-category.RData")
 }
 
-concatenate_character <- function(value) {
+concatenate_character <- function(value, collapse = ";;;", wrap_start = "[[[", wrap_end = "]]]") {
   purrr::map_chr(value, function(x) {
     x_prep <- x %>% tibble::deframe()
 
     if (length(x_prep) == 1) {
       as.character(x_prep)
     } else {
-      list_vals <- stringr::str_c(x_prep, collapse = ",")
-      stringr::str_glue("[[{list_vals}]]")
+      list_vals <- stringr::str_c(x_prep, collapse = collapse)
+      stringr::str_glue("{wrap_start}{list_vals}{wrap_end}")
     }
   })
 }

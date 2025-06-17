@@ -365,6 +365,8 @@ read_definition <- function(units, base_req) {
     # readr::write_rds(units_def, "D:/data/units_def.RData")
     # units_def <- readr::read_rds("D:/data/units_def.RData")
 
+    # units_def %>% dplyr::slice(12)
+
     unit_pages_prep <-
       units_def %>%
       dplyr::select(ws_id, unit_id, unit_key, definition) %>%
@@ -391,11 +393,14 @@ read_definition <- function(units, base_req) {
 
     cli::cli_h3("Extracting page information from unit definitions")
 
+    missing_string <- "___MISSING___"
+
     unit_pages <-
       unit_pages_nest %>%
       dplyr::mutate(
         variable_pages = purrr::map(variable_pages,
                                     eatAutoCode::extract_variable_location,
+                                    missing = missing_string,
                                     .progress = list(
                                       type ="custom",
                                       extra = list(
@@ -411,10 +416,28 @@ read_definition <- function(units, base_req) {
                                       clear = FALSE
                                     ))
       )
+    # unit_pages %>% .$variable_pages %>% .[[1]] %>% .$variable_pages
+    # variable_pages %>% dplyr::count(value_default) %>% View
+    # variable_pages %>% View
 
     variable_pages <-
       unit_pages %>%
       tidyr::unnest(variable_pages) %>%
+      dplyr::mutate(
+        variable_pages = purrr::map(variable_pages, function(variable_pages) {
+          variable_pages %>%
+            tibble::as_tibble() %>%
+            dplyr::mutate(dplyr::across(dplyr::any_of(c("value_default")),
+                                        function(x) {
+                                          # To conform to coding routine
+                                          if (typeof(x) == "logical") {
+                                            stringr::str_to_lower(x)
+                                          } else {
+                                            ifelse(x == missing_string, NA_character_, as.character(x))
+                                          }
+                                        }))
+        })
+      ) %>%
       tidyr::unnest(variable_pages, keep_empty = TRUE) %>%
       tidyr::unnest(variable_path, keep_empty = TRUE) %>%
       dplyr::select(
@@ -427,6 +450,7 @@ read_definition <- function(units, base_req) {
           "variable_ref" = "variable_ref",
           "variable_page_always_visible" = "variable_page_always_visible",
           "variable_dependencies" = "variable_dependencies",
+          "value_default" = "value_default",
 
           "variable_page" = "pages",
           "variable_section" = "sections",
@@ -457,6 +481,7 @@ read_definition <- function(units, base_req) {
           "variable_ref" = "variable_ref",
           "variable_page_always_visible" = "variable_page_always_visible",
           "variable_dependencies" = "variable_dependencies",
+          "value_default" = "value_default",
 
           "variable_dependency_page" = "pages",
           "variable_dependency_section" = "sections",
@@ -470,6 +495,7 @@ read_definition <- function(units, base_req) {
         c(
           dplyr::all_of(c("ws_id", "unit_id", "unit_key")),
           dplyr::any_of(c("variable_ref",
+                          "value_default",
                           "variable_page",
                           "variable_section",
                           "variable_content",
