@@ -310,48 +310,229 @@ list_to_logical <- function(x) {
   })
 }
 
+# unit_key <- units_to_update$unit_key[[15]]
+# ws_id <- units_to_update$ws_id[[15]]
+# unit_id <- units_to_update$unit_id[[15]]
+
 get_definition <- function(unit_key, ws_id, unit_id, base_req) {
   run_req_definition <- function() {
     base_req(method = "GET",
              endpoint = c("workspaces", ws_id, "units", unit_id, "definition")) %>%
       httr2::req_perform() %>%
-      httr2::resp_body_json()
+      httr2::resp_body_json() %>%
+      purrr::pluck("definition")
   }
 
   message <- glue::glue("Unit definition for {{.unit-key {unit_key}}} could not be retrieved.
                Please check: {{.href https://www.iqb-studio.de/#/a/{unit_id}/{unit_id}}}.")
 
   # Todo: Check if this could also be in a loop somehow?
-  resp_definition <-
-    run_safe(run_req_definition,
-             error_message = message)
+  # resp_definition <-
+  run_safe(run_req_definition,
+           error_message = message)
 
-  if (!is.null(resp_definition)) {
-    unit <- prepare_definition(resp_definition)
-  }
+  # if (!is.null(resp_definition)) {
+  #   prepare_definition(resp_definition)
+  # }
 }
 
 read_definition <- function(units, base_req) {
   unit_keys <- units$unit_key
+  ws_ids <- units$ws_id
+  n_ws_ids <- length(unique(ws_ids))
 
   if (length(unit_keys) > 0) {
-    units %>%
+    units_def <-
+      units %>%
       dplyr::mutate(
-        unit_definition = purrr::pmap(
+        definition = purrr::pmap_chr(
           list(unit_key, ws_id, unit_id),
           function(unit_key, ws_id, unit_id) get_definition(unit_key, ws_id, unit_id, base_req),
           .progress = list(
             type ="custom",
             extra = list(
-              unit_keys = pad_ids(unit_keys)
+              unit_keys = pad_ids(unit_keys),
+              ws_ids = ws_ids,
+              n_ws_ids = n_ws_ids
             ),
-            format = "Preparing unit definitions for {.ws-label workspace} {.ws-id {cli::pb_extra$ws_ids[cli::pb_current+1]}}, {.unit-label unit} {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
-            format_done = "Prepared unit definitions of {cli::pb_total} {.unit-label unit{?s}} of {cli::pb_extra$n_ws_ids} {.ws-label workspace{?s}} metadata in {cli::pb_elapsed}.",
-            format_failed = "Failed at preparing unit definition for {.ws-label workspace} {.ws-id {cli::pb_extra$ws_ids[cli::pb_current+1]}}, {.unit-label unit} {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}}",
+            format = "Retrieving unit definitions for {.ws-label workspace} {.ws-id {cli::pb_extra$ws_ids[cli::pb_current+1]}}, {.unit-label unit} {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
+            format_done = "Retrieved unit definitions of {cli::pb_total} {.unit-label unit{?s}} of {cli::pb_extra$n_ws_ids} {.ws-label workspace{?s}} metadata in {cli::pb_elapsed}.",
+            format_failed = "Failed at retrieving unit definition for {.ws-label workspace} {.ws-id {cli::pb_extra$ws_ids[cli::pb_current+1]}}, {.unit-label unit} {.unit-key {cli::pb_extra$unit_keys[cli::pb_current+1]}}",
             clear = FALSE
           ))
+      )
+
+    # readr::write_rds(units_def, "D:/data/units_def.RData")
+    # units_def <- readr::read_rds("D:/data/units_def.RData")
+
+    unit_pages_prep <-
+      units_def %>%
+      dplyr::select(ws_id, unit_id, unit_key, definition) %>%
+      dplyr::group_by(ws_id) %>%
+      dplyr::mutate(
+        # The process is pretty memory-demanding; therefore batching is applied
+        batch = ((seq_along(ws_id) - 1) %/% 10) + 1
       ) %>%
-      tidyr::unnest(unit_definition)
+      dplyr::ungroup()
+
+    unit_pages_nest <-
+      unit_pages_prep %>%
+      tidyr::nest(
+        variable_pages = c(unit_id, unit_key, definition)
+      )
+
+    ws_ids <- unit_pages_nest$ws_id
+    batches <- unit_pages_nest$batch
+    n_ws_batches <- unit_pages_nest %>%
+      dplyr::group_by(ws_id) %>%
+      dplyr::mutate(max_batch = max(batch)) %>%
+      dplyr::pull(max_batch)
+    n_ws_ids <- length(unique(ws_ids))
+
+    cli::cli_h3("Extracting page information from unit definitions")
+
+    unit_pages <-
+      unit_pages_nest %>%
+      dplyr::mutate(
+        variable_pages = purrr::map(variable_pages,
+                                    eatAutoCode::extract_variable_location,
+                                    .progress = list(
+                                      type ="custom",
+                                      extra = list(
+                                        ws_ids = ws_ids,
+                                        batches = batches,
+                                        n_ws_ids = n_ws_ids,
+                                        n_ws_batches = n_ws_batches
+                                      ),
+                                      show_after = 0,
+                                      format = "Extracting pages from unit definitions for {.ws-label workspace} {.ws-id {cli::pb_extra$ws_ids[cli::pb_current+1]}}, batch {cli::pb_extra$batches[cli::pb_current+1]} of {cli::pb_extra$n_ws_batches[cli::pb_current+1]} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
+                                      format_done = "Extracted pages from unit definitions from {cli::pb_extra$n_ws_ids} {.ws-label workspace{?s}} metadata in {cli::pb_elapsed}.",
+                                      format_failed = "Failed at extracting information from unit definition for {.ws-label workspace} {.ws-id {cli::pb_extra$ws_ids[cli::pb_current+1]}}",
+                                      clear = FALSE
+                                    ))
+      )
+
+    variable_pages <-
+      unit_pages %>%
+      tidyr::unnest(variable_pages) %>%
+      tidyr::unnest(variable_pages, keep_empty = TRUE) %>%
+      tidyr::unnest(variable_path, keep_empty = TRUE) %>%
+      dplyr::select(
+        dplyr::all_of(c(
+          "ws_id",
+          "unit_id",
+          "unit_key"
+        )),
+        dplyr::any_of(c(
+          "variable_ref" = "variable_ref",
+          "variable_page_always_visible" = "variable_page_always_visible",
+          "variable_dependencies" = "variable_dependencies",
+
+          "variable_page" = "pages",
+          "variable_section" = "sections",
+          "variable_element" = "elements",
+          "variable_content" = "content"
+        ))
+      ) %>%
+      dplyr::mutate(
+        variable_dependencies = purrr::map2(variable_page_always_visible,
+                                            variable_dependencies,
+                                            function(page_always_visible, dependencies) {
+                                              if (page_always_visible & length(dependencies) != 0) {
+                                                dependencies
+                                              } else {
+                                                tibble::tibble(
+                                                  variable_dependency_ref = NA_character_,
+                                                  variable_dependency_path = tibble::tibble(),
+                                                  variable_dependency_page_always_visible = NA)
+                                              }
+                                            })
+      ) %>%
+      tidyr::unnest(variable_dependencies, keep_empty = TRUE) %>%
+      tidyr::unnest(dplyr::any_of("variable_dependency_path"), keep_empty = TRUE) %>%
+      dplyr::filter(is.na(variable_dependency_page_always_visible) |
+                      !variable_dependency_page_always_visible) %>%
+      dplyr::rename(
+        dplyr::any_of(c(
+          "variable_ref" = "variable_ref",
+          "variable_page_always_visible" = "variable_page_always_visible",
+          "variable_dependencies" = "variable_dependencies",
+
+          "variable_dependency_page" = "pages",
+          "variable_dependency_section" = "sections",
+          "variable_dependency_content" = "content",
+          "variable_dependency_element" = "element"
+        ))
+      ) %>%
+      dplyr::distinct() %>%
+
+      dplyr::group_by(dplyr::across(
+        c(
+          dplyr::all_of(c("ws_id", "unit_id", "unit_key")),
+          dplyr::any_of(c("variable_ref",
+                          "variable_page",
+                          "variable_section",
+                          "variable_content",
+                          "variable_element",
+                          "variable_page_always_visible")))
+      )) %>%
+      dplyr::summarise(
+        dplyr::across(dplyr::any_of(c("variable_dependency_page",
+                                      "variable_dependency_section",
+                                      "variable_dependency_content",
+                                      "variable_dependency_element")),
+                      function(x) safe_min(x)),
+        .groups = "drop"
+      ) %>%
+      dplyr::group_by(dplyr::across(
+        c(
+          dplyr::all_of(c("ws_id", "unit_id", "unit_key")),
+          dplyr::any_of(c("variable_page_always_visible"))
+        )
+      )) %>%
+      dplyr::mutate(
+        # The minimum page number that is not always visible
+        variable_page_min = ifelse(!variable_page_always_visible, safe_min(variable_page), NA)
+      ) %>%
+      dplyr::group_by(dplyr::across(
+        c(
+          dplyr::all_of(c("ws_id", "unit_id", "unit_key"))
+        )
+      )) %>%
+      tidyr::fill(variable_page_min, .direction = "updown") %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(
+        dplyr::across(dplyr::any_of(c(
+          "variable_page",
+          "variable_dependency_page")),
+          function(x) x - .data[["variable_page_min"]])
+      ) %>%
+      dplyr::select(-dplyr::any_of("variable_page_min"))
+
+    if (tibble::has_name(variable_pages, "variable_dependency_page")) {
+      variable_pages <-
+        variable_pages %>%
+        dplyr::mutate(
+          variable_page = dplyr::case_when(
+            variable_page_always_visible & !is.na(variable_dependency_page) ~ variable_dependency_page,
+            variable_page_always_visible ~ 0,
+            .default = variable_page),
+          variable_section = ifelse(variable_page_always_visible & !is.na(variable_dependency_section),
+                                    variable_dependency_section,
+                                    variable_section)
+        ) %>%
+        dplyr::select(-dplyr::matches("^variable_dependency"))
+    }
+
+    units %>%
+      dplyr::left_join(
+        variable_pages %>% tidyr::nest(variable_pages = -dplyr::any_of(c("ws_id", "unit_id", "unit_key"))),
+        by = dplyr::join_by("ws_id", "unit_id", "unit_key")
+      ) %>%
+      dplyr::left_join(
+        unit_pages_prep %>% dplyr::rename(unit_definition = definition),
+        by = dplyr::join_by("ws_id", "unit_id", "unit_key")
+      )
   } else {
     units
   }
@@ -392,3 +573,13 @@ get_last_change <- function(units) {
 #             ) %>%
 #               dplyr::rename(unitname = id)
 #           })
+
+safe_min <- function(x, na.rm = FALSE) {
+  result <- min(x, na.rm = na.rm)
+  if (na.rm && is.infinite(result)) NA else result
+}
+
+safe_max <- function(x, na.rm = FALSE) {
+  result <- max(x, na.rm = na.rm)
+  if (na.rm && is.infinite(result)) NA else result
+}

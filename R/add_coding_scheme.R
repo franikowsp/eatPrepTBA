@@ -110,6 +110,7 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE, overwrite = FALSE)
         ) %>%
         tidyr::unnest(variable_pages)
 
+      # units_pages %>% dplyr::count(variable_page)
       units_st_nest <-
         units_st %>%
         dplyr::left_join(
@@ -121,6 +122,9 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE, overwrite = FALSE)
             dplyr::rename(
               variable_source_ref = "variable_ref",
               variable_source_page = "variable_page",
+              variable_source_section = "variable_section",
+              variable_source_content = "variable_content",
+              variable_source_element = "variable_element",
               variable_source_page_always_visible = "variable_page_always_visible"),
           by = dplyr::join_by("ws_id", "unit_id", "unit_key", "variable_source_ref")
         ) %>%
@@ -129,31 +133,35 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE, overwrite = FALSE)
         # dplyr::filter(variable_ref == "01") %>% View()
         dplyr::mutate(
           variable_page = dplyr::case_when(
-            !is.na(variable_page) ~ as.character(variable_page),
-            .default = variable_source_page %>% na.omit() %>% unique() %>% stringr::str_c(collapse = ",")
+            !is.na(variable_page) ~ variable_page,
+            .default = suppressWarnings(max(variable_source_page, na.rm = TRUE)) #%>% stringr::str_c(collapse = ",")
           ),
-          # If NA, the user would have to take a closer look
-          variable_page_always_visible = dplyr::case_when(
-            !is.na(variable_page_always_visible) ~ variable_page_always_visible,
-            # In case of no 1:1 relatiionship, this should be omitted
-            all(is.na(variable_source_page_always_visible)) ~ NA,
-            all(na.omit(variable_source_page_always_visible)) | all(!na.omit(variable_source_page_always_visible)) ~
-              any(variable_source_page_always_visible),
-            .default = NA
-          ),
+          # # If NA, the user would have to take a closer look
+          # variable_page_always_visible = dplyr::case_when(
+          #   !is.na(variable_page_always_visible) ~ variable_page_always_visible,
+          #   # In case of no 1:1 relatiionship, this should be omitted
+          #   all(is.na(variable_source_page_always_visible)) ~ NA,
+          #   all(na.omit(variable_source_page_always_visible)) | all(!na.omit(variable_source_page_always_visible)) ~
+          #     any(variable_source_page_always_visible),
+          #   .default = NA
+          # ),
         ) %>%
         dplyr::ungroup() %>%
         tidyr::nest(variable_sources = dplyr::any_of(c(
           "variable_source_id", "variable_source_ref",
           "variable_source_level", "variable_source_direct",
-          "variable_source_page", "variable_source_page_always_visible")))
+          "variable_source_page", "variable_source_section",
+          "variable_source_content", "variable_source_element",
+          "variable_source_page_always_visible")))
     } else {
       units_st_nest <-
         units_st %>%
         tidyr::nest(variable_sources = dplyr::any_of(c(
           "variable_source_id", "variable_source_ref",
           "variable_source_level", "variable_source_direct",
-          "variable_source_page", "variable_source_page_always_visible")))
+          "variable_source_page", "variable_source_section",
+          "variable_source_content", "variable_source_element",
+          "variable_source_page_always_visible")))
     }
 
     # Add unit variables
