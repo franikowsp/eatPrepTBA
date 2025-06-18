@@ -160,9 +160,9 @@ evaluate_psychometrics <- function(
           return(value)
         }
 
-        if (value %>% stringr::str_detect("^\\[\\[.+\\]\\]$")) {
-          value %>% stringr::str_extract("^\\[\\[(.+)\\]\\]$", group = TRUE) %>%
-            stringr::str_split_1(",")
+        if (value %>% stringr::str_detect("^\\[\\[\\[.+\\]\\]\\]$")) {
+          value %>% stringr::str_extract("^\\[\\[\\[(.+)\\]\\]\\]$", group = TRUE) %>%
+            stringr::str_split_1(";;;")
         } else {
           value
         }
