@@ -16,7 +16,7 @@ code_responses(
 \arguments{
 \item{responses}{Tibble. Response data retrieved from the IQB Testcenter with setting the argument \code{prepare = FALSE} for \code{\link[=get_responses]{get_responses()}} or \code{\link[=read_responses]{read_responses()}}.}
 
-\item{units}{Tibble. Unit data retrieved from the IQB Studio after setting the argument \code{coding_scheme = TRUE} for \code{\link[=get_units]{get_units()}}.}
+\item{units}{Tibble. Unit data retrieved from the IQB Studio with \code{\link[=get_units]{get_units()}}.}
 
 \item{prepare}{Logical. Whether to unpack the coding results and to add information from the coding schemes.}
 
@@ -24,7 +24,7 @@ code_responses(
 
 \item{codes_manual}{Tibble (optional). Data frame holding the manual codes. Defaults to \code{NULL} and does only automatic coding.}
 
-\item{missings}{Tibble (optional). Provide missing meta data with \code{code_id}, \code{status}, \code{score}, and \code{code_type}. Defaults to \code{NULL} and uses default scheme.
+\item{missings}{Tibble (optional). Provide missing meta data with \code{code_id}, \code{code_status}, \code{code_score}, and \code{code_type}. Defaults to \code{NULL} and uses default scheme.
 
 This function automatically codes responses by using the \code{eatAutoCode} package. It is already prepared for the new data format of the responses received from the \code{\link[=get_responses]{get_responses()}} and \code{\link[=read_responses]{read_responses()}} routines. This function will soon be deleted and be part of \code{\link[=code_responses]{code_responses()}}.}
 }
