@@ -124,7 +124,7 @@ add_profile <- function(unit_items, units, md_profile, profiles, extra_columns =
     dplyr::left_join(ws_settings %>% dplyr::select(ws_id, dplyr::all_of(md_profile)), by = dplyr::join_by("ws_id")) %>%
     dplyr::left_join(metadata, by = dplyr::join_by(!!! c("profile_name", "value_id", md_profile))) %>%
     dplyr::mutate(
-      value = dplyr::coalesce(value_label, value_id)
+      value = dplyr::coalesce(value_label, value_text)
     ) %>%
     dplyr::select(dplyr::all_of(c("ws_id", "unit_id", extra_columns, "profile_name", "value"))) %>%
     tidyr::pivot_wider(names_from = profile_name, values_from = value, values_fn = list) %>%
