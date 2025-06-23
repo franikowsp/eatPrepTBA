@@ -22,6 +22,7 @@
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/code_responses.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/code_responses_legacy.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/code_unit_legacy.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/complete_design.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/compute_sizes.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/configure_booklet.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/download_codebook.html</loc></url>
@@ -33,8 +34,10 @@
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/generate_booklet.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/generate_booklets.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/generate_testtakers.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_booklets.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_coding_report.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_credentials.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_design.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_logs.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_metadata_profile.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_responses.html</loc></url>
@@ -43,6 +46,7 @@
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_settings.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_states.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_system_checks.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_testtakers.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/get_units.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/index.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/insert_manual_legacy.html</loc></url>
@@ -61,9 +65,11 @@
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/prepare_logs.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/prepare_responses.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/prepare_source_tree.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/read_booklet.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/read_logs.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/read_responses.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/read_system_checks.html</loc></url>
+<url><loc>https://franikowsp.github.io/eatPrepTBA/reference/read_testtakers.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/restrict_testlet.html</loc></url>
 <url><loc>https://franikowsp.github.io/eatPrepTBA/reference/upload_file.html</loc></url>
 </urlset>

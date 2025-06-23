@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">eatPrepTBA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.6.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.7.9011</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,7 @@
 
 
 <dt id="arg-units">units<a class="anchor" aria-label="anchor" href="#arg-units"></a></dt>
-<dd><p>Tibble. Unit data retrieved from the IQB Studio after setting the argument <code>coding_scheme = TRUE</code> for <code><a href="get_units.html">get_units()</a></code>.</p></dd>
+<dd><p>Tibble. Unit data retrieved from the IQB Studio with <code><a href="get_units.html">get_units()</a></code>.</p></dd>
 
 
 <dt id="arg-prepare">prepare<a class="anchor" aria-label="anchor" href="#arg-prepare"></a></dt>
@@ -73,7 +73,7 @@
 
 
 <dt id="arg-missings">missings<a class="anchor" aria-label="anchor" href="#arg-missings"></a></dt>
-<dd><p>Tibble (optional). Provide missing meta data with <code>code_id</code>, <code>status</code>, <code>score</code>, and <code>code_type</code>. Defaults to <code>NULL</code> and uses default scheme.</p>
+<dd><p>Tibble (optional). Provide missing meta data with <code>code_id</code>, <code>code_status</code>, <code>code_score</code>, and <code>code_type</code>. Defaults to <code>NULL</code> and uses default scheme.</p>
 <p>This function automatically codes responses by using the <code>eatAutoCode</code> package. It is already prepared for the new data format of the responses received from the <code><a href="get_responses.html">get_responses()</a></code> and <code><a href="read_responses.html">read_responses()</a></code> routines. This function will soon be deleted and be part of <code>code_responses()</code>.</p></dd>
 
 </dl></div>
