@@ -5,7 +5,7 @@
 \title{Evaluates frequencies and discrimination parameters of codes and categories}
 \usage{
 evaluate_psychometrics(
-  coded,
+  design_coded,
   units,
   domains = NULL,
   max_n_categories = 10,
@@ -14,7 +14,7 @@ evaluate_psychometrics(
 )
 }
 \arguments{
-\item{coded}{Tibble. Response data coded with \code{\link[=code_responses]{code_responses()}}. The argument \code{prepare} must be \code{TRUE}.}
+\item{design_coded}{Tibble. Response data within the design merged by \code{\link[=complete_codes]{complete_codes()}}.}
 
 \item{units}{Tibble. Unit data retrieved from the IQB Studio after setting the argument \code{metadata = TRUE} for \code{\link[=get_units]{get_units()}} -- otherwise the item values could only be inferred from the variable source tree, i.e., item scores are taken from variable scores that are no source variables for other derived variables. Could optionally also contain \code{unit_codes} prepared by \code{add_coding_scheme()} (saves some time).}
 
@@ -33,5 +33,5 @@ A tibble.
 Evaluates frequencies and discrimination parameters of codes and categories
 }
 \details{
-This function estimates item, code and category frequencies for a set of coded responses.
+This function estimates item, code and category frequencies for a set of coded responses. Please note that cases that are not used will be eliminated prior to the anaylsis.
 }
