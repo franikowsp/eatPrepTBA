@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">eatPrepTBA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.7.9011</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.7.9012</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,7 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">evaluate_psychometrics</span><span class="op">(</span></span>
-<span>  <span class="va">coded</span>,</span>
+<span>  <span class="va">design_coded</span>,</span>
 <span>  <span class="va">units</span>,</span>
 <span>  domains <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_n_categories <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -52,8 +52,8 @@
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-coded">coded<a class="anchor" aria-label="anchor" href="#arg-coded"></a></dt>
-<dd><p>Tibble. Response data coded with <code><a href="code_responses.html">code_responses()</a></code>. The argument <code>prepare</code> must be <code>TRUE</code>.</p></dd>
+<dl><dt id="arg-design-coded">design_coded<a class="anchor" aria-label="anchor" href="#arg-design-coded"></a></dt>
+<dd><p>Tibble. Response data within the design merged by <code>complete_codes()</code>.</p></dd>
 
 
 <dt id="arg-units">units<a class="anchor" aria-label="anchor" href="#arg-units"></a></dt>
@@ -82,7 +82,7 @@
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This function estimates item, code and category frequencies for a set of coded responses.</p>
+    <p>This function estimates item, code and category frequencies for a set of coded responses. Please note that cases that are not used will be eliminated prior to the anaylsis.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
