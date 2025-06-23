@@ -42,6 +42,11 @@ reference:
   - prepare_responses
   - get_system_checks
   - read_system_checks
+  - get_design
+  - get_booklets
+  - read_booklet
+  - get_testtakers
+  - read_testtakers
   - get_results
   - get_logs
   - read_logs
@@ -75,5 +80,6 @@ reference:
 - subtitle: Code responses and work with coded responses and logs from IQB Testcenter
   contents:
   - code_responses
+  - complete_design
   - estimate_unit_times
   - evaluate_psychometrics

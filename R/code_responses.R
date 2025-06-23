@@ -1,11 +1,11 @@
 #' Code unit responses with coding schemes
 #'
 #' @param responses Tibble. Response data retrieved from the IQB Testcenter with setting the argument `prepare = FALSE` for [get_responses()] or [read_responses()].
-#' @param units Tibble. Unit data retrieved from the IQB Studio after setting the argument `coding_scheme = TRUE` for [get_units()].
+#' @param units Tibble. Unit data retrieved from the IQB Studio with [get_units()].
 #' @param prepare Logical. Whether to unpack the coding results and to add information from the coding schemes.
 #' @param codes_manual Tibble (optional). Data frame holding the manual codes. Defaults to `NULL` and does only automatic coding.
 #' @param overwrite Logical. Should column `unit_codes` be overwritten if they exist on `units`. Defaults to `FALSE`, i.e., `unit_codes` will be used if they were added to `units` beforehand by applying `add_coding_schemes()`.
-#' @param missings Tibble (optional). Provide missing meta data with `code_id`, `status`, `score`, and `code_type`. Defaults to `NULL` and uses default scheme.
+#' @param missings Tibble (optional). Provide missing meta data with `code_id`, `code_status`, `code_score`, and `code_type`. Defaults to `NULL` and uses default scheme.
 #'
 #' This function automatically codes responses by using the `eatAutoCode` package. It is already prepared for the new data format of the responses received from the [get_responses()] and [read_responses()] routines. This function will soon be deleted and be part of [code_responses()].
 #'
@@ -23,11 +23,11 @@ code_responses <- function(responses,
   if (is.null(missings)) {
     missings <-
       tibble::tribble(
-        ~code_id, ~status, ~code_score, ~code_type,
-        -96, "NOT_REACHED", 0, "MISSING NOT REACHED",
-        -97, "CODING_ERROR", 0, "MISSING CODING IMPOSSIBLE",
-        -98, "INVALID", 0, "MISSING INVALID RESPONSE",
-        -99, "DISPLAYED", 0, "MISSING BY OMISSION"
+        ~code_id, ~code_status, ~code_score, ~code_type,
+        -96, "NOT_REACHED", 0, "MISSING_NOT_REACHED",
+        -97, "CODING_ERROR", 0, "MISSING_CODING_IMPOSSIBLE",
+        -98, "INVALID", 0, "MISSING_INVALID_RESPONSE",
+        -99, "DISPLAYED", 0, "MISSING_BY_OMISSION"
       )
   }
 
@@ -98,7 +98,7 @@ code_responses <- function(responses,
 
     pcs_codes_insert <-
       pcs_codes %>%
-      dplyr::mutate(status = "CODING_COMPLETE") %>%
+      dplyr::mutate(code_status = "CODING_COMPLETE") %>%
       dplyr::select(-code_type)
 
     codes_manual_prepared <-
@@ -125,14 +125,14 @@ code_responses <- function(responses,
         by = dplyr::join_by("code_id"), suffix = c("", "_miss")
       ) %>%
       dplyr::mutate(
-        status = dplyr::coalesce(status, status_miss),
+        code_status = dplyr::coalesce(code_status, code_status_miss),
         code_score = dplyr::coalesce(code_score, code_score_miss)
       ) %>%
-      dplyr::select(-status_miss, -code_score_miss)
+      dplyr::select(-code_status_miss, -code_score_miss)
 
     codes_manual_nested <-
       codes_manual_prepared %>%
-      dplyr::rename(id = variable_id, code = code_id, score = code_score) %>%
+      dplyr::rename(id = variable_id, code = code_id, status = code_status, score = code_score) %>%
       tidyr::nest(
         manual = c(id, code, score, status)
       ) %>%
