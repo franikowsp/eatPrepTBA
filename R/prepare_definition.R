@@ -2,7 +2,7 @@ prepare_definition <- function(resp_definition) {
   # definition_prep <-
   variable_pages <-
     resp_definition %>%
-    eatAutoCode::extract_unit_definition() %>%
+    eatAutoCode::extract_variable_location() %>%
     tibble::as_tibble() %>%
     tidyr::unnest(variable_path, keep_empty = TRUE) %>%
     dplyr::select(
