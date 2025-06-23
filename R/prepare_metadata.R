@@ -106,7 +106,8 @@ read_items_profiles <- function(unit_metadata) {
     return(items_profiles)
   }
 
-  items_profiles_prep %>%
+  items_profiles <-
+    items_profiles_prep %>%
     dplyr::select(dplyr::any_of(c("item", "label.value", "value.id", "valueAsText.value"))) %>%
     dplyr::mutate(
       dplyr::across(dplyr::any_of(c("value.id", "valueAsText.value")),
