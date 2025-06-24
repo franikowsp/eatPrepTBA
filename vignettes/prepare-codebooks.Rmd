@@ -1,0 +1,36 @@
+---
+title: "Prepare Codebooks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Prepare Codebooks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(eatPrepTBA)
+```
+
+## Login Procedure
+
+```{r}
+login <- login_studio(keyring = TRUE)
+workspace <- access_workspace(login, ws_id = c(908))
+```
+
+## All codes
+
+```{r}
+codebooks <- prepare_codebook(workspace = workspace)
+
+codebooks
+```
+
+## Only Manual Codes
