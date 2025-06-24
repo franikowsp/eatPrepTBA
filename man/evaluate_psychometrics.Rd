@@ -14,7 +14,7 @@ evaluate_psychometrics(
 )
 }
 \arguments{
-\item{design_coded}{Tibble. Response data within the design merged by \code{\link[=complete_codes]{complete_codes()}}.}
+\item{design_coded}{Tibble. Response data within the design merged by \code{\link[=complete_design]{complete_design()}}.}
 
 \item{units}{Tibble. Unit data retrieved from the IQB Studio after setting the argument \code{metadata = TRUE} for \code{\link[=get_units]{get_units()}} -- otherwise the item values could only be inferred from the variable source tree, i.e., item scores are taken from variable scores that are no source variables for other derived variables. Could optionally also contain \code{unit_codes} prepared by \code{add_coding_scheme()} (saves some time).}
 

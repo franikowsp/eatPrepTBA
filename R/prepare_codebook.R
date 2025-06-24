@@ -74,7 +74,7 @@ setMethod("prepare_codebook",
             #   )
 
             download_codebook(workspace,
-                              path = temp_codebooks,
+                              path = tmp_codebooks,
                               format = "json",
 
                               unit_keys = unit_keys,

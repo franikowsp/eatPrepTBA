@@ -1,6 +1,6 @@
 #' Evaluates frequencies and discrimination parameters of codes and categories
 #'
-#' @param design_coded Tibble. Response data within the design merged by [complete_codes()].
+#' @param design_coded Tibble. Response data within the design merged by [complete_design()].
 #' @param units Tibble. Unit data retrieved from the IQB Studio after setting the argument `metadata = TRUE` for [get_units()] -- otherwise the item values could only be inferred from the variable source tree, i.e., item scores are taken from variable scores that are no source variables for other derived variables. Could optionally also contain `unit_codes` prepared by `add_coding_scheme()` (saves some time).
 #' @param domains Tibble. Contains columns `domain` and `unit_key`. Currently, the routine only works for one-dimensional `domain`, i.e., there is only one `domain` for each `unit_key`. If not specified, the `workspace_label` is regarded as the unit domain.
 #' @param max_n_categories Tibble. Maximum number of categories to check for category frequencies for list values, e.g., `[[01_1,01_2]]`. Defaults to `10`.

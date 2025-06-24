@@ -119,8 +119,8 @@ add_coding_scheme <- function(units, filter_has_codes = TRUE, overwrite = FALSE)
         ) %>%
         dplyr::left_join(
           units_pages %>%
+            dplyr::select(-dplyr::any_of("value_default")) %>%
             dplyr::rename(
-              value_default = "value_default",
               variable_source_ref = "variable_ref",
               variable_source_page = "variable_page",
               variable_source_section = "variable_section",

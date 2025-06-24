@@ -80,6 +80,6 @@ reference:
 - subtitle: Code responses and work with coded responses and logs from IQB Testcenter
   contents:
   - code_responses
-  - complete_codes
+  - complete_design
   - estimate_unit_times
   - evaluate_psychometrics
