@@ -12,8 +12,6 @@
 #'
 #' @aliases
 #' get_design,WorkspaceTestcenter-method
-#'
-#' @keywords internal
 setGeneric("get_design", function(workspace, units = NULL, overwrite = FALSE, mode = "run-hot-return") {
   cli_setting()
 

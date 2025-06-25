@@ -113,7 +113,7 @@ evaluate_psychometrics <- function(
     dplyr::ungroup()
 
   # Reconstruct variable labels
-  variable_labels_prep <-
+  variable_labels <-
     units_cs_unnest %>%
     tidyr::unnest(variable_values) %>%
     dplyr::filter(!is.na(value)) %>%
@@ -130,7 +130,7 @@ evaluate_psychometrics <- function(
     dplyr::select(unit_key, unit_codes) %>%
     tidyr::unnest(unit_codes) %>%
     dplyr::filter(variable_source_type == "BASE") %>%
-    dplyr::semi_join(variable_labels_prep, by = dplyr::join_by("unit_key", "variable_id")) %>%
+    dplyr::semi_join(variable_labels, by = dplyr::join_by("unit_key", "variable_id")) %>%
     dplyr::select(unit_key, variable_id, variable_multiple, variable_source_processing) %>%
     tidyr::unnest(variable_source_processing) %>%
     tidyr::unnest(variable_source_processing) %>%

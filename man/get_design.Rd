@@ -29,4 +29,3 @@ This function returns a frame of all booklets and testtakers in a given Testcent
 \item \code{get_design(WorkspaceTestcenter)}: Get design in a Testcenter workspace
 
 }}
-\keyword{internal}

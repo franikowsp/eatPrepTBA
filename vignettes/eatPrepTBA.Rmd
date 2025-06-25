@@ -37,7 +37,7 @@ For the purpose of following along this documentation, you can use the following
 - username: `eatPrepTBA`
 - password: `eatPrepTBA`
 
-The inital call of `create_login()` (and calling the `login` object) returns a list of workspaces that can be accessed with your credentials.
+The initial call of `create_login()` (and calling the `login` object) returns a list of workspaces that can be accessed with your credentials.
 
 ## Access a workspace
 

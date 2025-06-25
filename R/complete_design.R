@@ -61,7 +61,8 @@ complete_design <- function(coded,
       by = dplyr::join_by("group_id", "login_name", "login_code", "booklet_merge", "unit_key", "unit_alias", "variable_id")
     ) %>%
     dplyr::select(-dplyr::any_of(c("variable_source_type"))) %>%
-    dplyr::left_join(units_cs_merge, by = dplyr::join_by("unit_key", "variable_id")) %>%
+    dplyr::left_join(units_cs_merge,
+                     by = dplyr::join_by("unit_key", "variable_id")) %>%
     dplyr::group_by(
       dplyr::across(dplyr::any_of(identifiers))
     ) %>%
@@ -134,7 +135,8 @@ complete_design <- function(coded,
 
   design_missings %>%
     dplyr::left_join(
-      not_reached_cases
+      not_reached_cases,
+      by = dplyr::join_by(!!! identifiers, "booklet_no", "testlet_no", "unit_booklet_no")
     ) %>%
     dplyr::mutate(
       code_type = dplyr::case_when(
