@@ -4,9 +4,9 @@
 #' @param unit_keys Character. Keys (short names) of the units in the workspace the codebook should be retrieved from. If set to `NULL` (default), the codebook will be generated for the all units.
 #' @param missings Tibble (optional). Missing table to be added to each variable.
 #' @param missings_profile Missings profile. (Currently without effect.)
-#' @param only_coded Logical. Should only variables with codes be shown?
-#' @param general_instructions Logical. Should the general coding instructions be printed? Defaults to `TRUE`.
-#' @param hide_item_var_relation Logocal. Should item-variable relations be printed? Defaults to `FALSE`.
+#' @param only_coded Logical. Should only variables with codes be shown? Defaults to `TRUE`.
+#' @param general_instructions Logical. Should the general coding instructions be printed? Defaults to `FALSE`. (Currently not displayed.)
+#' @param hide_item_var_relation Logical. Should item-variable relations be printed? Defaults to `TRUE`.
 #' @param derived Logical. Should the derived variables be printed? Defaults to `TRUE`.
 #' @param manual Logical. Should only items with manual coding be printed? Defaults to `TRUE`.
 #' @param closed Logical. Should items that could be automatically coded be printed? Defaults to `TRUE`.
@@ -29,7 +29,7 @@ setGeneric("prepare_codebook", function(workspace,
                                         # Nur Variablen mit Codes
                                         only_coded = FALSE,
                                         # Allgemeine Hinweise für jede Variable
-                                        general_instructions = TRUE,
+                                        general_instructions = FALSE,
                                         # Item-Variable-Relation für jede Variable
                                         hide_item_var_relation = TRUE,
                                         # Abgeleitete Variablen
@@ -55,7 +55,7 @@ setMethod("prepare_codebook",
                    missings = NULL,
                    missings_profile = NULL,
                    only_coded = FALSE,
-                   general_instructions = TRUE,
+                   general_instructions = FALSE,
                    hide_item_var_relation = TRUE,
                    derived = TRUE,
                    manual = TRUE,

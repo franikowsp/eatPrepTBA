@@ -11,7 +11,7 @@ prepare_codebook(
   missings = NULL,
   missings_profile = NULL,
   only_coded = FALSE,
-  general_instructions = TRUE,
+  general_instructions = FALSE,
   hide_item_var_relation = TRUE,
   derived = TRUE,
   manual = TRUE,
@@ -26,7 +26,7 @@ prepare_codebook(
   missings = NULL,
   missings_profile = NULL,
   only_coded = FALSE,
-  general_instructions = TRUE,
+  general_instructions = FALSE,
   hide_item_var_relation = TRUE,
   derived = TRUE,
   manual = TRUE,
@@ -44,11 +44,11 @@ prepare_codebook(
 
 \item{missings_profile}{Missings profile. (Currently without effect.)}
 
-\item{only_coded}{Logical. Should only variables with codes be shown?}
+\item{only_coded}{Logical. Should only variables with codes be shown? Defaults to \code{TRUE}.}
 
-\item{general_instructions}{Logical. Should the general coding instructions be printed? Defaults to \code{TRUE}.}
+\item{general_instructions}{Logical. Should the general coding instructions be printed? Defaults to \code{FALSE}. (Currently not displayed.)}
 
-\item{hide_item_var_relation}{Logocal. Should item-variable relations be printed? Defaults to \code{FALSE}.}
+\item{hide_item_var_relation}{Logical. Should item-variable relations be printed? Defaults to \code{TRUE}.}
 
 \item{derived}{Logical. Should the derived variables be printed? Defaults to \code{TRUE}.}
 

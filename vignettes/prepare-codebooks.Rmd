@@ -2,9 +2,11 @@
 title: "Prepare Codebooks"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Prepare Codebooks}
-  %\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Prepare Codebooks}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+  editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -20,17 +22,46 @@ library(eatPrepTBA)
 
 ## Login Procedure
 
-```{r}
-login <- login_studio(keyring = TRUE)
+```{r eval=FALSE}
+login <- login_studio(keyring = TRUE, app_version = "12.3.1")
 workspace <- access_workspace(login, ws_id = c(908))
 ```
 
-## All codes
+If you want to retrieve all codes:
+
+```{r eval=FALSE}
+cb_all <- prepare_codebook(workspace = workspace)
+```
+
+```{r eval=FALSE, echo=FALSE}
+cb_all %>% readr::write_rds("inst/extdata/cb_all.rds")
+```
+
+```{r echo=FALSE}
+cb_all <- readr::read_rds(system.file("extdata", "cb_all.rds", package = "eatPrepTBA"))
+```
 
 ```{r}
-codebooks <- prepare_codebook(workspace = workspace)
-
-codebooks
+cb_all
 ```
 
 ## Only Manual Codes
+
+If you want to retrieve only codes:
+
+```{r eval=FALSE}
+cb_manual <- prepare_codebook(workspace = workspace, 
+                              manual = TRUE)
+```
+
+```{r eval=FALSE, echo=FALSE}
+cb_manual %>% readr::write_rds("inst/extdata/cb_manual.rds")
+```
+
+```{r echo=FALSE}
+cb_manual <- readr::read_rds(system.file("extdata", "cb_manual.rds", package = "eatPrepTBA"))
+```
+
+```{r}
+cb_manual
+```
