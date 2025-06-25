@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">eatPrepTBA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.7.9015</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.7.9016</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -17,6 +17,10 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/eatPrepTBA.html">Get started</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/prepare-codebooks.html">Prepare Codebooks</a></li>
+  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul></div>
@@ -44,7 +48,7 @@
 <span>  missings <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  missings_profile <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  only_coded <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  general_instructions <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  general_instructions <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  hide_item_var_relation <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  derived <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  manual <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -60,7 +64,7 @@
 <span>  missings <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  missings_profile <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  only_coded <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  general_instructions <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  general_instructions <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  hide_item_var_relation <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  derived <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  manual <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -91,15 +95,15 @@
 
 
 <dt id="arg-only-coded">only_coded<a class="anchor" aria-label="anchor" href="#arg-only-coded"></a></dt>
-<dd><p>Logical. Should only variables with codes be shown?</p></dd>
+<dd><p>Logical. Should only variables with codes be shown? Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-general-instructions">general_instructions<a class="anchor" aria-label="anchor" href="#arg-general-instructions"></a></dt>
-<dd><p>Logical. Should the general coding instructions be printed? Defaults to <code>TRUE</code>.</p></dd>
+<dd><p>Logical. Should the general coding instructions be printed? Defaults to <code>FALSE</code>. (Currently not displayed.)</p></dd>
 
 
 <dt id="arg-hide-item-var-relation">hide_item_var_relation<a class="anchor" aria-label="anchor" href="#arg-hide-item-var-relation"></a></dt>
-<dd><p>Logocal. Should item-variable relations be printed? Defaults to <code>FALSE</code>.</p></dd>
+<dd><p>Logical. Should item-variable relations be printed? Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-derived">derived<a class="anchor" aria-label="anchor" href="#arg-derived"></a></dt>
