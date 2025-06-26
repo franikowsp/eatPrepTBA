@@ -117,7 +117,9 @@ read_items_profiles <- function(unit_metadata) {
     dplyr::mutate(
       dplyr::across(dplyr::any_of("label.value"),
                     function(x) {
-                      stringr::str_replace_all(x, str_replacements, "_")
+                      stringr::str_replace_all(x, str_replacements, "_") %>%
+                                      stringr::str_remove_all(str_removals)
+
                     },
                     .names = "profile_name")
     ) %>%
