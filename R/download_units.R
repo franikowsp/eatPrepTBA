@@ -82,7 +82,7 @@ setMethod("download_units",
             run_req <- function(ws) {
               settings <-
                 list(
-                  unitIdList = ws$units,
+                  unitIdList = as.list(ws$units),
                   addPlayers = add_players,
                   addTestTakersReview = add_testtakers_review,
                   addTestTakersMonitor = add_testtakers_monitor,
