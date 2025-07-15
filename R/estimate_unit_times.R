@@ -90,8 +90,9 @@ estimate_unit_times <- function(logs) {
       dplyr::across(groups_unit)
     ) %>%
     dplyr::summarise(
+      unit_start_time = min(ts),
       unit_time = sum(unit_time, na.rm = TRUE),
-      unit_n_start = max(unit_time)
+      unit_n_start = length(unit_n_start)
     ) %>%
     dplyr::ungroup()
 
@@ -118,6 +119,7 @@ estimate_unit_times <- function(logs) {
       dplyr::filter(!is.na(page_id)) %>%
       dplyr::group_by(dplyr::across(c(groups_unit, "page_id"))) %>%
       dplyr::summarise(
+        page_start_time = min(page_time),
         page_time = sum(page_time),
         page_n_start = length(page_time),
       ) %>%
