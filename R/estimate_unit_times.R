@@ -139,7 +139,7 @@ estimate_unit_times <- function(logs) {
       dplyr::filter(!is.na(page_id)) %>%
       dplyr::group_by(dplyr::across(c(groups_unit, "page_id"))) %>%
       dplyr::summarise(
-        page_start_time = min(page_time),
+        page_start_time = min(ts),
         page_n_start = length(page_time),
         page_time = sum(page_time),
       ) %>%
