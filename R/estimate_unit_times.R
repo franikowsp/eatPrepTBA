@@ -74,7 +74,7 @@ estimate_unit_times <- function(logs) {
     dplyr::ungroup() %>%
     dplyr::filter(!is.na(ts_name))
 
-  unit_logs <-
+  unit_logs_prep <-
     all_ts %>%
     dplyr::filter(
       ts_name == "unit_start_ts" | ts_name == "unit_current_ts"
@@ -89,11 +89,31 @@ estimate_unit_times <- function(logs) {
     dplyr::group_by(
       dplyr::across(groups_unit)
     ) %>%
+    dplyr::mutate(
+      unit_start_i = seq_along(unit_time)
+    )
+
+  unit_logs_start <-
+    unit_logs_prep %>%
+    dplyr::select(dplyr::all_of(c(groups_unit,
+                                  "unit_start_i",
+                                  "unit_time_i" = "unit_time",
+                                  "unit_start_time_i" = "ts"))) %>%
+    tidyr::nest(
+      unit_logs_i = c("unit_start_i", "unit_time_i", "unit_start_time_i")
+    )
+
+  unit_logs <-
+    unit_logs_prep %>%
     dplyr::summarise(
       unit_start_time = min(ts),
       unit_n_start = length(unit_time),
       unit_time = sum(unit_time, na.rm = TRUE),
       .groups = "drop"
+    ) %>%
+    dplyr::left_join(
+      unit_logs_start,
+      by = dplyr::join_by(!!! groups_unit)
     )
 
   if (any(!is.na(all_ts$page_id))) {
@@ -124,7 +144,7 @@ estimate_unit_times <- function(logs) {
         page_time = sum(page_time),
       ) %>%
       dplyr::ungroup() %>%
-      tidyr::nest(unit_page_logs = dplyr::any_of(c("page_id", "page_start_time", "page_time", "page_n_start")))
+      tidyr::nest(unit_page_logs = dplyr::any_of(c("page_id", "page_start_time", "page_time")))
 
     unit_logs %>%
       dplyr::left_join(
