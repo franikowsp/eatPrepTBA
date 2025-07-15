@@ -60,13 +60,13 @@ estimate_unit_times <- function(logs) {
         .default = NA_integer_
       )
     ) %>%
-    dplyr::group_by(dplyr::across(c(groups_unit, "ts_name"))) %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_unit, "ts_name")))) %>%
     dplyr::mutate(
       n_start = ifelse(ts_name == "unit_start_ts", seq_along(ts_name), NA_integer_)
     ) %>%
-    dplyr::group_by(dplyr::across(groups_unit)) %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(groups_unit))) %>%
     tidyr::fill(n_start) %>%
-    dplyr::group_by(dplyr::across(c(groups_unit, "n_start"))) %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_unit, "n_start")))) %>%
     dplyr::mutate(
       n_ts = seq_along(ts_name),
       ts_name = ifelse(n_ts == max(n_ts), "unit_end_ts", ts_name),
@@ -91,10 +91,10 @@ estimate_unit_times <- function(logs) {
     ) %>%
     dplyr::summarise(
       unit_start_time = min(ts),
+      unit_n_start = length(unit_time),
       unit_time = sum(unit_time, na.rm = TRUE),
-      unit_n_start = length(unit_n_start)
-    ) %>%
-    dplyr::ungroup()
+      .groups = "drop"
+    )
 
   if (any(!is.na(all_ts$page_id))) {
     unit_page_logs <-
@@ -120,11 +120,11 @@ estimate_unit_times <- function(logs) {
       dplyr::group_by(dplyr::across(c(groups_unit, "page_id"))) %>%
       dplyr::summarise(
         page_start_time = min(page_time),
-        page_time = sum(page_time),
         page_n_start = length(page_time),
+        page_time = sum(page_time),
       ) %>%
       dplyr::ungroup() %>%
-      tidyr::nest(unit_page_logs = dplyr::any_of(c("page_id", "page_time", "page_n_start")))
+      tidyr::nest(unit_page_logs = dplyr::any_of(c("page_id", "page_start_time", "page_time", "page_n_start")))
 
     unit_logs %>%
       dplyr::left_join(
@@ -137,7 +137,5 @@ estimate_unit_times <- function(logs) {
   } else {
     unit_logs
   }
-
-
 }
 
