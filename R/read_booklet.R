@@ -94,5 +94,9 @@ read_booklet <- function(booklet_xml) {
     dplyr::mutate(
       unit_testlet_no = seq_along(unit_key)
     ) %>%
-    dplyr::ungroup()
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      dplyr::across(dplyr::any_of(c("unit_alias")),
+                    function(x) dplyr::coalesce(x, unit_key))
+    )
 }

@@ -71,10 +71,7 @@ setMethod("get_booklets",
                            format = "Preparing booklet {.booklet-id {cli::pb_extra$files[cli::pb_current+1]}} ({cli::pb_current}/{cli::pb_total}): {cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
                            format_done = "Prepared {cli::pb_total} {.booklet-label booklet} file{?s} in {cli::pb_elapsed}.",
                            clear = FALSE)) %>%
-              dplyr::bind_rows() %>%
-              dplyr::mutate(
-                unit_alias = dplyr::coalesce(unit_alias, unit_key)
-              )
+              dplyr::bind_rows()
 
             return(booklets)
           })
