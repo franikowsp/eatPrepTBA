@@ -50,6 +50,8 @@ complete_design <- function(coded,
       "variable_level", "variable_page", "variable_section", "variable_page_always_visible"
     )))
 
+  identifiers <- intersect(names(design), identifiers)
+
   # Merge codes and design
   design_coded <-
     design %>%
@@ -58,7 +60,7 @@ complete_design <- function(coded,
     ) %>%
     dplyr::left_join(
       coded %>% dplyr::mutate(booklet_merge = stringr::str_to_upper(booklet_id)) %>% dplyr::select(-booklet_id),
-      by = dplyr::join_by("group_id", "login_name", "login_code", "booklet_merge", "unit_key", "unit_alias", "variable_id")
+      by = dplyr::join_by(!!! c(identifiers, "booklet_merge", "unit_key", "unit_alias", "variable_id"))
     ) %>%
     dplyr::select(-dplyr::any_of(c("variable_source_type"))) %>%
     dplyr::left_join(units_cs_merge,
@@ -124,6 +126,11 @@ complete_design <- function(coded,
 
   not_reached_cases <-
     not_reached_classification %>%
+    dplyr::group_by(dplyr::across(
+      dplyr::any_of(c(
+        identifiers, "booklet_no", "testlet_no"
+      ))
+    )) %>%
     dplyr::arrange(dplyr::across(dplyr::any_of(c(identifiers, "booklet_no", "testlet_no"))), dplyr::desc(unit_booklet_no)) %>%
     dplyr::mutate(
       nr = dplyr::cumall(not_reach),
@@ -162,5 +169,10 @@ complete_design <- function(coded,
       dplyr::any_of(c(
         identifiers, "booklet_no", "testlet_no", "unit_booklet_no", "variable_page", "variable_section", "variable_level"
       ))
-    ))
+    )) %>%
+    dplyr::select(
+      -dplyr::any_of(c(
+        "not_reach", "nr", "lag_nr", "check_nr"
+      ))
+    )
 }

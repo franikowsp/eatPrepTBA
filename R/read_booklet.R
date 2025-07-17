@@ -73,6 +73,12 @@ read_booklet <- function(booklet_xml) {
         "testlet_label" = "label"
       ))
     ) %>%
+    tidyr::unnest(
+      dplyr::any_of("testlet_units")
+    ) %>%
+    tidyr::nest(
+      testlet_units = -dplyr::any_of(c("booklet_id", "booklet_label", "testlet_id", "testlet_label"))
+    ) %>%
     dplyr::mutate(
       testlet_no = seq_along(testlet_id)
     ) %>%
@@ -94,9 +100,5 @@ read_booklet <- function(booklet_xml) {
     dplyr::mutate(
       unit_testlet_no = seq_along(unit_key)
     ) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(
-      dplyr::across(dplyr::any_of(c("unit_alias")),
-                    function(x) dplyr::coalesce(x, unit_key))
-    )
+    dplyr::ungroup()
 }
