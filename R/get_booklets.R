@@ -77,7 +77,7 @@ setMethod("get_booklets",
             if (tibble::has_name(booklets, "unit_alias")) {
               booklets %>%
                 dplyr::mutate(
-                  unit_alias = dplyr::coalesce(x, unit_key)
+                  unit_alias = dplyr::coalesce(unit_alias, unit_key)
                 )
             } else {
               booklets %>%
