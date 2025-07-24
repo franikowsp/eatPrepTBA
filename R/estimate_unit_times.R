@@ -121,7 +121,7 @@ estimate_unit_times <- function(logs) {
     )
 
   if (any(!is.na(all_ts$page_id))) {
-    unit_page_logs <-
+    unit_page_logs_prep <-
       all_ts %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_booklet, "unit_key")))) %>%
       dplyr::mutate(
@@ -146,13 +146,37 @@ estimate_unit_times <- function(logs) {
       # Incomplete loads
       dplyr::filter(!is.na(page_id)) %>%
       dplyr::group_by(dplyr::across(c(groups_unit, "page_id"))) %>%
+      dplyr::mutate(
+        page_start_i = seq_along(page_time)
+      )
+
+    # Separate Unit start and stay times
+    unit_page_logs_start <-
+      unit_page_logs_prep %>%
+      dplyr::select(dplyr::all_of(c(groups_unit, "page_id",
+                                    "page_start_i",
+                                    "page_time_i" = "page_time",
+                                    "page_start_time_i" = "ts",
+                                    "page_end_time_i" = "ts_next"))) %>%
+      tidyr::nest(
+        page_logs_i = c("page_start_i", "page_time_i", "page_end_time_i", "page_start_time_i")
+      )
+
+    unit_page_logs <-
+      unit_page_logs_prep %>%
       dplyr::summarise(
         page_start_time = min(ts),
         page_n_start = length(page_time),
         page_time = sum(page_time),
+        .groups = "drop"
       ) %>%
-      dplyr::ungroup() %>%
-      tidyr::nest(unit_page_logs = dplyr::any_of(c("page_id", "page_start_time", "page_n_start", "page_time")))
+      dplyr::left_join(
+        unit_page_logs_start,
+        by = dplyr::join_by(!!! c(groups_unit, "page_id"))
+      ) %>%
+      tidyr::nest(unit_page_logs = dplyr::any_of(c("page_id", "page_start_time", "page_n_start", "page_time", "page_logs_i")))
+
+    unit_page_logs$unit_page_logs[[4]]$page_logs_i
 
     unit_logs %>%
       dplyr::left_join(
