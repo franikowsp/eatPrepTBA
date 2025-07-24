@@ -36,8 +36,10 @@ estimate_unit_times <- function(logs) {
           stringr::str_extract(log_entry, "\"(.+)\"", group = TRUE),
         .default = unit_key
       ),
+      is_max_ts = ts == max(ts)
     ) %>%
-    dplyr::filter(!is.na(unit_key) & unit_key != "") %>%
+    dplyr::filter((!is.na(unit_key) & unit_key != "") | is_max_ts) %>%
+    tidyr::fill(unit_key, .direction = "downup") %>%
     dplyr::ungroup()
 
   all_ts <-
@@ -49,6 +51,7 @@ estimate_unit_times <- function(logs) {
         stringr::str_detect(log_entry, "PLAYER = LOADING") ~ "unit_load_ts",
         stringr::str_detect(log_entry, "PLAYER = RUNNING") ~ "unit_start_ts",
         stringr::str_detect(log_entry, "CURRENT_PAGE_ID") ~ "page_start_ts",
+        is_max_ts ~ "unit_end_ts",
         log_entry == "PLAYER = PAUSED" ~ "n_paused",
         log_entry == "FOCUS : \"HAS_NOT\"" ~ "n_lost_focus",
         .default = NA_character_
@@ -77,32 +80,33 @@ estimate_unit_times <- function(logs) {
   unit_logs_prep <-
     all_ts %>%
     dplyr::filter(
-      ts_name == "unit_start_ts" | ts_name == "unit_current_ts"
+      ts_name == "unit_start_ts" | ts_name == "unit_current_ts" | is_max_ts
     ) %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_booklet)))) %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(groups_booklet))) %>%
     dplyr::mutate(
       ts_prev = dplyr::lag(ts),
       ts_next = dplyr::lead(ts),
       unit_time = ts_next - ts
     ) %>%
     dplyr::filter(ts_name %in% c("unit_start_ts")) %>%
-    dplyr::group_by(
-      dplyr::across(groups_unit)
-    ) %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(groups_unit))) %>%
     dplyr::mutate(
       unit_start_i = seq_along(unit_time)
     )
 
+  # Separate Unit start and stay times
   unit_logs_start <-
     unit_logs_prep %>%
     dplyr::select(dplyr::all_of(c(groups_unit,
                                   "unit_start_i",
                                   "unit_time_i" = "unit_time",
-                                  "unit_start_time_i" = "ts"))) %>%
+                                  "unit_start_time_i" = "ts",
+                                  "unit_end_time_i" = "ts_next"))) %>%
     tidyr::nest(
-      unit_logs_i = c("unit_start_i", "unit_time_i", "unit_start_time_i")
+      unit_logs_i = c("unit_start_i", "unit_time_i", "unit_end_time_i", "unit_start_time_i")
     )
 
+  # Total start and stay times
   unit_logs <-
     unit_logs_prep %>%
     dplyr::summarise(
@@ -119,8 +123,12 @@ estimate_unit_times <- function(logs) {
   if (any(!is.na(all_ts$page_id))) {
     unit_page_logs <-
       all_ts %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_booklet, "unit_key")))) %>%
+      dplyr::mutate(
+        is_max_ts = ts == max(ts)
+      ) %>%
       dplyr::filter(
-        ts_name %>% stringr::str_detect("^page_") | ts_name == "unit_start_ts" | ts_name == "unit_current_ts"
+        ts_name %>% stringr::str_detect("^page_") | ts_name == "unit_start_ts" | ts_name == "unit_current_ts" | is_max_ts
       ) %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(c(groups_booklet)))) %>%
       dplyr::mutate(
