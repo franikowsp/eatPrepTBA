@@ -144,7 +144,7 @@ estimate_unit_times <- function(logs) {
         page_time = sum(page_time),
       ) %>%
       dplyr::ungroup() %>%
-      tidyr::nest(unit_page_logs = dplyr::any_of(c("page_id", "page_start_time", "page_time")))
+      tidyr::nest(unit_page_logs = dplyr::any_of(c("page_id", "page_start_time", "page_n_start", "page_time")))
 
     unit_logs %>%
       dplyr::left_join(
