@@ -92,7 +92,7 @@ narrow_profile_list <- function(x) {
 prepare_profile_list <- function(url) {
   if (!is.na(url)) {
     httr2::request(url) %>%
-      # httr2::req_timeout(20) %>%
+      httr2::req_url_path_append("index.json") %>%
       httr2::req_perform() %>%
       httr2::resp_body_json() %>%
       purrr::pluck("hasTopConcept") %>%

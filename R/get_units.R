@@ -92,7 +92,9 @@ setMethod("get_units",
               dplyr::relocate(
                 names(ws_states),
                 .after = "group_name"
-              )
+              ) %>%
+              # Filters off empty workspaces
+              dplyr::filter(!is.na(unit_id))
 
             if (!is.null(units_old)) {
               # Filter for units that are available (automatic update)
