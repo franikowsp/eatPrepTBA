@@ -130,8 +130,10 @@ setMethod("get_responses",
                 dplyr::ungroup() %>%
                 dplyr::rename(
                   dplyr::any_of(c(
+                    coded = "responses_content",
                     responses = "elementCodes_content",
                     state_variables = "stateVariableCodes_content",
+                    coded_ts = "responses_ts",
                     responses_ts = "elementCodes_ts",
                     state_variables_ts = "stateVariableCodes_ts",
                     player = "PLAYER",

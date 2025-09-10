@@ -75,11 +75,12 @@ code_responses <- function(responses,
       add_coding_scheme(filter_has_codes = TRUE, overwrite = overwrite) %>%
       dplyr::select(unit_key, unit_codes) %>%
       tidyr::unnest(unit_codes) %>%
-      dplyr::select(unit_key, variable_id, variable_source_type, variable_codes)
+      dplyr::select(unit_key, variable_id,
+                    variable_source_type, variable_codes, variable_source_processing)
 
     pcs_variables <-
       coding_schemes_prepared %>%
-      dplyr::distinct(unit_key, variable_id, variable_source_type)
+      dplyr::distinct(unit_key, variable_id, variable_source_type, variable_source_processing)
 
     pcs_codes <-
       coding_schemes_prepared %>%
@@ -92,9 +93,16 @@ code_responses <- function(responses,
   if (!is.null(codes_manual)) {
     cli::cli_h3("Prepare manual codes")
 
-    # pcs_variables_insert <-
-    #   pcs_variables %>%
-    #   dplyr::select(-source_type)
+    # TODO: This should be somehow added to the coded object to signal that this could also become a NOT_REACHED or DISPLAYED state?
+    pcs_variables_insert <-
+      pcs_variables %>%
+      dplyr::mutate(
+        transform_displayed = purrr::map_lgl(variable_source_processing,
+                                             function(x) "TAKE_DISPLAYED_AS_VALUE_CHANGED" %in% x),
+        transform_not_reached = purrr::map_lgl(variable_source_processing,
+                                               function(x) "TAKE_NOT_REACHED_AS_VALUE_CHANGED" %in% x),
+      ) %>%
+      dplyr::select(-variable_source_type, -variable_source_processing)
 
     pcs_codes_insert <-
       pcs_codes %>%
@@ -117,6 +125,10 @@ code_responses <- function(responses,
         code_id = as.integer(code_id)
       ) %>%
       dplyr::left_join(
+        pcs_variables_insert,
+        by = dplyr::join_by("unit_key", "variable_id")
+      ) %>%
+      dplyr::left_join(
         pcs_codes_insert,
         by = dplyr::join_by("unit_key", "variable_id", "code_id")
       ) %>%
@@ -126,9 +138,21 @@ code_responses <- function(responses,
       ) %>%
       dplyr::mutate(
         code_status = dplyr::coalesce(code_status, code_status_miss),
-        code_score = dplyr::coalesce(code_score, code_score_miss)
+        code_score = dplyr::coalesce(code_score, code_score_miss),
+        # NEW: Transformation of specific missings before coding (only for manual codes)
+        code_status = dplyr::case_when(
+          transform_displayed & code_status == "DISPLAYED" ~ "CODING_COMPLETE",
+          transform_not_reached & code_status == "NOT_REACHED" ~ "CODING_COMPLETE",
+          .default = code_status
+        ),
+        code_score = dplyr::case_when(
+          transform_displayed & code_status == "DISPLAYED" ~ 0L,
+          transform_not_reached & code_status == "NOT_REACHED" ~ 0L,
+          .default = code_score
+        ),
       ) %>%
-      dplyr::select(-code_status_miss, -code_score_miss)
+      dplyr::select(-code_status_miss, -code_score_miss,
+                    -transform_displayed, -transform_not_reached)
 
     codes_manual_nested <-
       codes_manual_prepared %>%
@@ -237,7 +261,9 @@ code_responses <- function(responses,
       responses_coded %>%
         tidyr::unnest(value, keep_empty = TRUE) %>%
         dplyr::semi_join(pcs_variables, by = dplyr::join_by("unit_key", "variable_id")) %>%
-        dplyr::left_join(pcs_variables, by = dplyr::join_by("unit_key", "variable_id")) %>%
+        dplyr::left_join(pcs_variables %>%
+                           dplyr::select(-variable_source_processing),
+                         by = dplyr::join_by("unit_key", "variable_id")) %>%
         dplyr::left_join(pcs_codes %>% dplyr::select(unit_key, variable_id, code_id, code_type),
                          by = dplyr::join_by("unit_key", "variable_id", "code_id")) %>%
         dplyr::relocate(
