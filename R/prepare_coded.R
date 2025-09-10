@@ -43,6 +43,6 @@ prepare_coded <- function(responses) {
       "variable_id" = "id",
       "code_id" = "code",
       "code_score" = "score",
-      "variable_status" = "status"
+      "code_status" = "status"
     )))
 }
