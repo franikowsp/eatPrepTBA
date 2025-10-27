@@ -3,7 +3,7 @@ setMethod(f = "show",
           definition = function(object) {
             cli_setting()
 
-            cli::cli_text("You have access to the following workspace groups ({.wsg-id ws_id}: {.wsg ws_label}) with their respective workspaces ({.ws-id ws_id}: {.ws ws_label}):")
+            cli::cli_text("You have access to the following workspace groups ({.wsg-id wsg_id}: {.wsg wsg_label}) with their respective workspaces ({.ws-id ws_id}: {.ws ws_label}):")
 
             ul <- cli::cli_ul()
             object@wsg_list %>%
