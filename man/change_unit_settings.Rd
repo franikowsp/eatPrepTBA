@@ -8,6 +8,9 @@
 change_unit_settings(
   workspace,
   unit_id,
+  unit_key = NULL,
+  unit_name = NULL,
+  description = NULL,
   player = NULL,
   editor = NULL,
   schemer = NULL,
@@ -18,6 +21,9 @@ change_unit_settings(
 \S4method{change_unit_settings}{WorkspaceStudio}(
   workspace,
   unit_id,
+  unit_key = NULL,
+  unit_name = NULL,
+  description = NULL,
   player = NULL,
   editor = NULL,
   schemer = NULL,
@@ -28,20 +34,26 @@ change_unit_settings(
 \arguments{
 \item{workspace}{\linkS4class{WorkspaceStudio}. Workspace information necessary to retrieve unit information and resources from the API.}
 
-\item{unit_id}{Unit ID to be changed.}
+\item{unit_id}{Integer. Unit ID to be changed.}
 
-\item{player}{New player version.}
+\item{unit_key}{Character. New unit key. Please note that this has to be between 3 and 20 characters, whereas only capital and small letters of a-z, digits of 0-9, and underscores _ are allowed.}
 
-\item{editor}{New editor version.}
+\item{unit_name}{Character. New unit name.}
 
-\item{schemer}{New schemer version.}
+\item{description}{Character. New unit description / notes.}
 
-\item{group_name}{New group name.}
+\item{player}{Character. New minor player version, format \code{"A.B"} (A = major version, B = minor version). E.g., 2.10 (major release 2, minor version 10). Patch version will be omitted (\code{"A.B.C"} becomes \code{"A.B"}, e.g., \code{"2.10.4"} becomes \code{"2.10"}).}
 
-\item{state}{New state.}
+\item{editor}{Character. New minor editor version. Patch version will be omitted.}
+
+\item{schemer}{Character. New minor schemer version. Patch version will be omitted.}
+
+\item{group_name}{Character. New group name.}
+
+\item{state}{Numeric or character. New state id (when numeric) or label (when character).}
 }
 \description{
-This function updates the Studio metadata, i.e., versions for player, editor, or schemer, and the groups and the states of a single unit. To change multiple units, use \code{\link[=change_units_settings]{change_units_settings()}}.
+This function updates the Studio metadata, i.e., versions for player, editor, or schemer, and the groups and the states of a single unit. To change multiple units, use \code{\link[=change_units_settings]{change_units_settings()}}. Please note that invalid inputs will result in a default version (e.g., the newest one in case of \code{editor}, \code{player}, or \code{schemer}) or be ignored (in case of group_name or \code{state}).
 }
 \section{Functions}{
 \itemize{
