@@ -2,6 +2,7 @@
 #'
 #' @param workspace [WorkspaceTestcenter-class]. Workspace information necessary to retrieve unit information and resources from the API.
 #' @param groups Character. Name of the groups to be retrieved or all groups if not specified.
+#' @param units_filter_off Character. Names of the units to be removed from the dataset.
 #'
 #' @description
 #' This function returns responses for the selected groups.
@@ -12,7 +13,8 @@
 #' @aliases
 #' get_responses,WorkspaceTestcenter-method
 setGeneric("get_responses", function(workspace,
-                                     groups = NULL) {
+                                     groups = NULL,
+                                     units_filter_off = NULL) {
   cli_setting()
 
   standardGeneric("get_responses")
@@ -22,7 +24,8 @@ setGeneric("get_responses", function(workspace,
 setMethod("get_responses",
           signature = signature(workspace = "WorkspaceTestcenter"),
           function(workspace,
-                   groups = NULL) {
+                   groups = NULL,
+                   units_filter_off = NULL) {
             if (is.null(groups)) {
               groups <- get_results(workspace)$groupName
             }
@@ -32,12 +35,22 @@ setMethod("get_responses",
 
             # TODO: Loop, but no safe-run by now
             run_req <- function(group) {
-              base_req(method = "GET",
-                       endpoint = c("workspace", ws_id, "report", "response"),
-                       query = list(dataIds = group)) %>%
-                httr2::req_perform() %>%
-                httr2::resp_body_json()
+              body <- base_req(method = "GET",
+                               endpoint = c("workspace", ws_id, "report", "response"),
+                               query = list(dataIds = group)) %>%
+                httr2::req_perform()
+
+              # Makes it a bit safer (in case of empty body)
+              tryCatch(
+                error = function(cnd) {
+                  cli::cli_alert_warning("Group {group} is empty")
+                  return(NULL)
+                },
+                body %>% httr2::resp_body_json()
+              )
             }
+
+
 
             # resp <-
             #   run_safe(run_req,
@@ -98,6 +111,14 @@ setMethod("get_responses",
                     responses_nest = "responses",
                     laststate_nest = "laststate"
                   ))
+                ) %>%
+                # Hotfix to remove empty group data (better do that earlier?)
+                dplyr::filter(
+                  !is.na(group_id)
+                ) %>%
+                # Hotfix to remove too large units
+                dplyr::filter(
+                  !(unit_key %in% units_filter_off)
                 ) %>%
                 dplyr::group_by(
                   dplyr::across(dplyr::any_of(c("group_id", "login_name",
