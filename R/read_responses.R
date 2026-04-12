@@ -97,7 +97,7 @@ read_responses <- function(files) {
         geometry_variables = "geometryVariableCodes_content",
         state_variables = "stateVariableCodes_content",
         responses_ts = "elementCodes_ts",
-        geometry_variables_ts = "geometryVariableCodes_content",
+        geometry_variables_ts = "geometryVariableCodes_ts",
         state_variables_ts = "stateVariableCodes_ts",
         player = "PLAYER",
         presentation_progress = "PRESENTATION_PROGRESS",
