@@ -49,6 +49,8 @@ read_responses <- function(files) {
   }
 
   responses_raw %>%
+    # TODO: Remove hotfix?
+    dplyr::filter(!is.na(responses)) %>%
     dplyr::select(
       dplyr::any_of(c(
         file = "file",
