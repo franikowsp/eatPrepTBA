@@ -12,7 +12,9 @@ read_system_checks <- function(file) {
   system_checks_raw <- readr::read_delim(file, delim = ";")
 
   system_checks_raw %>%
+    # TODO: Why does this happen?
     dplyr::rename(responses = Responses) %>%
+    dplyr::filter(!is.na(responses)) %>%
     dplyr::mutate(
       responses = purrr::map(responses, function(x) {
         content <-
