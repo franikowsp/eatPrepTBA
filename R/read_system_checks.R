@@ -14,31 +14,35 @@ read_system_checks <- function(file) {
   system_checks_raw %>%
     # TODO: Why does this happen?
     dplyr::rename(responses = Responses) %>%
-    dplyr::filter(!is.na(responses)) %>%
+    # dplyr::filter(!is.na(responses)) %>%
     dplyr::mutate(
       responses = purrr::map(responses, function(x) {
-        content <-
-          x %>%
-          stringr::str_replace_all("`", "\"") %>%
-          jsonlite::parse_json() %>%
-          purrr::map(purrr::pluck, "content")
+        if (!is.na(x)) {
+          content <-
+            x %>%
+            stringr::str_replace_all("`", "\"") %>%
+            jsonlite::parse_json() %>%
+            purrr::map(purrr::pluck, "content")
 
-        contents <-
-          content %>%
-          purrr::map(function(cont) {
-            if (!is.null(cont) && cont != "[]") {
-              cont %>%
-                jsonlite::parse_json(simplifyVector = TRUE) %>%
-                tibble::as_tibble()
-            } else {
-              NULL
-            }
-          }) %>%
-          purrr::reduce(dplyr::bind_rows)
+          contents <-
+            content %>%
+            purrr::map(function(cont) {
+              if (!is.null(cont) && cont != "[]") {
+                cont %>%
+                  jsonlite::parse_json(simplifyVector = TRUE) %>%
+                  tibble::as_tibble()
+              } else {
+                NULL
+              }
+            }) %>%
+            purrr::reduce(dplyr::bind_rows)
+        } else {
+          tibble::tibble()
+        }
       })
     ) %>%
     tidyr::unnest(
-      c(responses)
+      c(responses), keep_empty = TRUE
     ) %>%
     dplyr::rename(any_of(c(
       variable_id = "id"
